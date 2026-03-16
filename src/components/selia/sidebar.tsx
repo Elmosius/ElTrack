@@ -1,8 +1,8 @@
 'use client';
 
-import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils.ts';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
+import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { createContext, useContext } from 'react';
 
@@ -83,128 +83,61 @@ export const sidebarVariants = cva('flex flex-col gap-2.5', {
   },
 });
 
-export function Sidebar({
-  size,
-  className,
-  ...props
-}: React.ComponentProps<'aside'> & VariantProps<typeof sidebarVariants>) {
-  return (
-    <aside
-      data-slot="sidebar"
-      className={cn(sidebarVariants({ size, className }))}
-      {...props}
-    />
-  );
+export function Sidebar({ size, className, ...props }: React.ComponentProps<'aside'> & VariantProps<typeof sidebarVariants>) {
+  return <aside data-slot='sidebar' className={cn(sidebarVariants({ size, className }))} {...props} />;
 }
 
-export function SidebarHeader({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'header'>) {
+export function SidebarHeader({ className, children, ...props }: React.ComponentProps<'header'>) {
   return (
-    <header data-slot="sidebar-header" {...props} className={cn(className)}>
+    <header data-slot='sidebar-header' {...props} className={cn(className)}>
       {children}
     </header>
   );
 }
 
-export function SidebarContent({
-  className,
-  render,
-  ...props
-}: useRender.ComponentProps<'div'>) {
+export function SidebarContent({ className, render, ...props }: useRender.ComponentProps<'div'>) {
   return useRender({
     defaultTagName: 'div',
     render,
     props: {
       'data-slot': 'sidebar-content',
-      className: cn(
-        'flex flex-col gap-2.5 h-full overflow-y-auto dark:scheme-dark',
-        className,
-      ),
+      className: cn('flex flex-col gap-2.5 h-full overflow-y-auto dark:scheme-dark', className),
       ...props,
     },
   });
 }
 
-export function SidebarLogo({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'div'>) {
+export function SidebarLogo({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div
-      data-slot="sidebar-logo"
-      className={cn(
-        'flex items-center gap-2.5 select-none text-lg text-foreground',
-        className,
-      )}
-      {...props}
-    >
+    <div data-slot='sidebar-logo' className={cn('flex items-center gap-2.5 select-none text-lg text-foreground', className)} {...props}>
       {children}
     </div>
   );
 }
 
-export function SidebarFooter({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'footer'>) {
+export function SidebarFooter({ className, children, ...props }: React.ComponentProps<'footer'>) {
   return (
-    <footer
-      data-slot="sidebar-footer"
-      className={cn('mt-auto', className)}
-      {...props}
-    >
+    <footer data-slot='sidebar-footer' className={cn('mt-auto', className)} {...props}>
       {children}
     </footer>
   );
 }
 
-export function SidebarMenu({
-  className,
-  ...props
-}: React.ComponentProps<'nav'>) {
-  return (
-    <nav
-      data-slot="sidebar-menu"
-      className={cn('flex flex-col gap-4.5', className)}
-      {...props}
-    />
-  );
+export function SidebarMenu({ className, ...props }: React.ComponentProps<'nav'>) {
+  return <nav data-slot='sidebar-menu' className={cn('flex flex-col gap-4.5', className)} {...props} />;
 }
 
-export function SidebarList({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'ul'>) {
+export function SidebarList({ className, children, ...props }: React.ComponentProps<'ul'>) {
   return (
-    <ul
-      data-slot="sidebar-list"
-      className={cn('flex flex-col gap-0.5 w-full', className)}
-      {...props}
-    >
+    <ul data-slot='sidebar-list' className={cn('flex flex-col gap-0.5 w-full', className)} {...props}>
       {children}
     </ul>
   );
 }
 
-export function SidebarItem({
-  className,
-  children,
-}: React.ComponentProps<'li'>) {
+export function SidebarItem({ className, children }: React.ComponentProps<'li'>) {
   return (
-    <li
-      data-slot="sidebar-item"
-      className={cn(
-        'group/sidebar-item',
-        '**:data-[slot=sidebar-submenu]:w-auto relative flex',
-        className,
-      )}
-    >
+    <li data-slot='sidebar-item' className={cn('group/sidebar-item', '**:data-[slot=sidebar-submenu]:w-auto relative flex', className)}>
       {children}
     </li>
   );
@@ -229,14 +162,8 @@ export function SidebarItemAction({
 }) {
   return (
     <div
-      data-slot="sidebar-item-action"
-      className={cn(
-        'absolute right-0 shrink-0 z-10 **:[svg]:size-4',
-        '*:[button]:cursor-pointer',
-        'transition-all duration-100',
-        showOnHover && 'opacity-0 group-hover/sidebar-item:opacity-100',
-        className,
-      )}
+      data-slot='sidebar-item-action'
+      className={cn('absolute right-0 shrink-0 z-10 **:[svg]:size-4', '*:[button]:cursor-pointer', 'transition-all duration-100', showOnHover && 'opacity-0 group-hover/sidebar-item:opacity-100', className)}
     >
       {children}
     </div>
@@ -260,12 +187,13 @@ export function SidebarItemButton({
       'data-slot': 'sidebar-item-button',
       'data-active': active ? true : undefined,
       className: cn(
-        'flex items-center gap-2.5 w-full relative z-10',
+        'group/sidebar-item-button flex items-center gap-2.5 w-full relative z-10',
         'text-foreground cursor-pointer text-left',
         'transition-colors duration-75 hover:not-[[disabled],[data-disabled]]:bg-accent',
         '**:[svg]:size-4 **:[svg]:text-muted',
         'focus-visible:outline-2 focus-visible:outline-offset-2 outline-primary',
         'data-popup-open:bg-accent',
+        'data-[active]:text-primary/80 data-[active]:[&_span]:text-primary/80 data-[active]:**:[svg]:text-primary/80',
         'disabled:opacity-70 disabled:cursor-not-allowed',
         expandableIndicator && [
           'data-expandable:after:bg-chevron-down-dark dark:data-expandable:after:bg-chevron-down data-expandable:after:size-4 data-expandable:after:ml-auto',
@@ -280,122 +208,44 @@ export function SidebarItemButton({
   });
 }
 
-export function SidebarGroup({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'section'>) {
+export function SidebarGroup({ className, children, ...props }: React.ComponentProps<'section'>) {
   return (
-    <section
-      role="group"
-      data-slot="sidebar-group"
-      className={cn(
-        'flex flex-wrap gap-0.5 *:data-[slot=sidebar-list]:p-0',
-        className,
-      )}
-      {...props}
-    >
+    <section role='group' data-slot='sidebar-group' className={cn('flex flex-wrap gap-0.5 *:data-[slot=sidebar-list]:p-0', className)} {...props}>
       {children}
     </section>
   );
 }
 
-export function SidebarGroupTitle({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'span'>) {
+export function SidebarGroupTitle({ className, children, ...props }: React.ComponentProps<'span'>) {
   return (
-    <span
-      data-slot="sidebar-group-title"
-      className={cn(
-        'inline-flex items-center text-sm font-medium text-dimmed',
-        '**:[svg]:size-3.5',
-        className,
-      )}
-      {...props}
-    >
+    <span data-slot='sidebar-group-title' className={cn('inline-flex items-center text-sm font-medium text-dimmed', '**:[svg]:size-3.5', className)} {...props}>
       {children}
     </span>
   );
 }
 
-export function SidebarGroupAction({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'div'>) {
+export function SidebarGroupAction({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div
-      data-slot="sidebar-group-action"
-      className={cn(
-        'ml-auto flex items-center gap-1.5 **:[svg]:size-3.5',
-        className,
-      )}
-      {...props}
-    >
+    <div data-slot='sidebar-group-action' className={cn('ml-auto flex items-center gap-1.5 **:[svg]:size-3.5', className)} {...props}>
       {children}
     </div>
   );
 }
 
-export function SidebarSubmenu({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="sidebar-submenu"
-      {...props}
-      className={cn('py-0.5 border-l border-border w-full', className)}
-    />
-  );
+export function SidebarSubmenu({ className, ...props }: React.ComponentProps<'div'>) {
+  return <div data-slot='sidebar-submenu' {...props} className={cn('py-0.5 border-l border-border w-full', className)} />;
 }
 
-export function SidebarCollapsible({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseCollapsible.Root>) {
-  return (
-    <BaseCollapsible.Root
-      data-slot="sidebar-collapsible"
-      className={cn('w-full', className)}
-      {...props}
-    />
-  );
+export function SidebarCollapsible({ className, ...props }: React.ComponentProps<typeof BaseCollapsible.Root>) {
+  return <BaseCollapsible.Root data-slot='sidebar-collapsible' className={cn('w-full', className)} {...props} />;
 }
 
-export function SidebarCollapsibleTrigger({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseCollapsible.Trigger>) {
-  return (
-    <BaseCollapsible.Trigger
-      data-expandable
-      {...props}
-      className={cn(
-        '**:data-[slot=expandable-indicator]:transition-all',
-        '**:data-[slot=expandable-indicator]:duration-100',
-        className,
-      )}
-    />
-  );
+export function SidebarCollapsibleTrigger({ className, ...props }: React.ComponentProps<typeof BaseCollapsible.Trigger>) {
+  return <BaseCollapsible.Trigger data-expandable {...props} className={cn('**:data-[slot=expandable-indicator]:transition-all', '**:data-[slot=expandable-indicator]:duration-100', className)} />;
 }
 
-export function SidebarCollapsiblePanel({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseCollapsible.Panel>) {
+export function SidebarCollapsiblePanel({ className, ...props }: React.ComponentProps<typeof BaseCollapsible.Panel>) {
   return (
-    <BaseCollapsible.Panel
-      data-slot="sidebar-collapsible-panel"
-      {...props}
-      className={cn(
-        'transition-all duration-100',
-        'h-(--collapsible-panel-height) overflow-hidden',
-        'data-[ending-style]:h-0 data-[starting-style]:h-0',
-        className,
-      )}
-    />
+    <BaseCollapsible.Panel data-slot='sidebar-collapsible-panel' {...props} className={cn('transition-all duration-100', 'h-(--collapsible-panel-height) overflow-hidden', 'data-[ending-style]:h-0 data-[starting-style]:h-0', className)} />
   );
 }
