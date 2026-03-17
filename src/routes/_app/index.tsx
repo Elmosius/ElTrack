@@ -1,7 +1,7 @@
 import { Breadcrumb, BreadcrumbButton, BreadcrumbList, BreadcrumbSeparator } from '#/components/selia/breadcrumb';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/')({ component: App });
+export const Route = createFileRoute('/_app/')({ component: App });
 
 function App() {
   return (
