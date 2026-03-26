@@ -1,6 +1,4 @@
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
 import NotFound from '#/components/shared/not-found';
 import appCss from '../styles.css?url';
@@ -41,9 +39,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div className='root'>{children}</div>
-        <TanStackDevtools
+        {/* <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: 'top-right',
           }}
           plugins={[
             {
@@ -51,7 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               render: <TanStackRouterDevtoolsPanel />,
             },
           ]}
-        />
+        /> */}
         <Scripts />
       </body>
     </html>

@@ -1,5 +1,6 @@
 import { useIsMobile } from '#/hooks/use-mobile';
 import { useState } from 'react';
+import Chatbot from '../chatbot';
 import AppHeader from '../shared/app-header';
 import AppSidebar from '../shared/app-sidebar';
 
@@ -34,6 +35,8 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
         {/* main content */}
         <section className='py-8'>{children}</section>
       </main>
+
+      <Chatbot />
     </div>
   );
 }
