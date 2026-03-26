@@ -1,0 +1,30 @@
+export const kalenderDayPickerClassNames = {
+  root: 'w-full',
+  months: 'w-full',
+  month: 'w-full rounded-lg border border-secondary-border bg-background p-3',
+  month_grid: 'w-full',
+  month_caption: 'mb-5 flex min-h-8 items-center justify-between gap-2',
+  caption_label: 'text-sm font-semibold',
+  nav: 'flex items-center gap-1.5 py-2',
+  button_previous: 'inline-flex size-8 items-center justify-center rounded-md border border-secondary-border text-muted hover:bg-accent hover:text-foreground p-2',
+  button_next: 'inline-flex size-8 items-center justify-center rounded-md border border-secondary-border text-muted hover:bg-accent hover:text-foreground p-2',
+  weekdays: 'grid grid-cols-7 gap-1 mb-2',
+  weekday: 'flex h-8 items-center justify-center text-xs text-dimmed font-medium',
+  week: 'grid grid-cols-7 gap-1',
+  day: 'h-11',
+  day_button: 'size-full',
+  today: 'text-foreground',
+  selected: 'text-foreground',
+  outside: 'text-dimmed/60',
+  disabled: 'opacity-50',
+};
+
+export const kalenderTexts = {
+  title: 'Kalender Transaksi',
+  subtitle: 'Klik tanggal untuk lihat transaksi harian.',
+  dailyTransactionTitle: 'Transaksi Harian',
+  emptyDailyTransactions: 'Belum ada transaksi di tanggal ini.',
+  unknownTransactionName: 'Tanpa nama transaksi',
+  unknownCategory: 'Tanpa kategori',
+  close: 'Tutup',
+};

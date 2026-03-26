@@ -1,4 +1,4 @@
-import KalenderContent from '#/components/catatan-keuangan/kalender/kalender-content';
+import KalenderSection from '#/components/catatan-keuangan/kalender';
 import TabelSection from '#/components/catatan-keuangan/tabel';
 import { Tabs, TabsItem, TabsList, TabsPanel } from '@/components/selia/tabs';
 import AppBreadCrumb from '@/components/shared/app-breadcrumb';
@@ -31,7 +31,7 @@ function RouteComponent() {
           <TabelSection />
         </TabsPanel>
         <TabsPanel value='kalender'>
-          <KalenderContent />
+          <KalenderSection />
         </TabsPanel>
       </Tabs>
     </div>
