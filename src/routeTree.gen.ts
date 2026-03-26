@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppCatatanKeuanganRouteImport } from './routes/_app/catatan-keuangan'
 import { Route as AuthAuthLoginRouteImport } from './routes/_auth/auth.login'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -27,6 +28,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppCatatanKeuanganRoute = AppCatatanKeuanganRouteImport.update({
+  id: '/catatan-keuangan',
+  path: '/catatan-keuangan',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -35,25 +41,34 @@ const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/auth/login': typeof AuthAuthLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/auth/login': typeof AuthAuthLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/_app/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/_app/': typeof AppIndexRoute
   '/_auth/auth/login': typeof AuthAuthLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login'
+  fullPaths: '/' | '/catatan-keuangan' | '/auth/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login'
-  id: '__root__' | '/_app' | '/_auth' | '/_app/' | '/_auth/auth/login'
+  to: '/' | '/catatan-keuangan' | '/auth/login'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/catatan-keuangan'
+    | '/_app/'
+    | '/_auth/auth/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -84,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/catatan-keuangan': {
+      id: '/_app/catatan-keuangan'
+      path: '/catatan-keuangan'
+      fullPath: '/catatan-keuangan'
+      preLoaderRoute: typeof AppCatatanKeuanganRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_auth/auth/login': {
       id: '/_auth/auth/login'
       path: '/auth/login'
@@ -95,10 +117,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteRouteChildren {
+  AppCatatanKeuanganRoute: typeof AppCatatanKeuanganRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppCatatanKeuanganRoute: AppCatatanKeuanganRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
