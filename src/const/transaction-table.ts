@@ -17,6 +17,7 @@ export const initialCategories: Kategori[] = [
 export const initialRows: TransaksiRow[] = [
   {
     id: 'row-1',
+    tanggal: '2026-03-26',
     namaTransaksi: 'Kopi pagi kantor',
     waktu: 'Pagi',
     nominal: '28000',
@@ -27,6 +28,7 @@ export const initialRows: TransaksiRow[] = [
   },
   {
     id: 'row-2',
+    tanggal: '2026-03-26',
     namaTransaksi: 'Bayar internet rumah',
     waktu: 'Siang',
     nominal: '350000',
@@ -37,6 +39,7 @@ export const initialRows: TransaksiRow[] = [
   },
   {
     id: 'row-3',
+    tanggal: '2026-03-25',
     namaTransaksi: 'Transfer gaji bulanan',
     waktu: 'Sore',
     nominal: '6500000',

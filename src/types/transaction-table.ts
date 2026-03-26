@@ -11,6 +11,7 @@ export type Kategori = {
 
 export type TransaksiRow = {
   id: string;
+  tanggal: string;
   namaTransaksi: string;
   waktu: Waktu;
   nominal: string;

@@ -1,10 +1,11 @@
 import { initialCategories, initialRows } from '#/const/transaction-table';
-import { createCategoryId, createTransactionRow, sanitizeNominal } from '#/lib/transaction-table';
+import { createCategoryId, createTransactionRow, getTodayDateString, sanitizeNominal } from '#/lib/transaction-table';
 import type { CategoryEditorMode, Kategori, TransaksiRow } from '#/types/transaction-table';
 import { create } from 'zustand';
 
 type TransactionTableStore = {
   rows: TransaksiRow[];
+  selectedDate: string;
   categories: Kategori[];
   categoryMode: CategoryEditorMode;
   categoryDraft: string;
@@ -14,6 +15,7 @@ type TransactionTableStore = {
   isDeleteDialogOpen: boolean;
 
   setCategoryDraft: (value: string) => void;
+  setSelectedDate: (value: string) => void;
   setIsDeleteDialogOpen: (open: boolean) => void;
   updateRow: (rowId: string, patch: Partial<TransaksiRow>) => void;
   handleNominalChange: (rowId: string, value: string) => void;
@@ -30,6 +32,7 @@ type TransactionTableStore = {
 
 export const useTransactionTableStore = create<TransactionTableStore>((set, get) => ({
   rows: initialRows,
+  selectedDate: getTodayDateString(),
   categories: initialCategories,
   categoryMode: 'idle',
   categoryDraft: '',
@@ -39,6 +42,7 @@ export const useTransactionTableStore = create<TransactionTableStore>((set, get)
   isDeleteDialogOpen: false,
 
   setCategoryDraft: (value) => set({ categoryDraft: value }),
+  setSelectedDate: (value) => set({ selectedDate: value }),
   setIsDeleteDialogOpen: (open) => set({ isDeleteDialogOpen: open }),
 
   updateRow: (rowId, patch) =>
@@ -54,7 +58,7 @@ export const useTransactionTableStore = create<TransactionTableStore>((set, get)
     set((state) => {
       const fallbackCategoryId = state.categories[0]?.id ?? 'uncategorized';
       return {
-        rows: [...state.rows, createTransactionRow(fallbackCategoryId)],
+        rows: [...state.rows, createTransactionRow(fallbackCategoryId, state.selectedDate)],
       };
     }),
 
