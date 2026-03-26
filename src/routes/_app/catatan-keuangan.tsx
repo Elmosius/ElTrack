@@ -1,5 +1,5 @@
-import KalenderContent from '@/components/catatan-keuangan/kalender-content';
-import TabelContent from '@/components/catatan-keuangan/tabel-content';
+import KalenderContent from '#/components/catatan-keuangan/kalender/kalender-content';
+import TabelContent from '#/components/catatan-keuangan/tabel/tabel-content';
 import { Tabs, TabsItem, TabsList, TabsPanel } from '@/components/selia/tabs';
 import AppBreadCrumb from '@/components/shared/app-breadcrumb';
 import { createFileRoute } from '@tanstack/react-router';

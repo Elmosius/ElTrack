@@ -1,10 +1,10 @@
 import type { ChatMessage } from '#/types/chatbot';
+import { initialMessages } from '@/const/chatbot';
 import { ArrowUp, Carrot, CornerDownLeft, ImagePlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../selia/button';
 import { PopoverPopup } from '../selia/popover';
 import { Textarea } from '../selia/textarea';
-import { initialMessages } from './constants';
 
 export function ChatPanel() {
   const [draft, setDraft] = useState('');

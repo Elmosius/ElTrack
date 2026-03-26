@@ -28,12 +28,12 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
     <div className='h-screen overflow-hidden flex w-full'>
       <AppSidebar isSidebarOpen={isSidebarOpen} />
 
-      <main className='flex flex-1 flex-col min-h-screen w-full px-8 py-8 transition-all duration-300'>
+      <main className='flex flex-1 flex-col min-h-screen min-w-0 w-full px-8 py-8 transition-all duration-300'>
         {/* header */}
         <AppHeader toggleSidebar={toggleSidebar} />
 
         {/* main content */}
-        <section className='py-8'>{children}</section>
+        <section className='py-8 min-w-0'>{children}</section>
       </main>
 
       <Chatbot />
