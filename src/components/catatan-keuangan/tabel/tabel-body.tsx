@@ -49,7 +49,13 @@ export default function TabelBody() {
           </TableCell>
 
           <TableCell>
-            <Textarea value={row.catatan} variant='notion' onChange={(event) => updateRow(row.id, { catatan: event.target.value })} placeholder='Opsional' className='min-h-8 max-h-20 resize-y overflow-y-auto px-0 py-1 text-sm leading-5' />
+            <Textarea
+              value={row.catatan}
+              variant='notion'
+              onChange={(event) => updateRow(row.id, { catatan: event.target.value })}
+              placeholder='Opsional'
+              className='min-h-8 max-h-20 resize-y overflow-y-auto py-2 px-2 rounded-none text-sm'
+            />
           </TableCell>
 
           <TableCell>
