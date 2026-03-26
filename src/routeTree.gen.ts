@@ -13,6 +13,7 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppCatatanKeuanganRouteImport } from './routes/_app/catatan-keuangan'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthAuthLoginRouteImport } from './routes/_auth/auth.login'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -33,6 +34,11 @@ const AppCatatanKeuanganRoute = AppCatatanKeuanganRouteImport.update({
   path: '/catatan-keuangan',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -43,11 +49,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/auth/login': typeof AuthAuthLoginRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/auth/login': typeof AuthAuthLoginRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -56,12 +64,13 @@ export interface FileRoutesById {
   '/_app/catatan-keuangan': typeof AppCatatanKeuanganRoute
   '/_app/': typeof AppIndexRoute
   '/_auth/auth/login': typeof AuthAuthLoginRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catatan-keuangan' | '/auth/login'
+  fullPaths: '/' | '/catatan-keuangan' | '/auth/login' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catatan-keuangan' | '/auth/login'
+  to: '/' | '/catatan-keuangan' | '/auth/login' | '/api/auth/$'
   id:
     | '__root__'
     | '/_app'
@@ -69,11 +78,13 @@ export interface FileRouteTypes {
     | '/_app/catatan-keuangan'
     | '/_app/'
     | '/_auth/auth/login'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -105,6 +116,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/catatan-keuangan'
       preLoaderRoute: typeof AppCatatanKeuanganRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_auth/auth/login': {
       id: '/_auth/auth/login'
@@ -145,6 +163,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
