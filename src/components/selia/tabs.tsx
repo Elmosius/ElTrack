@@ -4,37 +4,16 @@ import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { cn } from '@/lib/utils.ts';
 
-export function Tabs({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseTabs.Root>) {
-  return (
-    <BaseTabs.Root
-      data-slot="tabs"
-      className={cn('flex flex-col gap-2.5', className)}
-      {...props}
-    />
-  );
+export function Tabs({ className, ...props }: React.ComponentProps<typeof BaseTabs.Root>) {
+  return <BaseTabs.Root data-slot='tabs' className={cn('flex flex-col gap-2.5', className)} {...props} />;
 }
 
-export function TabsList({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof BaseTabs.List>) {
+export function TabsList({ className, children, ...props }: React.ComponentProps<typeof BaseTabs.List>) {
   return (
-    <BaseTabs.List
-      data-slot="tabs-list"
-      className={cn(
-        'relative z-0 flex items-center bg-tabs p-1 rounded',
-        'inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none',
-        className,
-      )}
-      {...props}
-    >
+    <BaseTabs.List data-slot='tabs-list' className={cn('relative z-0 flex items-center bg-tabs p-1 rounded', 'inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none', className)} {...props}>
       {children}
       <BaseTabs.Indicator
-        data-slot="tabs-indicator"
+        data-slot='tabs-indicator'
         className={cn(
           'absolute top-1/2 left-0 h-8 w-(--active-tab-width)',
           'translate-x-(--active-tab-left) -translate-y-1/2',
@@ -48,13 +27,10 @@ export function TabsList({
   );
 }
 
-export function TabsItem({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseTabs.Tab>) {
+export function TabsItem({ className, ...props }: React.ComponentProps<typeof BaseTabs.Tab>) {
   return (
     <BaseTabs.Tab
-      data-slot="tabs-item"
+      data-slot='tabs-item'
       className={cn(
         'flex items-center justify-center gap-2.5 rounded cursor-pointer',
         'h-8 py-1 px-3 text-muted hover:not-[[data-disabled]]:text-foreground flex-1 font-medium',
@@ -69,15 +45,6 @@ export function TabsItem({
   );
 }
 
-export function TabsPanel({
-  className,
-  ...props
-}: React.ComponentProps<typeof BaseTabs.Panel>) {
-  return (
-    <BaseTabs.Panel
-      data-slot="tabs-panel"
-      className={cn('outline-none', className)}
-      {...props}
-    />
-  );
+export function TabsPanel({ className, ...props }: React.ComponentProps<typeof BaseTabs.Panel>) {
+  return <BaseTabs.Panel data-slot='tabs-panel' className={cn('outline-none', className)} {...props} />;
 }
