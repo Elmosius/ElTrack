@@ -1,5 +1,6 @@
+import { useUser } from '#/stores/user';
 import { SidebarOpen } from 'lucide-react';
-import { Avatar } from '../selia/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../selia/avatar';
 import { Button } from '../selia/button';
 import { Menu, MenuTrigger } from '../selia/menu';
 
@@ -8,6 +9,8 @@ type AppHeaderProps = {
 };
 
 export default function AppHeader({ toggleSidebar }: AppHeaderProps) {
+  const user = useUser();
+
   return (
     <header className='w-full'>
       <nav className='w-full flex items-center justify-between'>
@@ -16,12 +19,12 @@ export default function AppHeader({ toggleSidebar }: AppHeaderProps) {
             <SidebarOpen className='size-4 text-muted' />
           </Button>
 
-          <span className='text-2xl'>Hello Elmo</span>
+          <span className='text-2xl'>Hello {user?.name || 'User'}!</span>
         </div>
         <Menu>
           <MenuTrigger>
             <Avatar size={'sm'} className={'font-normal text-sm  text-white cursor-pointer bg-primary/80 hover:bg-primary'}>
-              E
+              {user?.image ? <AvatarImage src={user?.image} alt={user.name} /> : <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>}
             </Avatar>
           </MenuTrigger>
         </Menu>

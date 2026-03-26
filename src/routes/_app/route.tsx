@@ -1,5 +1,6 @@
 import DefaultLayout from '#/components/layouts/default';
 import { getSession } from '#/lib/auth.functions';
+import { useSetUser } from '#/stores/user';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_app')({
@@ -16,6 +17,16 @@ export const Route = createFileRoute('/_app')({
 });
 
 function RouteComponent() {
+  const { user } = Route.useRouteContext();
+  const setUser = useSetUser();
+
+  setUser({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.image || undefined,
+  });
+
   return (
     <DefaultLayout>
       <Outlet />
