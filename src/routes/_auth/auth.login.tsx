@@ -17,10 +17,10 @@ function RouteComponent() {
 
   return (
     <>
-      <Card className='ring-0 text-center shadow-none'>
-        <CardHeader className='border-none'>
+      <Card className='ring-0 text-center shadow-none '>
+        <CardHeader className='border-none justify-center flex flex-col items-center '>
           <CardTitle className='font-semibold text-2xl lg:text-4xl tracking-wide py-1'>Welcome to ElTrack</CardTitle>
-          <CardDescription className='text-sm lg:text-base'>Please login to your account to continue using ElTrack and manage your financial records effectively.</CardDescription>
+          <CardDescription className='text-sm lg:text-base md:w-2/3'>Please login to your account to continue using ElTrack and manage your financial records effectively.</CardDescription>
         </CardHeader>
         <CardBody className='p-0'>
           <Button variant={'outline'} className={'text-sm lg:text-base'} onClick={handleGoogleLogin}>
