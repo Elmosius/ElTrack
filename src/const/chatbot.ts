@@ -1,19 +1,34 @@
-import type { ChatMessage } from '#/types/chatbot';
+import type { UIMessage } from '@tanstack/ai-react';
 
 export const initialMessages = [
   {
-    id: 1,
+    id: 'chatbot-welcome-1',
     role: 'assistant',
-    text: 'Halo! Aku Aimo. Aku siap membantu kamu apa pun!',
+    parts: [
+      {
+        type: 'text',
+        content: 'Halo! Aku Aimo. Aku siap membantu kamu apa pun!',
+      },
+    ],
   },
   {
-    id: 2,
+    id: 'chatbot-welcome-2',
     role: 'user',
-    text: 'Boleh bantu bikin ringkasan pemasukan minggu ini?',
+    parts: [
+      {
+        type: 'text',
+        content: 'Boleh bantu bikin ringkasan pemasukan minggu ini?',
+      },
+    ],
   },
   {
-    id: 3,
+    id: 'chatbot-welcome-3',
     role: 'assistant',
-    text: 'Siap. Mock ini belum terhubung data, tapi tampilannya sudah siap untuk alur chat.',
+    parts: [
+      {
+        type: 'text',
+        content: 'Sekarang aku juga bisa bantu baca foto struk dan menyiapkan preview transaksi sebelum disimpan.',
+      },
+    ],
   },
-] satisfies ChatMessage[];
+] satisfies UIMessage[];

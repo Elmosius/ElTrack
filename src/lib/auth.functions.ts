@@ -6,3 +6,4 @@ export const getSession = createServerFn({ method: 'GET' }).handler(async () => 
   const header = getRequestHeaders();
   return auth.api.getSession({ headers: header });
 });
+
