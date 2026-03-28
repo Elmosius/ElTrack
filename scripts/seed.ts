@@ -1,14 +1,12 @@
 import type { Model } from 'mongoose';
 import mongoose from 'mongoose';
 
-import { Kategori, type KategoriDoc } from '../src/db/models/kategori.server';
 import { MetodePembayaran, type MetodePembayaranDoc } from '../src/db/models/metode-pembayaran.server';
 import { Tipe, type TipeDoc } from '../src/db/models/tipe.server';
 import { Waktu, type WaktuDoc } from '../src/db/models/waktu.server';
 import { connectDB } from '../src/db/mongoose.server';
 
 const waktuDefault = ['Pagi', 'Siang', 'Sore', 'Malam'] as const;
-const kategoriDefault = ['Makan & Minum', 'Jajan', 'Parkir', 'Bensin'] as const;
 const metodePembayaranDefault = ['Tunai', 'Bank', 'QRIS', 'Flazz'] as const;
 const tipeDefault = ['Pengeluaran', 'Penghasilan'] as const;
 
@@ -30,7 +28,6 @@ async function main() {
   await connectDB();
 
   await seedNamaCollection<WaktuDoc>(Waktu, 'Waktu', waktuDefault);
-  await seedNamaCollection<KategoriDoc>(Kategori, 'Kategori', kategoriDefault);
   await seedNamaCollection<MetodePembayaranDoc>(MetodePembayaran, 'Metode pembayaran', metodePembayaranDefault);
   await seedNamaCollection<TipeDoc>(Tipe, 'Tipe', tipeDefault);
 

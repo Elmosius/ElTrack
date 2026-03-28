@@ -11,3 +11,14 @@ export const createTransaksiSchema = z.object({
 });
 
 export type CreateTransaksiInput = z.infer<typeof createTransaksiSchema>;
+
+export const updateTransaksiSchema = createTransaksiSchema.extend({
+  id: z.string().min(1, 'Id transaksi wajib ada'),
+});
+
+export const deleteTransaksiSchema = z.object({
+  id: z.string().min(1, 'Id transaksi wajib ada'),
+});
+
+export type UpdateTransaksiInput = z.infer<typeof updateTransaksiSchema>;
+export type DeleteTransaksiInput = z.infer<typeof deleteTransaksiSchema>;

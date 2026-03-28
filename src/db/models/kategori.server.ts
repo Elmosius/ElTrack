@@ -10,13 +10,15 @@ const kategoriSchema = new Schema(
     nama: {
       type: String,
       required: true,
-      unique: true,
+      trim: true,
     },
   },
   {
     timestamps: true,
   },
 );
+
+kategoriSchema.index({ userId: 1, nama: 1 }, { unique: true });
 
 export type KategoriDoc = InferSchemaType<typeof kategoriSchema>;
 export const Kategori = mongoose.models.Kategori || mongoose.model<KategoriDoc>('Kategori', kategoriSchema, 'kategori');
