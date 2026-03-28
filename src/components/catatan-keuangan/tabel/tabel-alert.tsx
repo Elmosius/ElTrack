@@ -12,20 +12,20 @@ export default function TabelAlert() {
           <AlertDialogTitle>Hapus kategori?</AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogBody>
-          <AlertDialogDescription>
+          <AlertDialogDescription className={'text-sm'}>
             Kategori <strong>{selectedCategory?.name || '-'}</strong> akan dihapus permanen dari daftar kategori.
           </AlertDialogDescription>
         </AlertDialogBody>
         <AlertDialogFooter>
           <AlertDialogClose
             render={
-              <Button variant='plain' size='sm'>
+              <Button variant='plain' size='sm' className={'text-sm'}>
                 Batal
               </Button>
             }
             onClick={clearDeleteTarget}
           />
-          <Button variant='danger' size='sm' onClick={() => void confirmDeleteCategory()}>
+          <Button variant='danger' size='sm' className={'text-sm'} onClick={() => void confirmDeleteCategory()}>
             Hapus
           </Button>
         </AlertDialogFooter>

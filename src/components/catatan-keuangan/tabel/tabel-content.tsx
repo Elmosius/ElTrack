@@ -39,7 +39,7 @@ export default function TabelContent() {
         </Button>
       </div>
 
-      {syncError ? <p className='px-4 pb-3 text-xs text-danger'>{syncError}</p> : null}
+      {syncError ? <p className='px-4 pb-3 text-xs text-danger'>*{syncError}</p> : null}
 
       <TabelAlert />
     </>

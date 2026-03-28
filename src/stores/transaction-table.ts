@@ -1,16 +1,16 @@
 import { deleteKategoriById, patchKategori, postKategori } from '#/features/kategori/kategori.functions';
 import { deleteTransaksiById, patchTransaksi, postTransaksi } from '#/features/transaksi/transaksi.functions';
 import { createTransactionRow, getTodayDateString, isDraftTransactionId, sanitizeNominal, toTransaksiMutationInput } from '#/lib/transaction-table';
-import type { CategoryEditorMode, Kategori, TransactionTableData, TransaksiRow } from '#/types/transaction-table';
+import type { CategoryEditorMode, Kategori, SelectOption, TransactionTableData, TransaksiRow } from '#/types/transaction-table';
 import { create } from 'zustand';
 
 type TransactionTableStore = {
   rows: TransaksiRow[];
   selectedDate: string;
   categories: Kategori[];
-  waktuOptions: string[];
-  metodePembayaranOptions: string[];
-  tipeOptions: string[];
+  waktuOptions: SelectOption[];
+  metodePembayaranOptions: SelectOption[];
+  tipeOptions: SelectOption[];
   categoryMode: CategoryEditorMode;
   categoryDraft: string;
   editingCategoryId: string | null;
@@ -96,9 +96,9 @@ export const useTransactionTableStore = create<TransactionTableStore>((set, get)
           createTransactionRow({
             tanggal: state.selectedDate,
             defaultCategoryId: fallbackCategoryId,
-            defaultWaktu: state.waktuOptions[0] ?? '',
-            defaultMetodePembayaran: state.metodePembayaranOptions[0] ?? '',
-            defaultTipe: state.tipeOptions[0] ?? '',
+            defaultWaktuId: state.waktuOptions[0]?.id ?? '',
+            defaultMetodePembayaranId: state.metodePembayaranOptions[0]?.id ?? '',
+            defaultTipeId: state.tipeOptions[0]?.id ?? '',
           }),
         ],
       };
@@ -120,6 +120,11 @@ export const useTransactionTableStore = create<TransactionTableStore>((set, get)
 
     if (!payload.kategori) {
       set({ syncError: 'Kategori wajib dipilih sebelum disimpan.' });
+      return;
+    }
+
+    if (!payload.waktu || !payload.metodePembayaran || !payload.tipe) {
+      set({ syncError: 'Waktu, metode pembayaran, dan tipe wajib dipilih sebelum disimpan.' });
       return;
     }
 

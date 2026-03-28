@@ -4,6 +4,10 @@ import { useTransactionTableStore } from '#/stores/transaction-table';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
+function createOptionMap(options: Array<{ id: string; name: string }>) {
+  return new Map(options.map((option) => [option.id, option.name]));
+}
+
 export function useKalenderContent() {
   const rows = useTransactionTableStore((state) => state.rows);
   const selectedDate = useTransactionTableStore((state) => state.selectedDate);
@@ -30,6 +34,9 @@ export function useKalenderContent() {
 export function useKalenderDailyDialog() {
   const rows = useTransactionTableStore((state) => state.rows);
   const categories = useTransactionTableStore((state) => state.categories);
+  const waktuOptions = useTransactionTableStore((state) => state.waktuOptions);
+  const metodePembayaranOptions = useTransactionTableStore((state) => state.metodePembayaranOptions);
+  const tipeOptions = useTransactionTableStore((state) => state.tipeOptions);
   const { dialogDate, isDialogOpen, setIsDialogOpen } = useKalenderStore(
     useShallow((state) => ({
       dialogDate: state.dialogDate,
@@ -39,6 +46,9 @@ export function useKalenderDailyDialog() {
   );
 
   const categoryMap = useMemo(() => new Map(categories.map((category) => [category.id, category.name])), [categories]);
+  const waktuMap = useMemo(() => createOptionMap(waktuOptions), [waktuOptions]);
+  const metodePembayaranMap = useMemo(() => createOptionMap(metodePembayaranOptions), [metodePembayaranOptions]);
+  const tipeMap = useMemo(() => createOptionMap(tipeOptions), [tipeOptions]);
   const dailyTransactions = useMemo(() => getDailyTransactions(rows, dialogDate), [rows, dialogDate]);
   const dailyTotal = useMemo(() => getDailyTotal(dailyTransactions), [dailyTransactions]);
 
@@ -47,6 +57,9 @@ export function useKalenderDailyDialog() {
     isDialogOpen,
     setIsDialogOpen,
     categoryMap,
+    waktuMap,
+    metodePembayaranMap,
+    tipeMap,
     dailyTransactions,
     dailyTotal,
   };

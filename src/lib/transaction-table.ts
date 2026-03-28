@@ -1,4 +1,4 @@
-import type { Kategori, TransactionTableData, TransaksiRow } from '#/types/transaction-table';
+import type { Kategori, SelectOption, TransactionTableData, TransaksiRow } from '#/types/transaction-table';
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -36,14 +36,6 @@ type RawTransaksiDoc = {
   tipe?: NamedDoc | string | null;
 };
 
-function getNamedDocName(value: NamedDoc | string | null | undefined): string {
-  if (!value) {
-    return '';
-  }
-
-  return typeof value === 'string' ? value : value.nama;
-}
-
 function getNamedDocId(value: NamedDoc | string | null | undefined): string {
   if (!value) {
     return '';
@@ -71,17 +63,24 @@ export function mapKategoriDocToOption(doc: NamedDoc): Kategori {
   };
 }
 
+export function mapNamedDocToOption(doc: NamedDoc): SelectOption {
+  return {
+    id: String(doc._id),
+    name: doc.nama,
+  };
+}
+
 export function mapTransaksiDocToRow(doc: RawTransaksiDoc): TransaksiRow {
   return {
     id: String(doc._id),
     tanggal: doc.tanggal || toIsoDateFromUnknown(doc.createdAt),
     namaTransaksi: doc.namaTransaksi ?? '',
-    waktu: getNamedDocName(doc.waktu),
+    waktuId: getNamedDocId(doc.waktu),
     nominal: doc.nominal != null ? String(doc.nominal) : '',
     kategoriId: getNamedDocId(doc.kategori),
-    metodePembayaran: getNamedDocName(doc.metodePembayaran),
+    metodePembayaranId: getNamedDocId(doc.metodePembayaran),
     catatan: doc.catatan ?? '',
-    tipe: getNamedDocName(doc.tipe),
+    tipeId: getNamedDocId(doc.tipe),
   };
 }
 
@@ -103,9 +102,9 @@ export function buildTransactionTableData({
   return {
     rows: listTransaksi.map(mapTransaksiDocToRow),
     categories: listKategori.map(mapKategoriDocToOption),
-    waktuOptions: listWaktu.map((item) => item.nama),
-    metodePembayaranOptions: listMetodePembayaran.map((item) => item.nama),
-    tipeOptions: listTipe.map((item) => item.nama),
+    waktuOptions: listWaktu.map(mapNamedDocToOption),
+    metodePembayaranOptions: listMetodePembayaran.map(mapNamedDocToOption),
+    tipeOptions: listTipe.map(mapNamedDocToOption),
   };
 }
 
@@ -137,28 +136,28 @@ export function formatTransactionDate(value: string): string {
 type CreateTransactionRowOptions = {
   tanggal?: string;
   defaultCategoryId?: string;
-  defaultWaktu?: string;
-  defaultMetodePembayaran?: string;
-  defaultTipe?: string;
+  defaultWaktuId?: string;
+  defaultMetodePembayaranId?: string;
+  defaultTipeId?: string;
 };
 
 export function createTransactionRow({
   tanggal = getTodayDateString(),
   defaultCategoryId = '',
-  defaultWaktu = 'Pagi',
-  defaultMetodePembayaran = 'Tunai',
-  defaultTipe = 'Pengeluaran',
+  defaultWaktuId = '',
+  defaultMetodePembayaranId = '',
+  defaultTipeId = '',
 }: CreateTransactionRowOptions): TransaksiRow {
   return {
     id: createId('draft'),
     tanggal,
     namaTransaksi: '',
-    waktu: defaultWaktu,
+    waktuId: defaultWaktuId,
     nominal: '',
     kategoriId: defaultCategoryId,
-    metodePembayaran: defaultMetodePembayaran,
+    metodePembayaranId: defaultMetodePembayaranId,
     catatan: '',
-    tipe: defaultTipe,
+    tipeId: defaultTipeId,
   };
 }
 
@@ -174,11 +173,11 @@ export function toTransaksiMutationInput(row: TransaksiRow) {
   return {
     namaTransaksi: row.namaTransaksi.trim(),
     tanggal: row.tanggal,
-    waktu: row.waktu,
+    waktu: row.waktuId,
     nominal: Number(sanitizeNominal(row.nominal) || 0),
     kategori: row.kategoriId,
-    metodePembayaran: row.metodePembayaran,
+    metodePembayaran: row.metodePembayaranId,
     catatan: row.catatan.trim() || undefined,
-    tipe: row.tipe,
+    tipe: row.tipeId,
   };
 }

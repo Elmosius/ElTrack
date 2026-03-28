@@ -1,8 +1,12 @@
 import { useTransactionTableStore } from '#/stores/transaction-table';
-import type { TransactionTableData } from '#/types/transaction-table';
+import type { SelectOption, TransactionTableData } from '#/types/transaction-table';
 import { useEffect } from 'react';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+
+function createOptionMap(options: SelectOption[]) {
+  return new Map(options.map((option) => [option.id, option.name]));
+}
 
 export function useHydrateTransactionTable(data: TransactionTableData) {
   const hydrateData = useTransactionTableStore((state) => state.hydrateData);
@@ -106,12 +110,18 @@ export function useTransactionTableBody() {
   const saveRow = useTransactionTableStore((state) => state.saveRow);
 
   const filteredRows = useMemo(() => rows.filter((row) => row.tanggal === selectedDate), [rows, selectedDate]);
+  const waktuMap = useMemo(() => createOptionMap(waktuOptions), [waktuOptions]);
+  const metodePembayaranMap = useMemo(() => createOptionMap(metodePembayaranOptions), [metodePembayaranOptions]);
+  const tipeMap = useMemo(() => createOptionMap(tipeOptions), [tipeOptions]);
 
   return {
     filteredRows,
     waktuOptions,
     metodePembayaranOptions,
     tipeOptions,
+    waktuMap,
+    metodePembayaranMap,
+    tipeMap,
     updateRow,
     handleNominalChange,
     handleDeleteRow,

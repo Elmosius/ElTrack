@@ -9,7 +9,7 @@ import { CategoryPopover } from './category-popover';
 import { MenuSelectField } from './menu-select-field';
 
 export default function TabelBody() {
-  const { filteredRows, waktuOptions, metodePembayaranOptions, tipeOptions, updateRow, handleNominalChange, handleDeleteRow, saveRow } = useTransactionTableBody();
+  const { filteredRows, waktuOptions, metodePembayaranOptions, tipeOptions, waktuMap, metodePembayaranMap, tipeMap, updateRow, handleNominalChange, handleDeleteRow, saveRow } = useTransactionTableBody();
 
   return (
     <TableBody>
@@ -28,10 +28,11 @@ export default function TabelBody() {
 
           <TableCell>
             <MenuSelectField
-              value={row.waktu}
+              value={row.waktuId}
               options={waktuOptions}
+              displayValue={waktuMap.get(row.waktuId)}
               onChange={(value) => {
-                updateRow(row.id, { waktu: value });
+                updateRow(row.id, { waktuId: value });
                 void saveRow(row.id);
               }}
             />
@@ -54,10 +55,11 @@ export default function TabelBody() {
 
           <TableCell>
             <MenuSelectField
-              value={row.metodePembayaran}
+              value={row.metodePembayaranId}
               options={metodePembayaranOptions}
+              displayValue={metodePembayaranMap.get(row.metodePembayaranId)}
               onChange={(value) => {
-                updateRow(row.id, { metodePembayaran: value });
+                updateRow(row.id, { metodePembayaranId: value });
                 void saveRow(row.id);
               }}
             />
@@ -76,10 +78,11 @@ export default function TabelBody() {
 
           <TableCell>
             <MenuSelectField
-              value={row.tipe}
+              value={row.tipeId}
               options={tipeOptions}
+              displayValue={tipeMap.get(row.tipeId)}
               onChange={(value) => {
-                updateRow(row.id, { tipe: value });
+                updateRow(row.id, { tipeId: value });
                 void saveRow(row.id);
               }}
             />

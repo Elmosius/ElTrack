@@ -1,10 +1,9 @@
-export type Waktu = string;
-
-export type MetodePembayaran = string;
-
-export type TipeTransaksi = string;
-
 export type Kategori = {
+  id: string;
+  name: string;
+};
+
+export type SelectOption = {
   id: string;
   name: string;
 };
@@ -13,12 +12,12 @@ export type TransaksiRow = {
   id: string;
   tanggal: string;
   namaTransaksi: string;
-  waktu: Waktu;
+  waktuId: string;
   nominal: string;
   kategoriId: string;
-  metodePembayaran: MetodePembayaran;
+  metodePembayaranId: string;
   catatan: string;
-  tipe: TipeTransaksi;
+  tipeId: string;
 };
 
 export type CategoryEditorMode = 'idle' | 'add' | 'edit';
@@ -26,7 +25,7 @@ export type CategoryEditorMode = 'idle' | 'add' | 'edit';
 export type TransactionTableData = {
   rows: TransaksiRow[];
   categories: Kategori[];
-  waktuOptions: Waktu[];
-  metodePembayaranOptions: MetodePembayaran[];
-  tipeOptions: TipeTransaksi[];
+  waktuOptions: SelectOption[];
+  metodePembayaranOptions: SelectOption[];
+  tipeOptions: SelectOption[];
 };

@@ -5,7 +5,7 @@ import { Button } from '@/components/selia/button';
 import { Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogTitle } from '@/components/selia/dialog';
 
 export default function KalenderDailyDialog() {
-  const { dialogDate, isDialogOpen, setIsDialogOpen, dailyTransactions, categoryMap, dailyTotal } = useKalenderDailyDialog();
+  const { dialogDate, isDialogOpen, setIsDialogOpen, dailyTransactions, categoryMap, waktuMap, metodePembayaranMap, tipeMap, dailyTotal } = useKalenderDailyDialog();
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -25,10 +25,10 @@ export default function KalenderDailyDialog() {
             <div key={row.id} className='rounded-md border border-secondary-border bg-card px-3 py-2'>
               <p className='text-sm font-medium'>{row.namaTransaksi || kalenderTexts.unknownTransactionName}</p>
               <div className='mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-dimmed'>
-                <span>{row.waktu}</span>
+                <span>{waktuMap.get(row.waktuId) || '-'}</span>
                 <span>{categoryMap.get(row.kategoriId) || kalenderTexts.unknownCategory}</span>
-                <span>{row.tipe}</span>
-                <span>{row.metodePembayaran}</span>
+                <span>{tipeMap.get(row.tipeId) || '-'}</span>
+                <span>{metodePembayaranMap.get(row.metodePembayaranId) || '-'}</span>
               </div>
               <p className='mt-2 text-sm font-semibold'>{formatRupiah(row.nominal) || 'Rp 0'}</p>
               {row.catatan && <p className='mt-1 text-xs text-dimmed'>{row.catatan}</p>}
