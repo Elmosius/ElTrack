@@ -14,4 +14,4 @@ const metodePembayaranSchema = new Schema(
 );
 
 export type MetodePembayaranDoc = InferSchemaType<typeof metodePembayaranSchema>;
-export const MetodePembayaran = mongoose.models.MetodePembayaran || mongoose.model<MetodePembayaranDoc>('MetodePembayaran', metodePembayaranSchema);
+export const MetodePembayaran = mongoose.models.MetodePembayaran || mongoose.model<MetodePembayaranDoc>('MetodePembayaran', metodePembayaranSchema, 'metode_pembayaran');

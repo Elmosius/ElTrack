@@ -14,4 +14,4 @@ const kategoriSchema = new Schema(
 );
 
 export type KategoriDoc = InferSchemaType<typeof kategoriSchema>;
-export const Kategori = mongoose.models.Kategori || mongoose.model<KategoriDoc>('Kategori', kategoriSchema);
+export const Kategori = mongoose.models.Kategori || mongoose.model<KategoriDoc>('Kategori', kategoriSchema, 'kategori');

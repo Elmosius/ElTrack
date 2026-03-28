@@ -14,4 +14,4 @@ const tipeSchema = new Schema(
 );
 
 export type TipeDoc = InferSchemaType<typeof tipeSchema>;
-export const Tipe = mongoose.models.Tipe || mongoose.model<TipeDoc>('Tipe', tipeSchema);
+export const Tipe = mongoose.models.Tipe || mongoose.model<TipeDoc>('Tipe', tipeSchema, 'tipe');

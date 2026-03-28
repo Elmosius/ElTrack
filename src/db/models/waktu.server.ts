@@ -14,4 +14,4 @@ const waktuSchema = new Schema(
 );
 
 export type WaktuDoc = InferSchemaType<typeof waktuSchema>;
-export const Waktu = mongoose.models.Waktu || mongoose.model<WaktuDoc>('Waktu', waktuSchema);
+export const Waktu = mongoose.models.Waktu || mongoose.model<WaktuDoc>('Waktu', waktuSchema, 'waktu');

@@ -9,6 +9,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
+    "seed": "node --env-file=.env --import tsx scripts/seed.ts",
     "test": "vitest run"
   },
   "dependencies": {

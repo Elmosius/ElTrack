@@ -35,4 +35,4 @@ const transaksiSchema = new Schema({
 });
 
 export type TransaksiDoc = InferSchemaType<typeof transaksiSchema>;
-export const Transaksi = mongoose.models.Transaksi || mongoose.model<TransaksiDoc>('Transaksi', transaksiSchema);
+export const Transaksi = mongoose.models.Transaksi || mongoose.model<TransaksiDoc>('Transaksi', transaksiSchema, 'transaksi');
