@@ -18,6 +18,9 @@ export type RenderedChatMessage = UIMessage & {
   imageCount: number;
 };
 
+const previewStatusMessagePattern =
+  /preview transaksi|siap disimpan|masih ada field|masih perlu dicek/i;
+
 export function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
     return error.message;
@@ -160,4 +163,12 @@ export function toRenderedChatMessages(messages: UIMessage[]): RenderedChatMessa
       imageCount: countImageParts(message),
     }))
     .filter((message) => message.text || message.imageCount > 0);
+}
+
+export function isPreviewStatusMessage(message: RenderedChatMessage) {
+  return (
+    message.role === 'assistant' &&
+    Boolean(message.text) &&
+    previewStatusMessagePattern.test(message.text)
+  );
 }

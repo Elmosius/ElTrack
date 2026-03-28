@@ -98,6 +98,11 @@ export function useChatbotPanel() {
     });
   };
 
+  const handleConfirmPreview = async () => {
+    stop();
+    await preview.actions.handleConfirmPreview();
+  };
+
   return {
     state: {
       draft: composer.state.draft,
@@ -115,7 +120,7 @@ export function useChatbotPanel() {
       handleComposerKeyDown,
       handleAttachmentSelect: composer.actions.handleAttachmentSelect,
       handleAttachmentClick: composer.actions.handleAttachmentClick,
-      handleConfirmPreview: preview.actions.handleConfirmPreview,
+      handleConfirmPreview,
       handleDismissPreview: preview.actions.handleDismissPreview,
       handleClearChat,
     },
