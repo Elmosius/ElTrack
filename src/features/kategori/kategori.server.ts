@@ -3,6 +3,34 @@ import { Kategori } from '#/db/models/kategori.server';
 import { connectDB } from '#/db/mongoose.server';
 import type { CreateKategoriInput, DeleteKategoriInput, UpdateKategoriInput } from './kategori.schema';
 
+export type SerializedKategori = {
+  _id: string;
+  userId: string;
+  nama: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+function serializeDate(value: Date | string | undefined) {
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function serializeKategoriDoc(item: {
+  _id: unknown;
+  userId: string;
+  nama: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}): SerializedKategori {
+  return {
+    _id: String(item._id),
+    userId: item.userId,
+    nama: item.nama,
+    createdAt: serializeDate(item.createdAt),
+    updatedAt: serializeDate(item.updatedAt),
+  };
+}
+
 async function ensureKategoriNameAvailable(userId: string, nama: string, ignoreId?: string) {
   const existingKategori = await Kategori.findOne({
     userId,
@@ -19,13 +47,15 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export async function listKategori(userId: string) {
+export async function listKategori(userId: string): Promise<SerializedKategori[]> {
   await connectDB();
 
-  return Kategori.find({ userId }).sort({ createdAt: 1 }).lean();
+  const list = await Kategori.find({ userId }).sort({ createdAt: 1 }).lean();
+
+  return list.map((item) => serializeKategoriDoc(item));
 }
 
-export async function createKategori(userId: string, data: CreateKategoriInput) {
+export async function createKategori(userId: string, data: CreateKategoriInput): Promise<SerializedKategori> {
   await connectDB();
   await ensureKategoriNameAvailable(userId, data.nama);
 
@@ -34,10 +64,10 @@ export async function createKategori(userId: string, data: CreateKategoriInput) 
     userId,
   });
 
-  return kategori.toObject();
+  return serializeKategoriDoc(kategori.toObject());
 }
 
-export async function updateKategori(userId: string, data: UpdateKategoriInput) {
+export async function updateKategori(userId: string, data: UpdateKategoriInput): Promise<SerializedKategori> {
   await connectDB();
   await ensureKategoriNameAvailable(userId, data.nama, data.id);
 
@@ -52,7 +82,7 @@ export async function updateKategori(userId: string, data: UpdateKategoriInput) 
       },
     },
     {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     },
   );
@@ -61,7 +91,7 @@ export async function updateKategori(userId: string, data: UpdateKategoriInput) 
     throw new Error('Kategori tidak ditemukan.');
   }
 
-  return kategori.toObject();
+  return serializeKategoriDoc(kategori.toObject());
 }
 
 export async function deleteKategori(userId: string, data: DeleteKategoriInput) {

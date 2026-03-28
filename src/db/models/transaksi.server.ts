@@ -12,6 +12,11 @@ const transaksiSchema = new Schema(
       required: true,
       trim: true,
     },
+    tanggal: {
+      type: String,
+      required: true,
+      index: true,
+    },
     waktu: {
       type: Schema.Types.ObjectId,
       ref: 'Waktu',

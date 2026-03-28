@@ -7,7 +7,7 @@ import TabelBody from './tabel-body';
 import TabelHeader from './tabel-header';
 
 export default function TabelContent() {
-  const { handleAddRow } = useTransactionTableContent();
+  const { handleAddRow, syncError } = useTransactionTableContent();
 
   return (
     <>
@@ -38,6 +38,8 @@ export default function TabelContent() {
           Tambah Baris
         </Button>
       </div>
+
+      {syncError ? <p className='px-4 pb-3 text-xs text-danger'>{syncError}</p> : null}
 
       <TabelAlert />
     </>

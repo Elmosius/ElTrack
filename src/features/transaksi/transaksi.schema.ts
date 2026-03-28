@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const createTransaksiSchema = z.object({
   namaTransaksi: z.string().trim().min(1, 'Nama transaksi wajib diisi'),
+  tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Tanggal transaksi tidak valid'),
   waktu: z.string().min(1, 'Waktu wajib dipilih'),
   nominal: z.number().nonnegative('Nominal tidak boleh negatif'),
   kategori: z.string().min(1, 'Kategori wajib dipilih'),

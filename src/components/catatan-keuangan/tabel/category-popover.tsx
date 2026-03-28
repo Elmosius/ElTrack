@@ -10,7 +10,7 @@ type CategoryPopoverProps = {
 };
 
 export function CategoryPopover({ row }: CategoryPopoverProps) {
-  const { categories, categoryMap, categoryMode, categoryDraft, categoryError, updateRow, handleAddCategory, handleEditCategory, requestDeleteCategory, setCategoryDraft, resetCategoryEditor, handleSaveCategory } =
+  const { categories, categoryMap, categoryMode, categoryDraft, categoryError, updateRow, saveRow, handleAddCategory, handleEditCategory, requestDeleteCategory, setCategoryDraft, resetCategoryEditor, handleSaveCategory } =
     useTransactionTableCategoryPopover();
 
   return (
@@ -33,7 +33,10 @@ export function CategoryPopover({ row }: CategoryPopoverProps) {
             return (
               <div key={category.id} className='flex items-center gap-2'>
                 <Button
-                  onClick={() => updateRow(row.id, { kategoriId: category.id })}
+                  onClick={() => {
+                    updateRow(row.id, { kategoriId: category.id });
+                    void saveRow(row.id);
+                  }}
                   size='xs'
                   variant='plain'
                   className={`h-8 w-full rounded px-3 text-left text-sm inline-flex items-center justify-between hover:bg-accent ${isSelected ? 'bg-accent' : ''}`}
@@ -55,10 +58,10 @@ export function CategoryPopover({ row }: CategoryPopoverProps) {
         <div className='h-px bg-popover-separator' />
 
         {categoryMode === 'idle' ? (
-          <Button size='xs' variant='plain' className='w-full text-sm' onClick={handleAddCategory}>
-            <Plus className='size-3.5' />
-            Tambah kategori
-          </Button>
+              <Button size='xs' variant='plain' className='w-full text-sm' onClick={handleAddCategory}>
+                <Plus className='size-3.5' />
+                Tambah kategori
+              </Button>
         ) : (
           <div className='space-y-2 w-full'>
             <p className='text-xs text-muted'>{categoryMode === 'add' ? 'Tambah kategori baru' : 'Edit nama kategori'}</p>
@@ -69,7 +72,7 @@ export function CategoryPopover({ row }: CategoryPopoverProps) {
                 <X className='size-3.5' />
                 Batal
               </Button>
-              <Button size='xs' variant='secondary' className={'text-sm'} onClick={handleSaveCategory}>
+              <Button size='xs' variant='secondary' className={'text-sm'} onClick={() => void handleSaveCategory()}>
                 <Check className='size-3.5' />
                 Simpan
               </Button>

@@ -1,11 +1,22 @@
 import { useTransactionTableStore } from '#/stores/transaction-table';
+import type { TransactionTableData } from '#/types/transaction-table';
+import { useEffect } from 'react';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+
+export function useHydrateTransactionTable(data: TransactionTableData) {
+  const hydrateData = useTransactionTableStore((state) => state.hydrateData);
+
+  useEffect(() => {
+    hydrateData(data);
+  }, [data, hydrateData]);
+}
 
 export function useTransactionTable() {
   const rows = useTransactionTableStore((state) => state.rows);
   const selectedDate = useTransactionTableStore((state) => state.selectedDate);
   const categories = useTransactionTableStore((state) => state.categories);
+  const syncError = useTransactionTableStore((state) => state.syncError);
   const categoryMode = useTransactionTableStore((state) => state.categoryMode);
   const categoryDraft = useTransactionTableStore((state) => state.categoryDraft);
   const categoryError = useTransactionTableStore((state) => state.categoryError);
@@ -39,6 +50,7 @@ export function useTransactionTable() {
       selectedDate,
       categories,
       categoryMap,
+      syncError,
       categoryMode,
       categoryDraft,
       categoryError,
@@ -77,6 +89,7 @@ export function useTransactionTableContent() {
   return useTransactionTableStore(
     useShallow((state) => ({
       handleAddRow: state.handleAddRow,
+      syncError: state.syncError,
     })),
   );
 }
@@ -84,17 +97,25 @@ export function useTransactionTableContent() {
 export function useTransactionTableBody() {
   const rows = useTransactionTableStore((state) => state.rows);
   const selectedDate = useTransactionTableStore((state) => state.selectedDate);
+  const waktuOptions = useTransactionTableStore((state) => state.waktuOptions);
+  const metodePembayaranOptions = useTransactionTableStore((state) => state.metodePembayaranOptions);
+  const tipeOptions = useTransactionTableStore((state) => state.tipeOptions);
   const updateRow = useTransactionTableStore((state) => state.updateRow);
   const handleNominalChange = useTransactionTableStore((state) => state.handleNominalChange);
   const handleDeleteRow = useTransactionTableStore((state) => state.handleDeleteRow);
+  const saveRow = useTransactionTableStore((state) => state.saveRow);
 
   const filteredRows = useMemo(() => rows.filter((row) => row.tanggal === selectedDate), [rows, selectedDate]);
 
   return {
     filteredRows,
+    waktuOptions,
+    metodePembayaranOptions,
+    tipeOptions,
     updateRow,
     handleNominalChange,
     handleDeleteRow,
+    saveRow,
   };
 }
 
@@ -128,6 +149,7 @@ export function useTransactionTableCategoryPopover() {
   const actions = useTransactionTableStore(
     useShallow((state) => ({
       updateRow: state.updateRow,
+      saveRow: state.saveRow,
       handleAddCategory: state.handleAddCategory,
       handleEditCategory: state.handleEditCategory,
       handleSaveCategory: state.handleSaveCategory,

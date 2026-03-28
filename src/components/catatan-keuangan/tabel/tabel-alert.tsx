@@ -25,14 +25,9 @@ export default function TabelAlert() {
             }
             onClick={clearDeleteTarget}
           />
-          <AlertDialogClose
-            render={
-              <Button variant='danger' size='sm'>
-                Hapus
-              </Button>
-            }
-            onClick={confirmDeleteCategory}
-          />
+          <Button variant='danger' size='sm' onClick={() => void confirmDeleteCategory()}>
+            Hapus
+          </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>
     </AlertDialog>

@@ -4,5 +4,12 @@ import { connectDB } from '#/db/mongoose.server';
 export async function listWaktu() {
   await connectDB();
 
-  return Waktu.find().sort({ createdAt: 1 }).lean();
+  const list = await Waktu.find().sort({ createdAt: 1 }).lean();
+
+  return list.map((item) => ({
+    ...item,
+    _id: String(item._id),
+    createdAt: item.createdAt?.toISOString?.() ?? item.createdAt,
+    updatedAt: item.updatedAt?.toISOString?.() ?? item.updatedAt,
+  }));
 }

@@ -1,8 +1,8 @@
-export type Waktu = 'Pagi' | 'Siang' | 'Sore' | 'Malam';
+export type Waktu = string;
 
-export type MetodePembayaran = 'Tunai' | 'Flazz' | 'Bank';
+export type MetodePembayaran = string;
 
-export type TipeTransaksi = 'Pengeluaran' | 'Penghasilan';
+export type TipeTransaksi = string;
 
 export type Kategori = {
   id: string;
@@ -22,3 +22,11 @@ export type TransaksiRow = {
 };
 
 export type CategoryEditorMode = 'idle' | 'add' | 'edit';
+
+export type TransactionTableData = {
+  rows: TransaksiRow[];
+  categories: Kategori[];
+  waktuOptions: Waktu[];
+  metodePembayaranOptions: MetodePembayaran[];
+  tipeOptions: TipeTransaksi[];
+};

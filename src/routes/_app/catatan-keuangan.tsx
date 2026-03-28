@@ -1,3 +1,5 @@
+import { useHydrateTransactionTable } from '#/hooks/use-transaction-table';
+import { buildTransactionTableData } from '#/lib/transaction-table';
 import KalenderSection from '#/components/catatan-keuangan/kalender';
 import TabelSection from '#/components/catatan-keuangan/tabel';
 import { getListKategori } from '#/features/kategori/kategori.functions';
@@ -19,7 +21,13 @@ export const Route = createFileRoute('/_app/catatan-keuangan')({
     const listMetodePembayaran = await getListMetodePembayaran();
     const listTransaksi = await getListTransaksi();
 
-    return { listWaktu, listTipe, listKategori, listMetodePembayaran, listTransaksi };
+    return buildTransactionTableData({
+      listWaktu,
+      listTipe,
+      listKategori,
+      listMetodePembayaran,
+      listTransaksi,
+    });
   },
 });
 
@@ -29,7 +37,7 @@ function RouteComponent() {
   const [tab, setTab] = useState('tabel');
   const data = Route.useLoaderData();
 
-  console.log('Data catatan keuangan:', data);
+  useHydrateTransactionTable(data);
 
   return (
     <div className='flex flex-col gap-4'>
