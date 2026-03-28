@@ -1,3 +1,4 @@
+import { toastManager } from '#/components/selia/toast';
 import { useTransactionTableContent } from '#/hooks/use-transaction-table';
 import { Button } from '@/components/selia/button';
 import { Table, TableContainer, TableHead, TableHeader, TableRow } from '@/components/selia/table';
@@ -8,6 +9,14 @@ import TabelHeader from './tabel-header';
 
 export default function TabelContent() {
   const { handleAddRow, syncError } = useTransactionTableContent();
+
+  if (syncError) {
+    toastManager.add({
+      type: 'error',
+      title: 'Error',
+      description: syncError,
+    });
+  }
 
   return (
     <>
@@ -38,8 +47,6 @@ export default function TabelContent() {
           Tambah Baris
         </Button>
       </div>
-
-      {syncError ? <p className='px-4 pb-3 text-xs text-danger'>*{syncError}</p> : null}
 
       <TabelAlert />
     </>

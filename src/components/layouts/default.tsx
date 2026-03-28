@@ -1,6 +1,7 @@
 import { useIsMobile } from '#/hooks/use-mobile';
 import { useState } from 'react';
 import Chatbot from '../chatbot';
+import { Toast } from '../selia/toast';
 import AppHeader from '../shared/app-header';
 import AppSidebar from '../shared/app-sidebar';
 
@@ -26,6 +27,8 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
 
   return (
     <div className='h-screen overflow-hidden flex w-full'>
+      <Toast />
+
       <AppSidebar isSidebarOpen={isSidebarOpen} />
 
       <main className='flex flex-1 flex-col min-h-screen min-w-0 w-full px-8 py-8 transition-all duration-300'>
