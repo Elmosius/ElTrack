@@ -1,6 +1,6 @@
-import type { CreateTransaksiInput, DeleteTransaksiInput, UpdateTransaksiInput } from './transaksi.schema';
 import { Transaksi } from '#/db/models/transaksi.server';
 import { connectDB } from '#/db/mongoose.server';
+import type { CreateTransaksiInput, DeleteTransaksiInput, UpdateTransaksiInput } from './transaksi.schema';
 
 type SerializedNamedRef = {
   _id: string;
@@ -16,7 +16,7 @@ export type SerializedTransaksi = {
   tanggal: string;
   nominal: number;
   catatan?: string;
-  waktu?: string | SerializedNamedRef | null;
+  waktu?: string | null;
   kategori?: string | SerializedNamedRef | null;
   metodePembayaran?: string | SerializedNamedRef | null;
   tipe?: string | SerializedNamedRef | null;
@@ -51,7 +51,7 @@ function serializeTransaksiDoc(item: {
     catatan: item.catatan,
     createdAt: serializeDate(item.createdAt),
     updatedAt: serializeDate(item.updatedAt),
-    waktu: serializeNamedRef(item.waktu),
+    waktu: item.waktu == null ? item.waktu : String(item.waktu),
     kategori: serializeNamedRef(item.kategori),
     metodePembayaran: serializeNamedRef(item.metodePembayaran),
     tipe: serializeNamedRef(item.tipe),
@@ -89,10 +89,7 @@ function serializeNamedRef(value: unknown): string | SerializedNamedRef | null |
 export async function listTransaksi(userId: string): Promise<SerializedTransaksi[]> {
   await connectDB();
 
-  const list = await Transaksi.find({ userId })
-    .populate('waktu kategori metodePembayaran tipe')
-    .sort({ createdAt: -1 })
-    .lean();
+  const list = await Transaksi.find({ userId }).populate('kategori metodePembayaran tipe').sort({ createdAt: 1 }).lean();
 
   return list.map((item) => serializeTransaksiDoc(item));
 }

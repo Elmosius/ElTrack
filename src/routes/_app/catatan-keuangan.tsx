@@ -6,7 +6,6 @@ import { getListKategori } from '#/features/kategori/kategori.functions';
 import { getListMetodePembayaran } from '#/features/metode-pembayaran/metode-pembayaran.functions';
 import { getListTipe } from '#/features/tipe/tipe.functions';
 import { getListTransaksi } from '#/features/transaksi/transaksi.functions';
-import { getListWaktu } from '#/features/waktu/waktu.functions';
 import { Tabs, TabsItem, TabsList, TabsPanel } from '@/components/selia/tabs';
 import AppBreadCrumb from '@/components/shared/app-breadcrumb';
 import { createFileRoute } from '@tanstack/react-router';
@@ -15,14 +14,12 @@ import { useState } from 'react';
 export const Route = createFileRoute('/_app/catatan-keuangan')({
   component: RouteComponent,
   loader: async () => {
-    const listWaktu = await getListWaktu();
     const listTipe = await getListTipe();
     const listKategori = await getListKategori();
     const listMetodePembayaran = await getListMetodePembayaran();
     const listTransaksi = await getListTransaksi();
 
     return buildTransactionTableData({
-      listWaktu,
       listTipe,
       listKategori,
       listMetodePembayaran,

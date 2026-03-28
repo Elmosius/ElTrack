@@ -1,5 +1,7 @@
 import type { Kategori, SelectOption, TransactionTableData, TransaksiRow } from '#/types/transaction-table';
 
+export const waktuOptionsStatic = ['Pagi', 'Siang', 'Sore', 'Malam'] as const;
+
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -85,7 +87,6 @@ export function mapTransaksiDocToRow(doc: RawTransaksiDoc): TransaksiRow {
 }
 
 type BuildTransactionTableDataArgs = {
-  listWaktu: NamedDoc[];
   listTipe: NamedDoc[];
   listKategori: NamedDoc[];
   listMetodePembayaran: NamedDoc[];
@@ -93,7 +94,6 @@ type BuildTransactionTableDataArgs = {
 };
 
 export function buildTransactionTableData({
-  listWaktu,
   listTipe,
   listKategori,
   listMetodePembayaran,
@@ -102,7 +102,7 @@ export function buildTransactionTableData({
   return {
     rows: listTransaksi.map(mapTransaksiDocToRow),
     categories: listKategori.map(mapKategoriDocToOption),
-    waktuOptions: listWaktu.map(mapNamedDocToOption),
+    waktuOptions: waktuOptionsStatic.map((name) => ({ id: name, name })),
     metodePembayaranOptions: listMetodePembayaran.map(mapNamedDocToOption),
     tipeOptions: listTipe.map(mapNamedDocToOption),
   };

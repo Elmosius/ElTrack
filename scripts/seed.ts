@@ -3,10 +3,8 @@ import mongoose from 'mongoose';
 
 import { MetodePembayaran, type MetodePembayaranDoc } from '../src/db/models/metode-pembayaran.server';
 import { Tipe, type TipeDoc } from '../src/db/models/tipe.server';
-import { Waktu, type WaktuDoc } from '../src/db/models/waktu.server';
 import { connectDB } from '../src/db/mongoose.server';
 
-const waktuDefault = ['Pagi', 'Siang', 'Sore', 'Malam'] as const;
 const metodePembayaranDefault = ['Tunai', 'Bank', 'QRIS', 'Flazz'] as const;
 const tipeDefault = ['Pengeluaran', 'Penghasilan'] as const;
 
@@ -27,7 +25,6 @@ async function seedNamaCollection<T extends { nama: string }>(model: Model<T>, l
 async function main() {
   await connectDB();
 
-  await seedNamaCollection<WaktuDoc>(Waktu, 'Waktu', waktuDefault);
   await seedNamaCollection<MetodePembayaranDoc>(MetodePembayaran, 'Metode pembayaran', metodePembayaranDefault);
   await seedNamaCollection<TipeDoc>(Tipe, 'Tipe', tipeDefault);
 

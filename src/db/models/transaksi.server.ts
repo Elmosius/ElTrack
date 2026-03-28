@@ -1,3 +1,4 @@
+import { waktuOptionsStatic } from '#/lib/transaction-table';
 import mongoose, { Schema, type InferSchemaType } from 'mongoose';
 
 const transaksiSchema = new Schema(
@@ -18,8 +19,8 @@ const transaksiSchema = new Schema(
       index: true,
     },
     waktu: {
-      type: Schema.Types.ObjectId,
-      ref: 'Waktu',
+      type: String,
+      enum: waktuOptionsStatic,
       required: true,
     },
     nominal: {
