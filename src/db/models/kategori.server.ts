@@ -2,6 +2,11 @@ import mongoose, { Schema, type InferSchemaType } from 'mongoose';
 
 const kategoriSchema = new Schema(
   {
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
     nama: {
       type: String,
       required: true,
