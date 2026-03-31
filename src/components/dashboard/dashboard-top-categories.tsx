@@ -25,7 +25,7 @@ export function DashboardTopCategories({ categories, isEmpty }: DashboardTopCate
             <p className='text-sm text-muted'>{isEmpty ? 'Belum ada transaksi di bulan ini. Tambahkan transaksi pertamamu untuk mulai melihat insight.' : 'Belum ada kategori pengeluaran yang bisa dibandingkan untuk periode ini.'}</p>
             {isEmpty ? (
               <Link to='/catatan-keuangan'>
-                <Button size='sm'>
+                <Button size='sm' className={'text-sm ring-accent'}>
                   Tambah transaksi
                   <ArrowRight className='size-4' />
                 </Button>
