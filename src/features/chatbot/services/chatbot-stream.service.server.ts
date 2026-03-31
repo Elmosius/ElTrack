@@ -13,7 +13,12 @@ import {
   type TransaksiPreview,
 } from '../chatbot.schema';
 import { extractPreviewSummary } from '../mappers';
-import { getGeminiModel, getPendingPreview, type ChatbotMasterData } from '../chatbot.shared.server';
+import {
+  getGeminiTextModel,
+  getGeminiVisionModel,
+  getPendingPreview,
+  type ChatbotMasterData,
+} from '../chatbot.shared.server';
 import { getChatbotMasterData } from './chatbot-master-data.service.server';
 import { buildResolvedPreview } from './chatbot-preview.service.server';
 import {
@@ -75,6 +80,25 @@ function withSystemPrompt(
   ] as ModelMessage[];
 }
 
+function hasImageContent(messages: Array<UIMessage | ModelMessage>) {
+  return messages.some((message) => {
+    const content =
+      'parts' in message && Array.isArray(message.parts)
+        ? message.parts
+        : 'content' in message && Array.isArray(message.content)
+          ? message.content
+          : [];
+
+    return content.some(
+      (part) =>
+        typeof part === 'object' &&
+        part !== null &&
+        'type' in part &&
+        part.type === 'image',
+    );
+  });
+}
+
 export async function createChatbotStreamService({
   userId,
   chatSessionId,
@@ -87,9 +111,12 @@ export async function createChatbotStreamService({
   const session = await getChatSessionOrThrow(userId, chatSessionId);
   const activePreview = getPendingPreview(session.pendingPreview);
   const masterData = await getChatbotMasterData(userId);
+  const model = hasImageContent(messages)
+    ? getGeminiVisionModel()
+    : getGeminiTextModel();
 
   return chat({
-    adapter: geminiText(getGeminiModel()),
+    adapter: geminiText(model),
     messages: withSystemPrompt(
       messages,
       buildSystemPrompt(masterData, activePreview),

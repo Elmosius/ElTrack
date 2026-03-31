@@ -115,7 +115,8 @@ Lalu isi value yang dibutuhkan, terutama:
 Jika ingin memakai chatbot AI via Gemini, siapkan juga:
 
 - `GOOGLE_API_KEY`
-- `GEMINI_MODEL`
+- `GEMINI_TEXT_MODEL`
+- `GEMINI_VISION_MODEL`
 
 ### 3. Jalankan seed data opsional
 
@@ -141,10 +142,16 @@ Jika ingin memakai fitur chatbot AI, siapkan API key Gemini dari Google AI Studi
 
 ```txt
 GOOGLE_API_KEY=your_google_ai_api_key
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_TEXT_MODEL=gemini-2.5-flash-lite
+GEMINI_VISION_MODEL=gemini-2.5-flash
 ```
 
-Model Gemini bisa diganti sesuai kebutuhan. Default yang saat ini dipakai project ini adalah `gemini-2.5-flash`.
+Default strategy saat ini:
+
+- chat teks biasa memakai `gemini-2.5-flash-lite`
+- request bergambar atau struk memakai `gemini-2.5-flash`
+
+Kalau ingin tetap memakai satu model untuk semua request, kamu masih bisa isi `GEMINI_MODEL` saja sebagai fallback.
 
 ## Scripts
 

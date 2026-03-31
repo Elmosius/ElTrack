@@ -13,10 +13,23 @@ export type ChatbotMasterData = {
 };
 
 export const defaultChatSessionTitle = 'Chat baru';
-const defaultGeminiModel: GeminiTextModel = 'gemini-2.5-flash';
+const defaultGeminiTextModel: GeminiTextModel = 'gemini-2.5-flash-lite';
+const defaultGeminiVisionModel: GeminiTextModel = 'gemini-2.5-flash';
 
-export function getGeminiModel(): GeminiTextModel {
-  return (process.env.GEMINI_MODEL as GeminiTextModel) || defaultGeminiModel;
+export function getGeminiTextModel(): GeminiTextModel {
+  return (
+    (process.env.GEMINI_TEXT_MODEL as GeminiTextModel) ||
+    (process.env.GEMINI_MODEL as GeminiTextModel) ||
+    defaultGeminiTextModel
+  );
+}
+
+export function getGeminiVisionModel(): GeminiTextModel {
+  return (
+    (process.env.GEMINI_VISION_MODEL as GeminiTextModel) ||
+    (process.env.GEMINI_MODEL as GeminiTextModel) ||
+    defaultGeminiVisionModel
+  );
 }
 
 export function normalizeText(value: string) {
