@@ -42,7 +42,7 @@ export default function AppSidebar({ isSidebarOpen }: AppSidebarProps) {
                 const isActive = route.pathname === to;
 
                 return (
-                  <Link to={to} key={label}>
+                  <Link to={to} key={label} preload='render'>
                     <SidebarItem>
                       <SidebarItemButton active={isActive}>
                         {icon}

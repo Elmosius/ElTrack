@@ -14,10 +14,17 @@ import { useState } from 'react';
 export const Route = createFileRoute('/_app/catatan-keuangan')({
   component: RouteComponent,
   loader: async () => {
-    const listTipe = await getListTipe();
-    const listKategori = await getListKategori();
-    const listMetodePembayaran = await getListMetodePembayaran();
-    const listTransaksi = await getListTransaksi();
+    const [
+      listTipe,
+      listKategori,
+      listMetodePembayaran,
+      listTransaksi,
+    ] = await Promise.all([
+      getListTipe(),
+      getListKategori(),
+      getListMetodePembayaran(),
+      getListTransaksi(),
+    ]);
 
     return buildTransactionTableData({
       listTipe,
