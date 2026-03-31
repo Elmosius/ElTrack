@@ -1,8 +1,8 @@
 import {
   fileToBase64Payload,
-  maxUploadSizeInBytes,
   type ChatComposerPart,
 } from '#/lib/chatbot';
+import { maxUploadSizeInBytes } from '@/const/chatbot';
 import { toastManager } from '@/components/selia/toast';
 import { useEffect, useRef, useState } from 'react';
 

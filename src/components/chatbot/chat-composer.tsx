@@ -1,34 +1,27 @@
+import type { ChatComposerViewModel } from '#/lib/chatbot/view-models';
 import { ArrowUp, CornerDownLeft, ImagePlus } from 'lucide-react';
 import { Button } from '../selia/button';
 import { Textarea } from '../selia/textarea';
 
 type ChatComposerProps = {
-  draft: string;
-  attachmentName: string;
-  isLoading: boolean;
-  isDisabled?: boolean;
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  onDraftChange: (value: string) => void;
-  onComposerKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-  onAttachmentSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onAttachmentClick: () => void;
-  onSend: () => void;
+  composer: ChatComposerViewModel;
 };
 
-export function ChatComposer({
-  draft,
-  attachmentName,
-  isLoading,
-  isDisabled,
-  textareaRef,
-  fileInputRef,
-  onDraftChange,
-  onComposerKeyDown,
-  onAttachmentSelect,
-  onAttachmentClick,
-  onSend,
-}: ChatComposerProps) {
+export function ChatComposer({ composer }: ChatComposerProps) {
+  const {
+    draft,
+    attachmentName,
+    isLoading,
+    isDisabled,
+    textareaRef,
+    fileInputRef,
+    onDraftChange,
+    onComposerKeyDown,
+    onAttachmentSelect,
+    onAttachmentClick,
+    onSend,
+  } = composer;
+
   return (
     <div className='w-full border-t border-popover-separator px-3.5 py-3'>
       <div className='rounded-xl border border-input-border/80 bg-input/50 px-2.5 py-2 transition-[border-color,box-shadow] focus-within:border-primary/65 focus-within:shadow-sm'>

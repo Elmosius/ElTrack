@@ -1,26 +1,22 @@
-import type { TransaksiPreview } from '#/features/chatbot/chatbot.schema';
-import { isPreviewStatusMessage, type RenderedChatMessage } from '#/lib/chatbot';
+import { isPreviewStatusMessage } from '#/lib/chatbot';
+import type { ChatMessageListViewModel } from '#/lib/chatbot/view-models';
 import { ChatMessageBubble } from './chat-message-bubble';
 import { ChatPreviewCard } from './chat-preview-card';
 import { ChatTypingIndicator } from './chat-typing-indicator';
 
-type ChatMessageListProps = {
-  messages: RenderedChatMessage[];
-  isLoading: boolean;
-  preview: TransaksiPreview | null;
-  isConfirmingPreview: boolean;
-  onConfirmPreview: () => void;
-  onDismissPreview: () => void;
-};
+type ChatMessageListProps = { messageList: ChatMessageListViewModel };
 
 export function ChatMessageList({
-  messages,
-  isLoading,
-  preview,
-  isConfirmingPreview,
-  onConfirmPreview,
-  onDismissPreview,
+  messageList,
 }: ChatMessageListProps) {
+  const {
+    messages,
+    isLoading,
+    preview,
+    isConfirmingPreview,
+    onConfirmPreview,
+    onDismissPreview,
+  } = messageList;
   let hiddenPreviewMessageIndex = -1;
 
   if (preview) {

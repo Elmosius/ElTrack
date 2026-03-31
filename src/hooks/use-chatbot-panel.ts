@@ -1,5 +1,10 @@
 import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
 import { getErrorMessage, toRenderedChatMessages } from '#/lib/chatbot';
+import type {
+  ChatComposerViewModel,
+  ChatMessageListViewModel,
+  ChatPanelHeaderViewModel,
+} from '#/lib/chatbot/view-models';
 import { useUser } from '#/stores/user';
 import { toastManager } from '@/components/selia/toast';
 import { initialMessages } from '@/const/chatbot';
@@ -169,35 +174,54 @@ export function useChatbotPanel() {
     activeSessionIdRef.current = detail.session.id;
   };
 
-  return {
-    state: {
-      draft: composer.state.draft,
-      attachmentName: composer.state.attachmentName,
-      pendingPreview: preview.state.pendingPreview,
-      isConfirmingPreview: preview.state.isConfirmingPreview,
+  const header: ChatPanelHeaderViewModel = {
+    sessions: sessions.state.sessions,
+    activeSessionId: sessions.state.activeSessionId,
+    isLoading:
+      sessions.state.isBootstrapping ||
+      sessions.state.isSwitchingSession ||
       isLoading,
-      sessions: sessions.state.sessions,
-      activeSessionId: sessions.state.activeSessionId,
-      isBootstrapping: sessions.state.isBootstrapping,
-      isSwitchingSession: sessions.state.isSwitchingSession,
-    },
-    derived: {
-      renderedMessages,
+    onClearChat: () => void handleClearChat(),
+    onSelectSession: (chatSessionId) => void handleSelectSession(chatSessionId),
+  };
+
+  const messageList: ChatMessageListViewModel = {
+    messages: renderedMessages,
+    isLoading,
+    preview: preview.state.pendingPreview,
+    isConfirmingPreview: preview.state.isConfirmingPreview,
+    onConfirmPreview: handleConfirmPreview,
+    onDismissPreview: handleDismissPreview,
+  };
+
+  const composerViewModel: ChatComposerViewModel = {
+    draft: composer.state.draft,
+    attachmentName: composer.state.attachmentName,
+    isLoading,
+    isDisabled:
+      sessions.state.isBootstrapping || sessions.state.isSwitchingSession,
+    textareaRef: composer.refs.textareaRef,
+    fileInputRef: composer.refs.fileInputRef,
+    onDraftChange: composer.actions.setDraft,
+    onComposerKeyDown: handleComposerKeyDown,
+    onAttachmentSelect: composer.actions.handleAttachmentSelect,
+    onAttachmentClick: composer.actions.handleAttachmentClick,
+    onSend: () => void handleSend(),
+  };
+
+  return {
+    sections: {
+      header,
+      messageList,
+      composer: composerViewModel,
     },
     actions: {
-      setDraft: composer.actions.setDraft,
       handleSend,
       handleComposerKeyDown,
-      handleAttachmentSelect: composer.actions.handleAttachmentSelect,
-      handleAttachmentClick: composer.actions.handleAttachmentClick,
       handleConfirmPreview,
       handleDismissPreview,
       handleClearChat,
       handleSelectSession,
-    },
-    refs: {
-      textareaRef: composer.refs.textareaRef,
-      fileInputRef: composer.refs.fileInputRef,
     },
   };
 }

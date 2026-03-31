@@ -1,23 +1,21 @@
-import type { ChatSessionSummary } from '#/features/chatbot/chatbot.schema';
+import type { ChatPanelHeaderViewModel } from '#/lib/chatbot/view-models';
 import { Carrot, RotateCcw } from 'lucide-react';
 import { Button } from '../selia/button';
 import { ChatSessionSwitcher } from './chat-session-switcher';
 
 type ChatPanelHeaderProps = {
-  sessions: ChatSessionSummary[];
-  activeSessionId: string | null;
-  isLoading: boolean;
-  onClearChat: () => void;
-  onSelectSession: (chatSessionId: string) => void;
+  header: ChatPanelHeaderViewModel;
 };
 
-export function ChatPanelHeader({
-  sessions,
-  activeSessionId,
-  isLoading,
-  onClearChat,
-  onSelectSession,
-}: ChatPanelHeaderProps) {
+export function ChatPanelHeader({ header }: ChatPanelHeaderProps) {
+  const {
+    sessions,
+    activeSessionId,
+    isLoading,
+    onClearChat,
+    onSelectSession,
+  } = header;
+
   return (
     <div className='w-full border-b border-popover-separator px-4 py-3'>
       <div className='flex items-start justify-between gap-3'>
