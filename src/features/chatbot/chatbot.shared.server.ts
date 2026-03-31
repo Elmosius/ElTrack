@@ -1,3 +1,4 @@
+import type { GeminiTextModel } from '@tanstack/ai-gemini';
 import { transaksiPreviewSchema, type PreviewTransaksiToolInput } from './chatbot.schema';
 
 export type NamedOption = {
@@ -12,10 +13,10 @@ export type ChatbotMasterData = {
 };
 
 export const defaultChatSessionTitle = 'Chat baru';
-const defaultOllamaModel = 'qwen3-vl:235b-cloud';
+const defaultGeminiModel: GeminiTextModel = 'gemini-2.5-flash';
 
-export function getOllamaModel() {
-  return process.env.OLLAMA_MODEL || defaultOllamaModel;
+export function getGeminiModel(): GeminiTextModel {
+  return (process.env.GEMINI_MODEL as GeminiTextModel) || defaultGeminiModel;
 }
 
 export function normalizeText(value: string) {

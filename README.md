@@ -45,7 +45,7 @@ Fokus versi sekarang:
   - kategori
   - metode pembayaran
   - tipe transaksi
-- Chatbot AI dengan TanStack AI + Ollama
+- Chatbot AI dengan TanStack AI + Gemini
 
 ## Tech Stack
 
@@ -56,7 +56,7 @@ Fokus versi sekarang:
 - Better Auth (Google provider only)
 - MongoDB + Mongoose
 - TanStack AI
-- Ollama
+- Gemini API
 - ApexCharts
 
 ## Struktur Folder
@@ -112,10 +112,10 @@ Lalu isi value yang dibutuhkan, terutama:
 - `GOOGLE_CLIENT_SECRET`
 - `MONGODB_URI`
 
-Jika ingin memakai chatbot AI via Ollama, siapkan juga:
+Jika ingin memakai chatbot AI via Gemini, siapkan juga:
 
-- `OLLAMA_HOST`
-- `OLLAMA_MODEL`
+- `GOOGLE_API_KEY`
+- `GEMINI_MODEL`
 
 ### 3. Jalankan seed data opsional
 
@@ -135,23 +135,16 @@ App akan berjalan di:
 http://localhost:3000
 ```
 
-## Setup Ollama
+## Setup Gemini
 
-Jika ingin memakai fitur chatbot AI:
-
-```bash
-ollama signin
-ollama pull qwen3-vl:235b-cloud
-ollama serve
-```
-
-Pastikan `OLLAMA_HOST` dan `OLLAMA_MODEL` di `.env` sudah sesuai.
-
-Model Ollama bisa diganti sesuai kebutuhan. Default yang saat ini dipakai project ini adalah:
+Jika ingin memakai fitur chatbot AI, siapkan API key Gemini dari Google AI Studio lalu isi env berikut:
 
 ```txt
-qwen3-vl:235b-cloud
+GOOGLE_API_KEY=your_google_ai_api_key
+GEMINI_MODEL=gemini-2.5-flash
 ```
+
+Model Gemini bisa diganti sesuai kebutuhan. Default yang saat ini dipakai project ini adalah `gemini-2.5-flash`.
 
 ## Scripts
 

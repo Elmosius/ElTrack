@@ -5,7 +5,7 @@ import {
   maxIterations,
   toolDefinition,
 } from '@tanstack/ai';
-import { ollamaText } from '@tanstack/ai-ollama';
+import { geminiText } from '@tanstack/ai-gemini';
 import {
   chatbotPreviewEventName,
   previewTransaksiToolInputSchema,
@@ -13,7 +13,7 @@ import {
   type TransaksiPreview,
 } from '../chatbot.schema';
 import { extractPreviewSummary } from '../mappers';
-import { getOllamaModel, getPendingPreview, type ChatbotMasterData } from '../chatbot.shared.server';
+import { getGeminiModel, getPendingPreview, type ChatbotMasterData } from '../chatbot.shared.server';
 import { getChatbotMasterData } from './chatbot-master-data.service.server';
 import { buildResolvedPreview } from './chatbot-preview.service.server';
 import {
@@ -89,7 +89,7 @@ export async function createChatbotStreamService({
   const masterData = await getChatbotMasterData(userId);
 
   return chat({
-    adapter: ollamaText(getOllamaModel()),
+    adapter: geminiText(getGeminiModel()),
     messages: withSystemPrompt(
       messages,
       buildSystemPrompt(masterData, activePreview),
