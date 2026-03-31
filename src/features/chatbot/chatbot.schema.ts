@@ -1,3 +1,4 @@
+import type { UIMessage } from '@tanstack/ai-react';
 import { waktuOptionsStatic } from '#/lib/transaction-table';
 import { z } from 'zod';
 
@@ -35,8 +36,49 @@ export const transaksiPreviewSchema = z.object({
   canConfirm: z.boolean(),
 });
 
-export const confirmTransaksiPreviewSchema = transaksiPreviewSchema;
+const chatMessagePartSchema = z.object({
+  type: z.string().trim().min(1),
+}).catchall(z.unknown());
+
+const assistantChatMessageSchema = z.object({
+  id: z.string().trim().min(1),
+  role: z.literal('assistant'),
+  parts: z.array(chatMessagePartSchema),
+});
+
+export const chatSessionInputSchema = z.object({
+  chatSessionId: z.string().trim().min(1),
+});
+
+export const confirmTransaksiPreviewSchema = chatSessionInputSchema;
+export const dismissTransaksiPreviewSchema = chatSessionInputSchema;
+export const persistAssistantChatMessageSchema = chatSessionInputSchema.extend({
+  message: assistantChatMessageSchema,
+});
 
 export type PreviewTransaksiToolInput = z.infer<typeof previewTransaksiToolInputSchema>;
 export type TransaksiPreview = z.infer<typeof transaksiPreviewSchema>;
 export type ConfirmTransaksiPreviewInput = z.infer<typeof confirmTransaksiPreviewSchema>;
+export type DismissTransaksiPreviewInput = z.infer<typeof dismissTransaksiPreviewSchema>;
+export type PersistAssistantChatMessageInput = z.infer<typeof persistAssistantChatMessageSchema>;
+
+export type ChatSessionSummary = {
+  id: string;
+  title: string;
+  status: 'active';
+  createdAt?: string;
+  updatedAt?: string;
+  lastMessageAt?: string | null;
+  lastOpenedAt?: string | null;
+};
+
+export type ChatSessionDetail = {
+  session: ChatSessionSummary;
+  messages: UIMessage[];
+  pendingPreview: TransaksiPreview | null;
+};
+
+export type ConfirmChatbotPreviewResult = {
+  assistantMessage: UIMessage;
+  session: ChatSessionSummary;
+};

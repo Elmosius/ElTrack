@@ -29,10 +29,6 @@ export function getErrorMessage(error: unknown) {
   return 'Terjadi kesalahan. Coba lagi.';
 }
 
-export function getChatHistoryStorageKey(userId: string) {
-  return `eltrack:chatbot-history:${userId}`;
-}
-
 export function extractMessageText(message: UIMessage) {
   return message.parts
     .filter(
@@ -49,65 +45,29 @@ export function countImageParts(message: UIMessage) {
   return message.parts.filter((part) => part.type === 'image').length;
 }
 
-export function serializeMessagesForHistory(messages: UIMessage[]) {
-  return messages.map((message) => {
-    const textParts = message.parts.filter(
-      (
-        part,
-      ): part is Extract<UIMessage['parts'][number], { type: 'text' }> =>
-        part.type === 'text',
-    );
-    const hasImage = message.parts.some((part) => part.type === 'image');
-
-    return {
-      id: message.id,
-      role: message.role,
-      parts: [
-        ...textParts,
-        ...(hasImage
-          ? [
-              {
-                type: 'text' as const,
-                content: textParts.length > 0
-                  ? `\n${photoPlaceholderText}`
-                  : photoPlaceholderText,
-              },
-            ]
-          : []),
-      ],
-    } satisfies UIMessage;
-  });
-}
-
-export function parseStoredMessages(raw: string | null): UIMessage[] | null {
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-
-    if (!Array.isArray(parsed)) {
-      return null;
+export function sanitizeMessageForStorage(message: UIMessage): UIMessage {
+  const sanitizedParts = message.parts.flatMap((part) => {
+    if (part.type === 'image') {
+      return [
+        {
+          type: 'text' as const,
+          content: photoPlaceholderText,
+        },
+      ];
     }
 
-    const messages = parsed.filter(
-      (item): item is UIMessage =>
-        Boolean(
-          item &&
-            typeof item === 'object' &&
-            typeof item.id === 'string' &&
-            (item.role === 'assistant' ||
-              item.role === 'user' ||
-              item.role === 'system') &&
-            Array.isArray(item.parts),
-        ),
-    );
+    return [part];
+  });
 
-    return messages.length > 0 ? messages : null;
-  } catch {
-    return null;
-  }
+  return {
+    id: message.id,
+    role: message.role,
+    parts: sanitizedParts,
+  };
+}
+
+export function sanitizeMessagesForStorage(messages: UIMessage[]) {
+  return messages.map((message) => sanitizeMessageForStorage(message));
 }
 
 export function createAssistantMessage(content: string): UIMessage {
@@ -171,4 +131,18 @@ export function isPreviewStatusMessage(message: RenderedChatMessage) {
     Boolean(message.text) &&
     previewStatusMessagePattern.test(message.text)
   );
+}
+
+export function createChatSessionTitle(rawText: string | null | undefined) {
+  const normalized = rawText
+    ?.replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalized) {
+    return 'Chat baru';
+  }
+
+  return normalized.length > 48
+    ? `${normalized.slice(0, 45).trimEnd()}...`
+    : normalized;
 }

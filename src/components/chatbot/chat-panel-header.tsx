@@ -1,16 +1,36 @@
+import type { ChatSessionSummary } from '#/features/chatbot/chatbot.schema';
 import { Carrot, RotateCcw } from 'lucide-react';
 import { Button } from '../selia/button';
+import { ChatSessionSwitcher } from './chat-session-switcher';
 
 type ChatPanelHeaderProps = {
+  sessions: ChatSessionSummary[];
+  activeSessionId: string | null;
+  isLoading: boolean;
   onClearChat: () => void;
+  onSelectSession: (chatSessionId: string) => void;
 };
 
-export function ChatPanelHeader({ onClearChat }: ChatPanelHeaderProps) {
+export function ChatPanelHeader({
+  sessions,
+  activeSessionId,
+  isLoading,
+  onClearChat,
+  onSelectSession,
+}: ChatPanelHeaderProps) {
   return (
     <div className='w-full border-b border-popover-separator px-4 py-3'>
-      <div className='flex items-center justify-between gap-3'>
-        <div>
+      <div className='flex items-start justify-between gap-3'>
+        <div className='min-w-0'>
           <p className='text-sm font-medium leading-none'>Eltrack Assistant</p>
+          <div className='mt-2'>
+            <ChatSessionSwitcher
+              sessions={sessions}
+              activeSessionId={activeSessionId}
+              isLoading={isLoading}
+              onSelectSession={onSelectSession}
+            />
+          </div>
         </div>
 
         <div className='flex items-center justify-center gap-2'>
@@ -23,6 +43,7 @@ export function ChatPanelHeader({ onClearChat }: ChatPanelHeaderProps) {
             variant='plain'
             className='ring-0 size-7 rounded-lg text-muted hover:text-foreground'
             onClick={onClearChat}
+            disabled={isLoading}
             aria-label='Mulai chat baru'
             title='Mulai chat baru'
           >

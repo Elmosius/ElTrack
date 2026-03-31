@@ -2,7 +2,10 @@ import { toServerSentEventsResponse } from '@tanstack/ai';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createFileRoute } from '@tanstack/react-router';
 import { auth } from '#/lib/auth.server';
-import { createChatbotStream } from '#/features/chatbot/chatbot.server';
+import {
+  createChatbotStream,
+  persistChatUserMessage,
+} from '#/features/chatbot/chatbot.server';
 
 export const Route = createFileRoute('/api/chat')({
   server: {
@@ -19,12 +22,27 @@ export const Route = createFileRoute('/api/chat')({
         try {
           const body = (await request.json()) as {
             messages?: Array<UIMessage | ModelMessage>;
+            chatSessionId?: string;
           };
+
+          if (!body.chatSessionId) {
+            return new Response('Chat session wajib ada.', { status: 400 });
+          }
 
           const abortController = new AbortController();
           request.signal.addEventListener('abort', () => abortController.abort(), { once: true });
 
-          const stream = await createChatbotStream(session.user.id, body.messages ?? []);
+          await persistChatUserMessage(
+            session.user.id,
+            body.chatSessionId,
+            body.messages ?? [],
+          );
+
+          const stream = await createChatbotStream({
+            userId: session.user.id,
+            chatSessionId: body.chatSessionId,
+            messages: body.messages ?? [],
+          });
 
           return toServerSentEventsResponse(stream, {
             abortController,

@@ -14,7 +14,17 @@ export function ChatPanel() {
       sideOffset={14}
       className='w-[min(92vw,23rem)] p-0 gap-0 overflow-hidden rounded-xl'
     >
-      <ChatPanelHeader onClearChat={actions.handleClearChat} />
+      <ChatPanelHeader
+        sessions={state.sessions}
+        activeSessionId={state.activeSessionId}
+        isLoading={
+          state.isBootstrapping || state.isSwitchingSession || state.isLoading
+        }
+        onClearChat={() => void actions.handleClearChat()}
+        onSelectSession={(chatSessionId) =>
+          void actions.handleSelectSession(chatSessionId)
+        }
+      />
 
       <ChatMessageList
         messages={derived.renderedMessages}
@@ -29,6 +39,7 @@ export function ChatPanel() {
         draft={state.draft}
         attachmentName={state.attachmentName}
         isLoading={state.isLoading}
+        isDisabled={state.isBootstrapping || state.isSwitchingSession}
         textareaRef={refs.textareaRef}
         fileInputRef={refs.fileInputRef}
         onDraftChange={actions.setDraft}

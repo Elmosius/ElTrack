@@ -6,6 +6,7 @@ type ChatComposerProps = {
   draft: string;
   attachmentName: string;
   isLoading: boolean;
+  isDisabled?: boolean;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onDraftChange: (value: string) => void;
@@ -19,6 +20,7 @@ export function ChatComposer({
   draft,
   attachmentName,
   isLoading,
+  isDisabled,
   textareaRef,
   fileInputRef,
   onDraftChange,
@@ -35,6 +37,7 @@ export function ChatComposer({
           type='file'
           accept='image/*'
           className='hidden'
+          disabled={isDisabled}
           aria-label='Upload foto chatbot'
           title='Upload foto chatbot'
           onChange={onAttachmentSelect}
@@ -46,6 +49,7 @@ export function ChatComposer({
           rows={1}
           onChange={(event) => onDraftChange(event.target.value)}
           onKeyDown={onComposerKeyDown}
+          disabled={isDisabled}
           placeholder='Tanya apa saja...'
           className='min-h-0 max-h-36 resize-none overflow-y-auto pl-1 pr-0 py-0 text-xs leading-5 placeholder:text-dimmed '
         />
@@ -65,6 +69,7 @@ export function ChatComposer({
               variant='plain'
               className='ring-0 size-7 rounded-lg text-muted hover:text-foreground'
               onClick={onAttachmentClick}
+              disabled={isDisabled}
               aria-label='Upload foto'
             >
               <ImagePlus className='size-3.5' />
@@ -74,7 +79,7 @@ export function ChatComposer({
               variant='primary'
               className='ring-0 text-accent/80 size-7 rounded-lg'
               onClick={onSend}
-              disabled={isLoading}
+              disabled={isLoading || isDisabled}
             >
               <ArrowUp className='size-3.5' />
             </Button>

@@ -1,11 +1,27 @@
-import { toolDefinition, chat, convertMessagesToModelMessages, maxIterations } from '@tanstack/ai';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
+import { toolDefinition, chat, convertMessagesToModelMessages, maxIterations } from '@tanstack/ai';
 import { ollamaText } from '@tanstack/ai-ollama';
+import { Types } from 'mongoose';
+import { ChatMessage } from '#/db/models/chat-message.server';
+import { ChatSession } from '#/db/models/chat-session.server';
+import { connectDB } from '#/db/mongoose.server';
+import { createAssistantMessage, createChatSessionTitle, extractMessageText, sanitizeMessageForStorage } from '#/lib/chatbot';
 import { listKategori } from '#/features/kategori/kategori.server';
 import { listMetodePembayaran } from '#/features/metode-pembayaran/metode-pembayaran.server';
 import { createTransaksi } from '#/features/transaksi/transaksi.server';
 import { listTipe } from '#/features/tipe/tipe.server';
-import { chatbotPreviewEventName, previewTransaksiToolInputSchema, transaksiPreviewSchema, type ConfirmTransaksiPreviewInput, type PreviewTransaksiToolInput, type TransaksiPreview } from './chatbot.schema';
+import {
+  chatbotPreviewEventName,
+  transaksiPreviewSchema,
+  previewTransaksiToolInputSchema,
+  type ChatSessionDetail,
+  type ChatSessionSummary,
+  type ConfirmChatbotPreviewResult,
+  type ConfirmTransaksiPreviewInput,
+  type PersistAssistantChatMessageInput,
+  type PreviewTransaksiToolInput,
+  type TransaksiPreview,
+} from './chatbot.schema';
 
 type NamedOption = {
   id: string;
@@ -18,6 +34,15 @@ type ChatbotMasterData = {
   tipe: NamedOption[];
 };
 
+type StoredChatMessage = {
+  _id?: unknown;
+  messageId: string;
+  role: UIMessage['role'];
+  parts: UIMessage['parts'];
+  createdAt?: Date | string;
+};
+
+const defaultChatSessionTitle = 'Chat baru';
 const defaultOllamaModel = 'qwen3-vl:235b-cloud';
 
 const previewTransaksiTool = toolDefinition({
@@ -107,6 +132,61 @@ function uniq(values: Array<string | null | undefined>) {
   );
 }
 
+function serializeDate(value: Date | string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function serializeChatSession(item: {
+  _id: unknown;
+  title: string;
+  status?: 'active';
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  lastMessageAt?: Date | string | null;
+  lastOpenedAt?: Date | string | null;
+}): ChatSessionSummary {
+  return {
+    id: String(item._id),
+    title: item.title,
+    status: item.status ?? 'active',
+    createdAt: serializeDate(item.createdAt) ?? undefined,
+    updatedAt: serializeDate(item.updatedAt) ?? undefined,
+    lastMessageAt: serializeDate(item.lastMessageAt),
+    lastOpenedAt: serializeDate(item.lastOpenedAt),
+  };
+}
+
+function serializeChatMessage(item: StoredChatMessage): UIMessage {
+  return {
+    id: item.messageId || String(item._id),
+    role: item.role,
+    parts: Array.isArray(item.parts) ? item.parts : [],
+  };
+}
+
+function extractPreviewSummary(preview: TransaksiPreview) {
+  const lines = [
+    `Nama transaksi: ${preview.namaTransaksi ?? '-'}`,
+    `Tanggal: ${preview.tanggal ?? '-'}`,
+    `Waktu: ${preview.waktu ?? '-'}`,
+    `Nominal: ${preview.nominal != null ? String(preview.nominal) : '-'}`,
+    `Kategori: ${preview.kategoriName ?? '-'}`,
+    `Metode pembayaran: ${preview.metodePembayaranName ?? '-'}`,
+    `Tipe: ${preview.tipeName ?? '-'}`,
+    `Catatan: ${preview.catatan ?? '-'}`,
+  ];
+
+  if (preview.missingFields.length > 0) {
+    lines.push(`Field yang masih perlu dicek: ${preview.missingFields.join(' | ')}`);
+  }
+
+  return lines.join('\n');
+}
+
 function findBestOptionMatch(options: NamedOption[], rawValue: string | null) {
   if (!rawValue) {
     return null;
@@ -160,7 +240,7 @@ function buildMissingFields(preview: Omit<TransaksiPreview, 'missingFields' | 'c
   }
 
   if (!preview.tipeId) {
-    missingFields.push('Tipe transaksi belum cocok dengan daftar yang tersedia.');
+    missingFields.push('Tipe transaksi belum cocok dengan daftar tipe yang tersedia.');
   }
 
   return missingFields;
@@ -218,7 +298,7 @@ async function getChatbotMasterData(userId: string): Promise<ChatbotMasterData> 
   };
 }
 
-function buildSystemPrompt(masterData: ChatbotMasterData) {
+function buildSystemPrompt(masterData: ChatbotMasterData, activePreview: TransaksiPreview | null) {
   const tanggalHariIni = new Date().toISOString().slice(0, 10);
   const kategoriList = masterData.kategori.map((item) => item.name).join(', ') || '-';
   const metodePembayaranList = masterData.metodePembayaran.map((item) => item.name).join(', ') || '-';
@@ -237,9 +317,14 @@ function buildSystemPrompt(masterData: ChatbotMasterData) {
     `Daftar metode pembayaran yang tersedia: ${metodePembayaranList}.`,
     `Daftar tipe yang tersedia: ${tipeList}.`,
     'Daftar waktu yang tersedia: Pagi, Siang, Sore, Malam.',
+    activePreview
+      ? `Saat ini ada preview transaksi aktif yang sedang dibahas user:\n${extractPreviewSummary(activePreview)}`
+      : null,
     'Setelah tool berhasil dipanggil, berikan jawaban singkat dan ramah yang menjelaskan apakah preview sudah siap ditinjau atau masih ada field yang perlu dicek.',
     'Jangan mengarang ID atau membuat kategori/metode baru.',
-  ].join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 function withSystemPrompt(messages: Array<UIMessage | ModelMessage>, systemPrompt: string) {
@@ -252,14 +337,243 @@ function withSystemPrompt(messages: Array<UIMessage | ModelMessage>, systemPromp
   ] as ModelMessage[];
 }
 
-export async function createChatbotStream(userId: string, messages: Array<UIMessage | ModelMessage>) {
+async function getChatSessionDoc(userId: string, chatSessionId: string) {
+  await connectDB();
+
+  if (!Types.ObjectId.isValid(chatSessionId)) {
+    throw new Error('Session chatbot tidak ditemukan.');
+  }
+
+  const session = await ChatSession.findOne({
+    _id: chatSessionId,
+    userId,
+  });
+
+  if (!session) {
+    throw new Error('Session chatbot tidak ditemukan.');
+  }
+
+  return session;
+}
+
+async function setSessionPendingPreview(userId: string, chatSessionId: string, preview: TransaksiPreview | null) {
+  const session = await getChatSessionDoc(userId, chatSessionId);
+  session.pendingPreview = preview;
+  session.lastOpenedAt = new Date();
+  await session.save();
+  return serializeChatSession(session.toObject());
+}
+
+async function storeChatMessage(userId: string, chatSessionId: string, message: UIMessage) {
+  const sessionObjectId = new Types.ObjectId(chatSessionId);
+  const storedMessage = sanitizeMessageForStorage(message);
+
+  await ChatMessage.findOneAndUpdate(
+    {
+      sessionId: sessionObjectId,
+      messageId: storedMessage.id,
+    },
+    {
+      $setOnInsert: {
+        sessionId: sessionObjectId,
+        userId,
+        messageId: storedMessage.id,
+        role: storedMessage.role,
+        parts: storedMessage.parts,
+      },
+    },
+    {
+      upsert: true,
+      returnDocument: 'after',
+      runValidators: true,
+    },
+  );
+
+  const updatePayload: Record<string, unknown> = {
+    lastMessageAt: new Date(),
+    lastOpenedAt: new Date(),
+  };
+
+  if (storedMessage.role === 'user') {
+    const title = createChatSessionTitle(extractMessageText(storedMessage));
+    updatePayload.title = title;
+  }
+
+  await ChatSession.findOneAndUpdate(
+    {
+      _id: sessionObjectId,
+      userId,
+      title: defaultChatSessionTitle,
+      status: 'active',
+    },
+    {
+      $set: updatePayload,
+    },
+    {
+      returnDocument: 'after',
+    },
+  );
+
+  await ChatSession.findOneAndUpdate(
+    {
+      _id: sessionObjectId,
+      userId,
+    },
+    {
+      $set: {
+        lastMessageAt: updatePayload.lastMessageAt,
+        lastOpenedAt: updatePayload.lastOpenedAt,
+      },
+    },
+    {
+      returnDocument: 'after',
+    },
+  );
+
+  return storedMessage;
+}
+
+async function listSessionMessages(userId: string, chatSessionId: string) {
+  const sessionObjectId = new Types.ObjectId(chatSessionId);
+  const messages = await ChatMessage.find({
+    userId,
+    sessionId: sessionObjectId,
+  })
+    .sort({ createdAt: 1, _id: 1 })
+    .lean();
+
+  return messages.map((message) => serializeChatMessage(message as StoredChatMessage));
+}
+
+function getPendingPreview(value: unknown) {
+  const parsed = transaksiPreviewSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
+function getLastUserMessage(messages: Array<UIMessage | ModelMessage>) {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index];
+
+    if (message && 'parts' in message && message.role === 'user') {
+      return message;
+    }
+  }
+
+  return null;
+}
+
+export async function listChatSessions(userId: string): Promise<ChatSessionSummary[]> {
+  await connectDB();
+
+  const sessions = await ChatSession.find({
+    userId,
+    status: 'active',
+  })
+    .sort({ lastOpenedAt: -1, lastMessageAt: -1, updatedAt: -1, _id: -1 })
+    .lean();
+
+  return sessions.map((session) => serializeChatSession(session));
+}
+
+export async function getChatSessionDetail(userId: string, chatSessionId: string): Promise<ChatSessionDetail> {
+  const session = await getChatSessionDoc(userId, chatSessionId);
+  session.lastOpenedAt = new Date();
+  await session.save();
+
+  const messages = await listSessionMessages(userId, chatSessionId);
+
+  return {
+    session: serializeChatSession(session.toObject()),
+    messages,
+    pendingPreview: getPendingPreview(session.pendingPreview),
+  };
+}
+
+export async function createChatSession(userId: string): Promise<ChatSessionDetail> {
+  await connectDB();
+
+  const session = await ChatSession.create({
+    userId,
+    title: defaultChatSessionTitle,
+    status: 'active',
+    lastOpenedAt: new Date(),
+    lastMessageAt: null,
+    pendingPreview: null,
+  });
+
+  return {
+    session: serializeChatSession(session.toObject()),
+    messages: [],
+    pendingPreview: null,
+  };
+}
+
+export async function persistChatUserMessage(userId: string, chatSessionId: string, messages: Array<UIMessage | ModelMessage>) {
+  const session = await getChatSessionDoc(userId, chatSessionId);
+  const latestUserMessage = getLastUserMessage(messages);
+
+  if (!latestUserMessage) {
+    return {
+      session: serializeChatSession(session.toObject()),
+    };
+  }
+
+  await storeChatMessage(userId, chatSessionId, latestUserMessage);
+  const updatedSession = await getChatSessionDoc(userId, chatSessionId);
+
+  return {
+    session: serializeChatSession(updatedSession.toObject()),
+  };
+}
+
+export async function persistAssistantChatMessage(userId: string, input: PersistAssistantChatMessageInput) {
+  const { chatSessionId, message } = input;
+  await getChatSessionDoc(userId, chatSessionId);
+  const storedMessage = await storeChatMessage(
+    userId,
+    chatSessionId,
+    message as unknown as UIMessage,
+  );
+  const updatedSession = await getChatSessionDoc(userId, chatSessionId);
+
+  return {
+    assistantMessage: storedMessage,
+    session: serializeChatSession(updatedSession.toObject()),
+  };
+}
+
+export async function dismissChatbotPreview(userId: string, chatSessionId: string) {
+  const session = await getChatSessionDoc(userId, chatSessionId);
+  session.pendingPreview = null;
+  session.lastOpenedAt = new Date();
+  await session.save();
+
+  return {
+    session: serializeChatSession(session.toObject()),
+    cleared: true,
+  };
+}
+
+export async function createChatbotStream({
+  userId,
+  chatSessionId,
+  messages,
+}: {
+  userId: string;
+  chatSessionId: string;
+  messages: Array<UIMessage | ModelMessage>;
+}) {
+  const session = await getChatSessionDoc(userId, chatSessionId);
+  const activePreview = getPendingPreview(session.pendingPreview);
   const masterData = await getChatbotMasterData(userId);
+
   const stream = chat({
     adapter: ollamaText(getOllamaModel()),
-    messages: withSystemPrompt(messages, buildSystemPrompt(masterData)) as never,
+    messages: withSystemPrompt(messages, buildSystemPrompt(masterData, activePreview)) as never,
     tools: [
       previewTransaksiTool.server(async (args, context) => {
         const preview = buildResolvedPreview(args, masterData);
+        await setSessionPendingPreview(userId, chatSessionId, preview);
         context?.emitCustomEvent(chatbotPreviewEventName, preview);
         return preview;
       }),
@@ -270,18 +584,27 @@ export async function createChatbotStream(userId: string, messages: Array<UIMess
   return stream;
 }
 
-export async function confirmChatbotPreview(userId: string, input: ConfirmTransaksiPreviewInput) {
-  const preview = transaksiPreviewSchema.parse(input);
+export async function confirmChatbotPreview(userId: string, input: ConfirmTransaksiPreviewInput): Promise<ConfirmChatbotPreviewResult> {
+  const session = await getChatSessionDoc(userId, input.chatSessionId);
+  const preview = getPendingPreview(session.pendingPreview);
 
-  if (!preview.canConfirm) {
+  if (!preview || !preview.canConfirm) {
     throw new Error('Preview transaksi belum lengkap, jadi belum bisa disimpan.');
   }
 
-  if (!preview.namaTransaksi || !preview.tanggal || preview.nominal == null || !preview.waktu || !preview.kategoriId || !preview.metodePembayaranId || !preview.tipeId) {
+  if (
+    !preview.namaTransaksi ||
+    !preview.tanggal ||
+    preview.nominal == null ||
+    !preview.waktu ||
+    !preview.kategoriId ||
+    !preview.metodePembayaranId ||
+    !preview.tipeId
+  ) {
     throw new Error('Preview transaksi belum lengkap, jadi belum bisa disimpan.');
   }
 
-  return createTransaksi(userId, {
+  await createTransaksi(userId, {
     namaTransaksi: preview.namaTransaksi,
     tanggal: preview.tanggal,
     waktu: preview.waktu,
@@ -291,4 +614,17 @@ export async function confirmChatbotPreview(userId: string, input: ConfirmTransa
     catatan: preview.catatan ?? undefined,
     tipe: preview.tipeId,
   });
+
+  const assistantMessage = createAssistantMessage('Transaksi berhasil disimpan ke tabel.');
+  await storeChatMessage(userId, input.chatSessionId, assistantMessage);
+
+  session.pendingPreview = null;
+  session.lastOpenedAt = new Date();
+  session.lastMessageAt = new Date();
+  await session.save();
+
+  return {
+    assistantMessage,
+    session: serializeChatSession(session.toObject()),
+  };
 }

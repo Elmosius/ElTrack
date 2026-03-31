@@ -1,4 +1,5 @@
-import { createAssistantMessage, getErrorMessage, toRenderedChatMessages } from '#/lib/chatbot';
+import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
+import { getErrorMessage, toRenderedChatMessages } from '#/lib/chatbot';
 import { useUser } from '#/stores/user';
 import { toastManager } from '@/components/selia/toast';
 import { initialMessages } from '@/const/chatbot';
@@ -6,40 +7,82 @@ import { fetchServerSentEvents, type UIMessage, useChat } from '@tanstack/ai-rea
 import { useRouter } from '@tanstack/react-router';
 import { useDeferredValue, useEffect, useMemo, useRef } from 'react';
 import { useChatbotComposer } from './use-chatbot-composer';
-import { useChatbotHistory } from './use-chatbot-history';
 import { useChatbotPreview } from './use-chatbot-preview';
+import { useChatbotSessions } from './use-chatbot-sessions';
 
 export function useChatbotPanel() {
   const latestErrorRef = useRef<string | null>(null);
   const latestMessagesRef = useRef<UIMessage[]>(initialMessages);
+  const activeSessionIdRef = useRef<string | null>(null);
   const router = useRouter();
   const user = useUser();
   const composer = useChatbotComposer();
   const preview = useChatbotPreview({
-    onConfirmSuccess: async () => {
-      setMessages([...latestMessagesRef.current, createAssistantMessage('Transaksi berhasil disimpan ke tabel.')]);
+    getActiveSessionId: () => activeSessionIdRef.current,
+    onConfirmSuccess: async (result) => {
+      setMessages([...latestMessagesRef.current, result.assistantMessage]);
+      sessions.actions.syncSessionSummary(result.session);
+      await sessions.actions.refreshSessions();
       await router.invalidate();
+    },
+    onDismissSuccess: async () => {
+      await sessions.actions.refreshSessions();
     },
   });
 
-  const { messages, sendMessage, setMessages, stop, isLoading, error } = useChat({
-    connection: fetchServerSentEvents('/api/chat'),
-    initialMessages,
-    onCustomEvent: preview.actions.handleCustomEvent,
-  });
-  const history = useChatbotHistory({
+  const { messages, sendMessage, setMessages, stop, isLoading, error } =
+    useChat({
+      connection: fetchServerSentEvents('/api/chat', () => ({
+        body: {
+          chatSessionId: activeSessionIdRef.current,
+        },
+      })),
+      initialMessages,
+      onCustomEvent: preview.actions.handleCustomEvent,
+      onFinish: (message) => {
+        const chatSessionId = activeSessionIdRef.current;
+
+        if (!chatSessionId || message.role !== 'assistant') {
+          return;
+        }
+
+        void persistChatbotAssistantSessionMessage({
+          data: {
+            chatSessionId,
+            message: message as Extract<UIMessage, { role: 'assistant' }>,
+          },
+        })
+          .then((result: any) => {
+            sessions.actions.syncSessionSummary(result.session);
+            return sessions.actions.refreshSessions();
+          })
+          .catch((persistError) => {
+            console.error(
+              'Persist assistant chat message error:',
+              persistError,
+            );
+          });
+      },
+    });
+  const sessions = useChatbotSessions({
     userId: user?.id,
-    messages,
     setMessages,
-    initialMessages,
+    setPendingPreview: preview.actions.setPendingPreview,
   });
 
   const deferredMessages = useDeferredValue(messages);
-  const renderedMessages = useMemo(() => toRenderedChatMessages(deferredMessages), [deferredMessages]);
+  const renderedMessages = useMemo(
+    () => toRenderedChatMessages(deferredMessages),
+    [deferredMessages],
+  );
 
   useEffect(() => {
     latestMessagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    activeSessionIdRef.current = sessions.state.activeSessionId;
+  }, [sessions.state.activeSessionId]);
 
   useEffect(() => {
     if (!error || latestErrorRef.current === error.message) {
@@ -57,15 +100,24 @@ export function useChatbotPanel() {
 
   const handleSend = async () => {
     try {
+      let chatSessionId = activeSessionIdRef.current;
+
+      if (!chatSessionId) {
+        const detail = await sessions.actions.createSession();
+        chatSessionId = detail.session.id;
+        activeSessionIdRef.current = detail.session.id;
+      }
+
       const payload = await composer.actions.buildMessagePayload();
 
-      if (!payload) {
+      if (!payload || !chatSessionId) {
         return;
       }
 
       preview.actions.clearPreview();
       composer.actions.resetComposer();
       await sendMessage(payload);
+      await sessions.actions.refreshSessions();
     } catch (sendError) {
       toastManager.add({
         type: 'error',
@@ -75,7 +127,9 @@ export function useChatbotPanel() {
     }
   };
 
-  const handleComposerKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleComposerKeyDown = (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) => {
     if (event.key !== 'Enter' || event.shiftKey) {
       return;
     }
@@ -84,23 +138,35 @@ export function useChatbotPanel() {
     void handleSend();
   };
 
-  const handleClearChat = () => {
+  const handleClearChat = async () => {
     stop();
-    preview.actions.clearPreview();
     composer.actions.resetComposer();
-    setMessages(initialMessages);
-    history.actions.clearHistory();
+    const detail = await sessions.actions.createSession();
+    activeSessionIdRef.current = detail.session.id;
+    preview.actions.clearPreview();
 
     toastManager.add({
       type: 'success',
       title: 'Chat baru',
-      description: 'Riwayat percakapan berhasil direset.',
+      description: 'Session percakapan baru sudah dibuat.',
     });
   };
 
   const handleConfirmPreview = async () => {
     stop();
     await preview.actions.handleConfirmPreview();
+  };
+
+  const handleDismissPreview = async () => {
+    await preview.actions.handleDismissPreview();
+  };
+
+  const handleSelectSession = async (chatSessionId: string) => {
+    stop();
+    composer.actions.resetComposer();
+    preview.actions.clearPreview();
+    const detail = await sessions.actions.selectSession(chatSessionId);
+    activeSessionIdRef.current = detail.session.id;
   };
 
   return {
@@ -110,6 +176,10 @@ export function useChatbotPanel() {
       pendingPreview: preview.state.pendingPreview,
       isConfirmingPreview: preview.state.isConfirmingPreview,
       isLoading,
+      sessions: sessions.state.sessions,
+      activeSessionId: sessions.state.activeSessionId,
+      isBootstrapping: sessions.state.isBootstrapping,
+      isSwitchingSession: sessions.state.isSwitchingSession,
     },
     derived: {
       renderedMessages,
@@ -121,8 +191,9 @@ export function useChatbotPanel() {
       handleAttachmentSelect: composer.actions.handleAttachmentSelect,
       handleAttachmentClick: composer.actions.handleAttachmentClick,
       handleConfirmPreview,
-      handleDismissPreview: preview.actions.handleDismissPreview,
+      handleDismissPreview,
       handleClearChat,
+      handleSelectSession,
     },
     refs: {
       textareaRef: composer.refs.textareaRef,

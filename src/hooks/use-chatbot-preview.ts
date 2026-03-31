@@ -1,7 +1,11 @@
-import { confirmChatbotPreviewTransaksi } from '#/features/chatbot/chatbot.functions';
+import {
+  confirmChatbotPreviewTransaksi,
+  dismissChatbotPreviewSession,
+} from '#/features/chatbot/chatbot.functions';
 import {
   chatbotPreviewEventName,
   transaksiPreviewSchema,
+  type ConfirmChatbotPreviewResult,
   type TransaksiPreview,
 } from '#/features/chatbot/chatbot.schema';
 import { getErrorMessage } from '#/lib/chatbot';
@@ -9,12 +13,18 @@ import { toastManager } from '@/components/selia/toast';
 import { useState } from 'react';
 
 type UseChatbotPreviewOptions = {
-  onConfirmSuccess?: () => Promise<void> | void;
+  getActiveSessionId: () => string | null;
+  onConfirmSuccess?: (
+    result: ConfirmChatbotPreviewResult,
+  ) => Promise<void> | void;
+  onDismissSuccess?: () => Promise<void> | void;
 };
 
 export function useChatbotPreview({
+  getActiveSessionId,
   onConfirmSuccess,
-}: UseChatbotPreviewOptions = {}) {
+  onDismissSuccess,
+}: UseChatbotPreviewOptions) {
   const [pendingPreview, setPendingPreview] = useState<TransaksiPreview | null>(
     null,
   );
@@ -35,19 +45,26 @@ export function useChatbotPreview({
   };
 
   const handleConfirmPreview = async () => {
-    if (!pendingPreview || !pendingPreview.canConfirm || isConfirmingPreview) {
+    const chatSessionId = getActiveSessionId();
+
+    if (
+      !chatSessionId ||
+      !pendingPreview ||
+      !pendingPreview.canConfirm ||
+      isConfirmingPreview
+    ) {
       return;
     }
 
     try {
       setIsConfirmingPreview(true);
 
-      await confirmChatbotPreviewTransaksi({
-        data: pendingPreview,
-      });
+      const result = await confirmChatbotPreviewTransaksi({
+        data: { chatSessionId },
+      }) as ConfirmChatbotPreviewResult;
 
       setPendingPreview(null);
-      await onConfirmSuccess?.();
+      await onConfirmSuccess?.(result);
       toastManager.add({
         type: 'success',
         title: 'Berhasil',
@@ -64,8 +81,26 @@ export function useChatbotPreview({
     }
   };
 
-  const handleDismissPreview = () => {
+  const handleDismissPreview = async () => {
+    const chatSessionId = getActiveSessionId();
     setPendingPreview(null);
+
+    if (!chatSessionId) {
+      return;
+    }
+
+    try {
+      await dismissChatbotPreviewSession({
+        data: { chatSessionId },
+      });
+      await onDismissSuccess?.();
+    } catch (dismissError) {
+      toastManager.add({
+        type: 'error',
+        title: 'Gagal membatalkan preview',
+        description: getErrorMessage(dismissError),
+      });
+    }
   };
 
   return {
@@ -77,7 +112,10 @@ export function useChatbotPreview({
       handleCustomEvent,
       handleConfirmPreview,
       handleDismissPreview,
-      clearPreview: handleDismissPreview,
+      clearPreview() {
+        setPendingPreview(null);
+      },
+      setPendingPreview,
     },
   };
 }
