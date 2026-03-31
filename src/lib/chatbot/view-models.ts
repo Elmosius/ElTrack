@@ -7,6 +7,7 @@ import type {
   ChatSessionSummary,
   TransaksiPreview,
 } from '#/features/chatbot/chatbot.schema';
+import type { ChatComposerPayload } from './composer';
 import type { RenderedChatMessage } from './messages';
 
 export type ChatPanelHeaderViewModel = {
@@ -38,4 +39,11 @@ export type ChatComposerViewModel = {
   onAttachmentSelect: (event: ChangeEvent<HTMLInputElement>) => void;
   onAttachmentClick: () => void;
   onSend: () => void;
+};
+
+export type ChatComposerSectionViewModel = {
+  isLoading: boolean;
+  isDisabled: boolean;
+  resetVersion: number;
+  onSubmit: (payload: ChatComposerPayload) => Promise<void>;
 };

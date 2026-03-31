@@ -1,7 +1,11 @@
 import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
-import { getErrorMessage, toRenderedChatMessages } from '#/lib/chatbot';
+import {
+  getErrorMessage,
+  toRenderedChatMessages,
+  type ChatComposerPayload,
+} from '#/lib/chatbot';
 import type {
-  ChatComposerViewModel,
+  ChatComposerSectionViewModel,
   ChatMessageListViewModel,
   ChatPanelHeaderViewModel,
 } from '#/lib/chatbot/view-models';
@@ -10,8 +14,14 @@ import { toastManager } from '@/components/selia/toast';
 import { initialMessages } from '@/const/chatbot';
 import { fetchServerSentEvents, type UIMessage, useChat } from '@tanstack/ai-react';
 import { useRouter } from '@tanstack/react-router';
-import { useDeferredValue, useEffect, useMemo, useRef } from 'react';
-import { useChatbotComposer } from './use-chatbot-composer';
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useChatbotPreview } from './use-chatbot-preview';
 import { useChatbotSessions } from './use-chatbot-sessions';
 
@@ -21,7 +31,7 @@ export function useChatbotPanel() {
   const activeSessionIdRef = useRef<string | null>(null);
   const router = useRouter();
   const user = useUser();
-  const composer = useChatbotComposer();
+  const [composerResetVersion, setComposerResetVersion] = useState(0);
   const preview = useChatbotPreview({
     getActiveSessionId: () => activeSessionIdRef.current,
     onConfirmSuccess: async (result) => {
@@ -89,6 +99,10 @@ export function useChatbotPanel() {
     activeSessionIdRef.current = sessions.state.activeSessionId;
   }, [sessions.state.activeSessionId]);
 
+  const resetComposer = useCallback(() => {
+    setComposerResetVersion((currentVersion) => currentVersion + 1);
+  }, []);
+
   useEffect(() => {
     if (!error || latestErrorRef.current === error.message) {
       return;
@@ -103,7 +117,7 @@ export function useChatbotPanel() {
     });
   }, [error]);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async (payload: ChatComposerPayload) => {
     try {
       let chatSessionId = activeSessionIdRef.current;
 
@@ -113,14 +127,11 @@ export function useChatbotPanel() {
         activeSessionIdRef.current = detail.session.id;
       }
 
-      const payload = await composer.actions.buildMessagePayload();
-
-      if (!payload || !chatSessionId) {
+      if (!chatSessionId) {
         return;
       }
 
       preview.actions.clearPreview();
-      composer.actions.resetComposer();
       await sendMessage(payload);
       await sessions.actions.refreshSessions();
     } catch (sendError) {
@@ -130,22 +141,11 @@ export function useChatbotPanel() {
         description: getErrorMessage(sendError),
       });
     }
-  };
+  }, [preview.actions, sendMessage, sessions.actions]);
 
-  const handleComposerKeyDown = (
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-  ) => {
-    if (event.key !== 'Enter' || event.shiftKey) {
-      return;
-    }
-
-    event.preventDefault();
-    void handleSend();
-  };
-
-  const handleClearChat = async () => {
+  const handleClearChat = useCallback(async () => {
     stop();
-    composer.actions.resetComposer();
+    resetComposer();
     const detail = await sessions.actions.createSession();
     activeSessionIdRef.current = detail.session.id;
     preview.actions.clearPreview();
@@ -155,59 +155,83 @@ export function useChatbotPanel() {
       title: 'Chat baru',
       description: 'Session percakapan baru sudah dibuat.',
     });
-  };
+  }, [preview.actions, resetComposer, sessions.actions, stop]);
 
-  const handleConfirmPreview = async () => {
+  const handleConfirmPreview = useCallback(async () => {
     stop();
     await preview.actions.handleConfirmPreview();
-  };
+  }, [preview.actions, stop]);
 
-  const handleDismissPreview = async () => {
+  const handleDismissPreview = useCallback(async () => {
     await preview.actions.handleDismissPreview();
-  };
+  }, [preview.actions]);
 
-  const handleSelectSession = async (chatSessionId: string) => {
+  const handleSelectSession = useCallback(async (chatSessionId: string) => {
     stop();
-    composer.actions.resetComposer();
+    resetComposer();
     preview.actions.clearPreview();
     const detail = await sessions.actions.selectSession(chatSessionId);
     activeSessionIdRef.current = detail.session.id;
-  };
+  }, [preview.actions, resetComposer, sessions.actions, stop]);
 
-  const header: ChatPanelHeaderViewModel = {
-    sessions: sessions.state.sessions,
-    activeSessionId: sessions.state.activeSessionId,
-    isLoading:
-      sessions.state.isBootstrapping ||
-      sessions.state.isSwitchingSession ||
+  const header: ChatPanelHeaderViewModel = useMemo(
+    () => ({
+      sessions: sessions.state.sessions,
+      activeSessionId: sessions.state.activeSessionId,
+      isLoading:
+        sessions.state.isBootstrapping ||
+        sessions.state.isSwitchingSession ||
+        isLoading,
+      onClearChat: () => void handleClearChat(),
+      onSelectSession: (chatSessionId) =>
+        void handleSelectSession(chatSessionId),
+    }),
+    [
+      handleClearChat,
+      handleSelectSession,
       isLoading,
-    onClearChat: () => void handleClearChat(),
-    onSelectSession: (chatSessionId) => void handleSelectSession(chatSessionId),
-  };
+      sessions.state.activeSessionId,
+      sessions.state.isBootstrapping,
+      sessions.state.isSwitchingSession,
+      sessions.state.sessions,
+    ],
+  );
 
-  const messageList: ChatMessageListViewModel = {
-    messages: renderedMessages,
-    isLoading,
-    preview: preview.state.pendingPreview,
-    isConfirmingPreview: preview.state.isConfirmingPreview,
-    onConfirmPreview: handleConfirmPreview,
-    onDismissPreview: handleDismissPreview,
-  };
+  const messageList: ChatMessageListViewModel = useMemo(
+    () => ({
+      messages: renderedMessages,
+      isLoading,
+      preview: preview.state.pendingPreview,
+      isConfirmingPreview: preview.state.isConfirmingPreview,
+      onConfirmPreview: handleConfirmPreview,
+      onDismissPreview: handleDismissPreview,
+    }),
+    [
+      handleConfirmPreview,
+      handleDismissPreview,
+      isLoading,
+      preview.state.isConfirmingPreview,
+      preview.state.pendingPreview,
+      renderedMessages,
+    ],
+  );
 
-  const composerViewModel: ChatComposerViewModel = {
-    draft: composer.state.draft,
-    attachmentName: composer.state.attachmentName,
-    isLoading,
-    isDisabled:
-      sessions.state.isBootstrapping || sessions.state.isSwitchingSession,
-    textareaRef: composer.refs.textareaRef,
-    fileInputRef: composer.refs.fileInputRef,
-    onDraftChange: composer.actions.setDraft,
-    onComposerKeyDown: handleComposerKeyDown,
-    onAttachmentSelect: composer.actions.handleAttachmentSelect,
-    onAttachmentClick: composer.actions.handleAttachmentClick,
-    onSend: () => void handleSend(),
-  };
+  const composerViewModel: ChatComposerSectionViewModel = useMemo(
+    () => ({
+      isLoading,
+      isDisabled:
+        sessions.state.isBootstrapping || sessions.state.isSwitchingSession,
+      resetVersion: composerResetVersion,
+      onSubmit: handleSend,
+    }),
+    [
+      composerResetVersion,
+      handleSend,
+      isLoading,
+      sessions.state.isBootstrapping,
+      sessions.state.isSwitchingSession,
+    ],
+  );
 
   return {
     sections: {
@@ -217,7 +241,6 @@ export function useChatbotPanel() {
     },
     actions: {
       handleSend,
-      handleComposerKeyDown,
       handleConfirmPreview,
       handleDismissPreview,
       handleClearChat,

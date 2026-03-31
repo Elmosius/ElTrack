@@ -1,14 +1,21 @@
 import {
   fileToBase64Payload,
+  type ChatComposerPayload,
   type ChatComposerPart,
 } from '#/lib/chatbot';
 import { maxUploadSizeInBytes } from '@/const/chatbot';
 import { toastManager } from '@/components/selia/toast';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-type ChatComposerPayload = string | { content: ChatComposerPart[] };
+type UseChatbotComposerOptions = {
+  resetVersion: number;
+  onSubmit: (payload: ChatComposerPayload) => Promise<void>;
+};
 
-export function useChatbotComposer() {
+export function useChatbotComposer({
+  resetVersion,
+  onSubmit,
+}: UseChatbotComposerOptions) {
   const [draft, setDraft] = useState('');
   const [attachmentName, setAttachmentName] = useState('');
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
@@ -26,19 +33,23 @@ export function useChatbotComposer() {
     node.style.height = `${Math.min(node.scrollHeight, 144)}px`;
   }, [draft]);
 
-  const clearAttachment = () => {
+  const clearAttachment = useCallback(() => {
     setAttachmentFile(null);
     setAttachmentName('');
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
+  }, []);
 
-  const resetComposer = () => {
+  const resetComposer = useCallback(() => {
     setDraft('');
     clearAttachment();
-  };
+  }, [clearAttachment]);
+
+  useEffect(() => {
+    resetComposer();
+  }, [resetComposer, resetVersion]);
 
   const handleAttachmentSelect = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -78,45 +89,71 @@ export function useChatbotComposer() {
     fileInputRef.current?.click();
   };
 
-  const buildMessagePayload = async (): Promise<ChatComposerPayload | null> => {
-    const message = draft.trim();
-    const nextAttachmentFile = attachmentFile;
+  const buildMessagePayload = useCallback(
+    async (): Promise<ChatComposerPayload | null> => {
+      const message = draft.trim();
+      const nextAttachmentFile = attachmentFile;
 
-    if (!message && !nextAttachmentFile) {
-      return null;
+      if (!message && !nextAttachmentFile) {
+        return null;
+      }
+
+      const contentParts: ChatComposerPart[] = [];
+      const promptText =
+        message ||
+        (nextAttachmentFile
+          ? 'Tolong bantu baca struk ini dan siapkan preview transaksi.'
+          : '');
+
+      if (promptText) {
+        contentParts.push({
+          type: 'text',
+          content: promptText,
+        });
+      }
+
+      if (nextAttachmentFile) {
+        const imagePayload = await fileToBase64Payload(nextAttachmentFile);
+
+        contentParts.push({
+          type: 'image',
+          source: {
+            type: 'data',
+            value: imagePayload.value,
+            mimeType: imagePayload.mimeType,
+          },
+        });
+      }
+
+      return contentParts.length === 1 && contentParts[0]?.type === 'text'
+        ? contentParts[0].content || ''
+        : { content: contentParts };
+    },
+    [attachmentFile, draft],
+  );
+
+  const handleSend = useCallback(async () => {
+    const payload = await buildMessagePayload();
+
+    if (!payload) {
+      return;
     }
 
-    const contentParts: ChatComposerPart[] = [];
-    const promptText =
-      message ||
-      (nextAttachmentFile
-        ? 'Tolong bantu baca struk ini dan siapkan preview transaksi.'
-        : '');
+    resetComposer();
+    await onSubmit(payload);
+  }, [buildMessagePayload, onSubmit, resetComposer]);
 
-    if (promptText) {
-      contentParts.push({
-        type: 'text',
-        content: promptText,
-      });
-    }
+  const handleComposerKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key !== 'Enter' || event.shiftKey) {
+        return;
+      }
 
-    if (nextAttachmentFile) {
-      const imagePayload = await fileToBase64Payload(nextAttachmentFile);
-
-      contentParts.push({
-        type: 'image',
-        source: {
-          type: 'data',
-          value: imagePayload.value,
-          mimeType: imagePayload.mimeType,
-        },
-      });
-    }
-
-    return contentParts.length === 1 && contentParts[0]?.type === 'text'
-      ? contentParts[0].content || ''
-      : { content: contentParts };
-  };
+      event.preventDefault();
+      void handleSend();
+    },
+    [handleSend],
+  );
 
   return {
     state: {
@@ -127,8 +164,8 @@ export function useChatbotComposer() {
       setDraft,
       handleAttachmentSelect,
       handleAttachmentClick,
-      resetComposer,
-      buildMessagePayload,
+      handleComposerKeyDown,
+      handleSend,
     },
     refs: {
       textareaRef,

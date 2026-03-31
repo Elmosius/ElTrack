@@ -8,6 +8,8 @@ export type ChatComposerPart =
       source: { type: 'data'; value: string; mimeType: string };
     };
 
+export type ChatComposerPayload = string | { content: ChatComposerPart[] };
+
 export async function fileToBase64Payload(file: File) {
   return await new Promise<{ mimeType: string; value: string }>(
     (resolve, reject) => {

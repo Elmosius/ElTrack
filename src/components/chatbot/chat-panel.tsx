@@ -1,6 +1,6 @@
 import { useChatbotPanel } from '#/hooks/use-chatbot-panel';
 import { PopoverPopup } from '../selia/popover';
-import { ChatComposer } from './chat-composer';
+import { ChatComposerSection } from './chat-composer-section';
 import { ChatMessageList } from './chat-message-list';
 import { ChatPanelHeader } from './chat-panel-header';
 
@@ -18,7 +18,7 @@ export function ChatPanel() {
 
       <ChatMessageList messageList={sections.messageList} />
 
-      <ChatComposer composer={sections.composer} />
+      <ChatComposerSection composer={sections.composer} />
     </PopoverPopup>
   );
 }
