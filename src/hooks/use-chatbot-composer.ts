@@ -75,7 +75,7 @@ export function useChatbotComposer({
       toastManager.add({
         type: 'error',
         title: 'File terlalu besar',
-        description: 'Maksimal ukuran gambar adalah 5 MB.',
+        description: 'Maksimal ukuran file asli adalah 8 MB.',
       });
       clearAttachment();
       return;
@@ -133,14 +133,25 @@ export function useChatbotComposer({
   );
 
   const handleSend = useCallback(async () => {
-    const payload = await buildMessagePayload();
+    try {
+      const payload = await buildMessagePayload();
 
-    if (!payload) {
-      return;
+      if (!payload) {
+        return;
+      }
+
+      resetComposer();
+      await onSubmit(payload);
+    } catch (error) {
+      toastManager.add({
+        type: 'error',
+        title: 'Gagal memproses foto',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Coba lagi dengan gambar yang lebih kecil.',
+      });
     }
-
-    resetComposer();
-    await onSubmit(payload);
   }, [buildMessagePayload, onSubmit, resetComposer]);
 
   const handleComposerKeyDown = useCallback(
