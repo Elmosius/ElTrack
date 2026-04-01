@@ -1,3 +1,4 @@
+import { CatatanKeuanganPending } from '#/components/catatan-keuangan/catatan-keuangan-pending';
 import { useHydrateTransactionTable } from '#/hooks/use-transaction-table';
 import { buildTransactionTableData } from '#/lib/transaction-table';
 import KalenderSection from '#/components/catatan-keuangan/kalender';
@@ -13,6 +14,7 @@ import { useState } from 'react';
 
 export const Route = createFileRoute('/_app/catatan-keuangan')({
   component: RouteComponent,
+  pendingComponent: CatatanKeuanganPending,
   loader: async () => {
     const [
       listTipe,

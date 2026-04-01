@@ -1,3 +1,4 @@
+import { DashboardPending } from '#/components/dashboard/dashboard-pending';
 import { HomeDashboard } from '#/components/dashboard/home-dashboard';
 import AppBreadCrumb from '#/components/shared/app-breadcrumb';
 import { getDashboardHome } from '#/features/dashboard/dashboard.functions';
@@ -5,6 +6,7 @@ import { normalizeDashboardMonth } from '#/lib/dashboard';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_app/')({
+  pendingComponent: DashboardPending,
   validateSearch: (search: Record<string, unknown>) => ({
     month:
       typeof search.month === 'string' && /^\d{4}-\d{2}$/.test(search.month)
