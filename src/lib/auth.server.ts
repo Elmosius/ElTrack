@@ -1,13 +1,17 @@
 import '@tanstack/react-start/server-only';
 
-import { getAuthMongoClient, getAuthMongoDatabase } from '#/db/auth-mongo.server';
+import { connectDB } from '#/db/mongoose.server';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 
+const mongoose = await connectDB();
+const authMongoDatabase = mongoose.connection.db;
+const authMongoClient = mongoose.connection.getClient();
+
 export const auth = betterAuth({
-  database: mongodbAdapter(getAuthMongoDatabase(), {
-    client: getAuthMongoClient(),
+  database: mongodbAdapter(authMongoDatabase, {
+    client: authMongoClient,
   }),
   baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {
