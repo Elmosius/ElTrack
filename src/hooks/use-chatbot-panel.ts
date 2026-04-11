@@ -1,6 +1,6 @@
 import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
 import {
-  getErrorMessage,
+  getChatbotErrorMessage,
   toRenderedChatMessages,
   type ChatComposerPayload,
 } from '#/lib/chatbot';
@@ -104,16 +104,22 @@ export function useChatbotPanel() {
   }, []);
 
   useEffect(() => {
-    if (!error || latestErrorRef.current === error.message) {
+    if (!error) {
       return;
     }
 
-    latestErrorRef.current = error.message;
+    const sanitizedMessage = getChatbotErrorMessage(error);
+
+    if (latestErrorRef.current === sanitizedMessage) {
+      return;
+    }
+
+    latestErrorRef.current = sanitizedMessage;
 
     toastManager.add({
       type: 'error',
       title: 'Chatbot error',
-      description: error.message,
+      description: sanitizedMessage,
     });
   }, [error]);
 
@@ -138,7 +144,7 @@ export function useChatbotPanel() {
       toastManager.add({
         type: 'error',
         title: 'Gagal mengirim pesan',
-        description: getErrorMessage(sendError),
+        description: getChatbotErrorMessage(sendError),
       });
     }
   }, [preview.actions, sendMessage, sessions.actions]);
