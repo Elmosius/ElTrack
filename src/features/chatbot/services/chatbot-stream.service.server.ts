@@ -9,8 +9,8 @@ import { geminiText } from '@tanstack/ai-gemini';
 import {
   chatbotPreviewEventName,
   previewTransaksiToolInputSchema,
-  transaksiPreviewSchema,
-  type TransaksiPreview,
+  transaksiPreviewGroupSchema,
+  type TransaksiPreviewGroup,
 } from '../chatbot.schema';
 import { extractPreviewSummary } from '../mappers';
 import {
@@ -29,14 +29,14 @@ import {
 const previewTransaksiTool = toolDefinition({
   name: 'preview_transaksi',
   description:
-    'Siapkan preview transaksi sebelum disimpan ke tabel. Gunakan tool ini saat user mengirim foto struk atau meminta dibuatkan transaksi dari teks. Isi field dengan hasil ekstraksi terbaikmu dan pakai label kategori/metode/tipe yang paling cocok dari daftar yang tersedia.',
+    'Siapkan preview transaksi sebelum disimpan ke tabel. Gunakan tool ini saat user mengirim foto struk, meminta dibuatkan transaksi dari teks, atau memberi koreksi pada preview aktif. Bisa memuat satu atau beberapa transaksi sekaligus. Isi field dengan hasil ekstraksi terbaikmu dan pakai label kategori/metode/tipe yang paling cocok dari daftar yang tersedia.',
   inputSchema: previewTransaksiToolInputSchema,
-  outputSchema: transaksiPreviewSchema,
+  outputSchema: transaksiPreviewGroupSchema,
 });
 
 function buildSystemPrompt(
   masterData: ChatbotMasterData,
-  activePreview: TransaksiPreview | null,
+  activePreview: TransaksiPreviewGroup | null,
 ) {
   const tanggalHariIni = new Date().toISOString().slice(0, 10);
   const kategoriList = masterData.kategori.map((item) => item.name).join(', ') || '-';
@@ -48,7 +48,11 @@ function buildSystemPrompt(
     'Kamu adalah ElTrack Assistant, asisten keuangan pribadi dalam bahasa Indonesia.',
     `Hari ini ${tanggalHariIni}.`,
     'Tugas utamamu adalah membantu chat biasa dan membantu menyiapkan preview transaksi sebelum disimpan.',
-    'Jika user mengirim foto struk, menyebut detail transaksi, atau meminta dibuatkan transaksi, kamu WAJIB memanggil tool preview_transaksi tepat satu kali sebelum memberi jawaban akhir.',
+    'Jika user mengirim foto struk, menyebut detail transaksi, meminta dibuatkan transaksi, atau mengoreksi detail transaksi yang sedang dipreview, kamu WAJIB memanggil tool preview_transaksi tepat satu kali sebelum memberi jawaban akhir.',
+    'Tool preview_transaksi SELALU harus memakai bentuk { items: [...] }.',
+    'Jika user menyebut beberapa transaksi sekaligus, tool preview_transaksi harus berisi semua transaksi tersebut dalam satu preview group.',
+    'Setiap item di dalam items harus berisi field yang memang sudah kamu ketahui. Jangan pernah mengirim item kosong.',
+    'Jika baru tahu sebagian detail, tetap isi field yang sudah diketahui dan biarkan sisanya null.',
     'Jika pertanyaan user bukan tentang membuat transaksi, jawab secara natural tanpa memanggil tool.',
     'Saat memanggil tool, gunakan nilai yang paling sesuai dengan daftar yang tersedia.',
     'Gunakan format tanggal YYYY-MM-DD jika kamu berhasil menebaknya.',
@@ -60,7 +64,14 @@ function buildSystemPrompt(
     activePreview
       ? `Saat ini ada preview transaksi aktif yang sedang dibahas user:\n${extractPreviewSummary(activePreview)}`
       : null,
-    'Setelah tool berhasil dipanggil, berikan jawaban singkat dan ramah yang menjelaskan apakah preview sudah siap ditinjau atau masih ada field yang perlu dicek.',
+    activePreview
+      ? 'Jika user berkata seperti "iya itu", "oke", "sip", atau memberi koreksi singkat, anggap itu sebagai pembahasan preview aktif dan PERBARUI preview; jangan anggap sebagai instruksi simpan otomatis.'
+      : null,
+    activePreview
+      ? 'Saat memperbarui preview aktif, jangan menghapus detail yang sudah benar. Jika koreksi user hanya tentang tanggal atau field bersama lainnya, perbarui item preview yang ada tanpa membuat item kosong baru.'
+      : null,
+    'Aplikasi hanya menyimpan transaksi ke tabel setelah user menekan tombol konfirmasi di UI. Kamu tidak boleh mengatakan transaksi sudah berhasil disimpan, ditambahkan ke tabel, atau selesai disimpan kecuali sistem benar-benar memberi tahu hal itu.',
+    'Setelah tool berhasil dipanggil, berikan jawaban singkat dan ramah yang menjelaskan apakah preview sudah siap ditinjau, sudah diperbarui, atau masih ada field yang perlu dicek.',
     'Jangan mengarang ID atau membuat kategori/metode baru.',
   ]
     .filter(Boolean)
@@ -123,7 +134,8 @@ export async function createChatbotStreamService({
     ) as never,
     tools: [
       previewTransaksiTool.server(async (args, context) => {
-        const preview = buildResolvedPreview(args, masterData);
+        const normalizedArgs = previewTransaksiToolInputSchema.parse(args);
+        const preview = buildResolvedPreview(normalizedArgs, masterData);
         await updateChatSessionPendingPreviewService(
           userId,
           chatSessionId,

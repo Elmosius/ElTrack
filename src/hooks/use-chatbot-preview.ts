@@ -4,9 +4,10 @@ import {
 } from '#/features/chatbot/chatbot.functions';
 import {
   chatbotPreviewEventName,
-  transaksiPreviewSchema,
+  isMeaningfulPreviewItem,
+  transaksiPreviewGroupSchema,
   type ConfirmChatbotPreviewResult,
-  type TransaksiPreview,
+  type TransaksiPreviewGroup,
 } from '#/features/chatbot/chatbot.schema';
 import { getErrorMessage } from '#/lib/chatbot';
 import { toastManager } from '@/components/selia/toast';
@@ -25,7 +26,7 @@ export function useChatbotPreview({
   onConfirmSuccess,
   onDismissSuccess,
 }: UseChatbotPreviewOptions) {
-  const [pendingPreview, setPendingPreview] = useState<TransaksiPreview | null>(
+  const [pendingPreview, setPendingPreview] = useState<TransaksiPreviewGroup | null>(
     null,
   );
   const [isConfirmingPreview, setIsConfirmingPreview] = useState(false);
@@ -35,13 +36,24 @@ export function useChatbotPreview({
       return;
     }
 
-    const preview = transaksiPreviewSchema.safeParse(value);
+    const preview = transaksiPreviewGroupSchema.safeParse(value);
 
     if (!preview.success) {
       return;
     }
 
-    setPendingPreview(preview.data);
+    const meaningfulItems = preview.data.items.filter((item) =>
+      isMeaningfulPreviewItem(item),
+    );
+
+    if (meaningfulItems.length === 0) {
+      return;
+    }
+
+    setPendingPreview({
+      ...preview.data,
+      items: meaningfulItems,
+    });
   };
 
   const handleConfirmPreview = async () => {

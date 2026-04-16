@@ -1,4 +1,8 @@
-import type { TransaksiPreview } from '#/features/chatbot/chatbot.schema';
+import type {
+  TransaksiPreviewGroup,
+  TransaksiPreviewItem,
+} from '#/features/chatbot/chatbot.schema';
+import { isMeaningfulPreviewItem } from '#/features/chatbot/chatbot.schema';
 import { Button } from '../selia/button';
 
 type PreviewFieldProps = {
@@ -15,8 +19,64 @@ function PreviewField({ label, value }: PreviewFieldProps) {
   );
 }
 
+function formatNominal(value: number | null) {
+  return value != null
+    ? `Rp ${new Intl.NumberFormat('id-ID').format(value)}`
+    : '-';
+}
+
+type PreviewItemCardProps = {
+  item: TransaksiPreviewItem;
+  index: number;
+};
+
+function PreviewItemCard({ item, index }: PreviewItemCardProps) {
+  return (
+    <div className='rounded-lg border border-card-separator bg-accent/30 px-2.5 py-2.5'>
+      <div className='flex items-center justify-between gap-3'>
+        <p className='font-medium text-foreground'>
+          {index + 1}. {item.namaTransaksi || 'Transaksi tanpa nama'}
+        </p>
+        <span
+          className={`rounded-full px-2 py-1 text-[10px] font-medium ${
+            item.canConfirm
+              ? 'bg-success/10 text-success'
+              : 'bg-warning/10 text-warning'
+          }`}
+        >
+          {item.canConfirm ? 'Siap' : 'Perlu dicek'}
+        </span>
+      </div>
+
+      <div className='mt-2 space-y-2'>
+        <PreviewField label='Tanggal' value={item.tanggal || '-'} />
+        <PreviewField label='Waktu' value={item.waktu || '-'} />
+        <PreviewField label='Nominal' value={formatNominal(item.nominal)} />
+        <PreviewField label='Kategori' value={item.kategoriName || '-'} />
+        <PreviewField
+          label='Metode'
+          value={item.metodePembayaranName || '-'}
+        />
+        <PreviewField label='Tipe' value={item.tipeName || '-'} />
+        <PreviewField label='Catatan' value={item.catatan || '-'} />
+      </div>
+
+      {item.missingFields.length > 0 ? (
+        <div className='mt-3 rounded-lg border border-warning/25 bg-warning/8 px-2.5 py-2 text-[11px] text-warning'>
+          <p className='font-medium'>Masih perlu dicek:</p>
+          <ul className='mt-1 list-disc pl-4'>
+            {item.missingFields.map((field) => (
+              <li key={field}>{field}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 type ChatPreviewCardProps = {
-  preview: TransaksiPreview;
+  preview: TransaksiPreviewGroup;
   isConfirming: boolean;
   onConfirm: () => void;
   onDismiss: () => void;
@@ -28,11 +88,17 @@ export function ChatPreviewCard({
   onConfirm,
   onDismiss,
 }: ChatPreviewCardProps) {
+  const visibleItems = preview.items.filter((item) =>
+    isMeaningfulPreviewItem(item),
+  );
+
   return (
     <div className='rounded-xl border border-card-separator bg-card px-3 py-3 text-xs shadow-sm'>
       <div className='flex items-center justify-between gap-3'>
         <div>
-          <p className='font-medium text-foreground'>Preview transaksi</p>
+          <p className='font-medium text-foreground'>
+            Preview transaksi ({visibleItems.length})
+          </p>
           <p className='mt-1 text-[10px] text-muted'>
             Cek dulu sebelum disimpan ke tabel.
           </p>
@@ -49,29 +115,18 @@ export function ChatPreviewCard({
       </div>
 
       <div className='mt-3 space-y-2'>
-        <PreviewField label='Nama' value={preview.namaTransaksi || '-'} />
-        <PreviewField label='Tanggal' value={preview.tanggal || '-'} />
-        <PreviewField label='Waktu' value={preview.waktu || '-'} />
-        <PreviewField
-          label='Nominal'
-          value={
-            preview.nominal != null
-              ? `Rp ${new Intl.NumberFormat('id-ID').format(preview.nominal)}`
-              : '-'
-          }
-        />
-        <PreviewField label='Kategori' value={preview.kategoriName || '-'} />
-        <PreviewField
-          label='Metode'
-          value={preview.metodePembayaranName || '-'}
-        />
-        <PreviewField label='Tipe' value={preview.tipeName || '-'} />
-        <PreviewField label='Catatan' value={preview.catatan || '-'} />
+        {visibleItems.map((item, index) => (
+          <PreviewItemCard
+            key={`${item.namaTransaksi || 'transaksi'}-${index}`}
+            item={item}
+            index={index}
+          />
+        ))}
       </div>
 
       {preview.missingFields.length > 0 ? (
         <div className='mt-3 rounded-lg border border-warning/25 bg-warning/8 px-2.5 py-2 text-[11px] text-warning'>
-          <p className='font-medium'>Masih perlu dicek:</p>
+          <p className='font-medium'>Ringkasan yang masih perlu dicek:</p>
           <ul className='mt-1 list-disc pl-4'>
             {preview.missingFields.map((item) => (
               <li key={item}>{item}</li>

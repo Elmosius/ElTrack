@@ -1,6 +1,10 @@
 import type { UIMessage } from '@tanstack/ai-react';
 import { serializeDate, stringifyId } from '#/lib/serialization';
-import type { ChatSessionSummary, TransaksiPreview } from './chatbot.schema';
+import type {
+  ChatSessionSummary,
+  TransaksiPreviewGroup,
+  TransaksiPreviewItem,
+} from './chatbot.schema';
 
 export type StoredChatMessage = {
   _id?: unknown;
@@ -38,9 +42,9 @@ export function serializeChatMessage(item: StoredChatMessage): UIMessage {
   };
 }
 
-export function extractPreviewSummary(preview: TransaksiPreview) {
+function extractPreviewItemSummary(preview: TransaksiPreviewItem, index: number) {
   const lines = [
-    `Nama transaksi: ${preview.namaTransaksi ?? '-'}`,
+    `Transaksi ${index + 1}: ${preview.namaTransaksi ?? '-'}`,
     `Tanggal: ${preview.tanggal ?? '-'}`,
     `Waktu: ${preview.waktu ?? '-'}`,
     `Nominal: ${preview.nominal != null ? String(preview.nominal) : '-'}`,
@@ -57,4 +61,20 @@ export function extractPreviewSummary(preview: TransaksiPreview) {
   }
 
   return lines.join('\n');
+}
+
+export function extractPreviewSummary(preview: TransaksiPreviewGroup) {
+  const sections = preview.items.map((item, index) =>
+    extractPreviewItemSummary(item, index),
+  );
+
+  if (preview.missingFields.length > 0) {
+    sections.push(
+      `Ringkasan field yang masih perlu dicek: ${preview.missingFields.join(
+        ' || ',
+      )}`,
+    );
+  }
+
+  return sections.join('\n\n');
 }

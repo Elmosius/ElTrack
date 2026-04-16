@@ -1,6 +1,7 @@
 import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
 import {
   getChatbotErrorMessage,
+  sanitizeAssistantPreviewResponseMessage,
   toRenderedChatMessages,
   type ChatComposerPayload,
 } from '#/lib/chatbot';
@@ -29,9 +30,6 @@ export function useChatbotPanel() {
   const latestErrorRef = useRef<string | null>(null);
   const latestMessagesRef = useRef<UIMessage[]>(initialMessages);
   const activeSessionIdRef = useRef<string | null>(null);
-  const router = useRouter();
-  const user = useUser();
-  const [composerResetVersion, setComposerResetVersion] = useState(0);
   const preview = useChatbotPreview({
     getActiveSessionId: () => activeSessionIdRef.current,
     onConfirmSuccess: async (result) => {
@@ -44,6 +42,10 @@ export function useChatbotPanel() {
       await sessions.actions.refreshSessions();
     },
   });
+  const pendingPreviewRef = useRef(preview.state.pendingPreview);
+  const router = useRouter();
+  const user = useUser();
+  const [composerResetVersion, setComposerResetVersion] = useState(0);
 
   const { messages, sendMessage, setMessages, stop, isLoading, error } =
     useChat({
@@ -56,15 +58,25 @@ export function useChatbotPanel() {
       onCustomEvent: preview.actions.handleCustomEvent,
       onFinish: (message) => {
         const chatSessionId = activeSessionIdRef.current;
+        const sanitizedMessage = sanitizeAssistantPreviewResponseMessage(
+          message as UIMessage,
+          pendingPreviewRef.current,
+        );
 
         if (!chatSessionId || message.role !== 'assistant') {
           return;
         }
 
+        const nextMessages = latestMessagesRef.current.map((item) =>
+          item.id === message.id ? sanitizedMessage : item,
+        );
+        latestMessagesRef.current = nextMessages;
+        setMessages(nextMessages);
+
         void persistChatbotAssistantSessionMessage({
           data: {
             chatSessionId,
-            message: message as Extract<UIMessage, { role: 'assistant' }>,
+            message: sanitizedMessage as Extract<UIMessage, { role: 'assistant' }>,
           },
         })
           .then((result: any) => {
@@ -94,6 +106,10 @@ export function useChatbotPanel() {
   useEffect(() => {
     latestMessagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    pendingPreviewRef.current = preview.state.pendingPreview;
+  }, [preview.state.pendingPreview]);
 
   useEffect(() => {
     activeSessionIdRef.current = sessions.state.activeSessionId;

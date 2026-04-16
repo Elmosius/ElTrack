@@ -5,7 +5,7 @@ import type {
 } from 'react';
 import type {
   ChatSessionSummary,
-  TransaksiPreview,
+  TransaksiPreviewGroup,
 } from '#/features/chatbot/chatbot.schema';
 import type { ChatComposerPayload } from './composer';
 import type { RenderedChatMessage } from './messages';
@@ -21,7 +21,7 @@ export type ChatPanelHeaderViewModel = {
 export type ChatMessageListViewModel = {
   messages: RenderedChatMessage[];
   isLoading: boolean;
-  preview: TransaksiPreview | null;
+  preview: TransaksiPreviewGroup | null;
   isConfirmingPreview: boolean;
   onConfirmPreview: () => void;
   onDismissPreview: () => void;

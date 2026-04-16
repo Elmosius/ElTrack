@@ -1,5 +1,10 @@
 import type { GeminiTextModel } from '@tanstack/ai-gemini';
-import { transaksiPreviewSchema, type PreviewTransaksiToolInput } from './chatbot.schema';
+import {
+  transaksiPreviewGroupSchema,
+  transaksiPreviewItemSchema,
+  type PreviewTransaksiToolInput,
+  type TransaksiPreviewGroup,
+} from './chatbot.schema';
 
 export type NamedOption = {
   id: string;
@@ -138,9 +143,25 @@ export function findBestOptionMatch(options: NamedOption[], rawValue: string | n
   return looseMatches.length === 1 ? looseMatches[0] : null;
 }
 
-export function getPendingPreview(value: unknown) {
-  const parsed = transaksiPreviewSchema.safeParse(value);
-  return parsed.success ? parsed.data : null;
+export function getPendingPreview(value: unknown): TransaksiPreviewGroup | null {
+  const parsedGroup = transaksiPreviewGroupSchema.safeParse(value);
+
+  if (parsedGroup.success) {
+    return parsedGroup.data;
+  }
+
+  const parsedLegacyItem = transaksiPreviewItemSchema.safeParse(value);
+
+  if (!parsedLegacyItem.success) {
+    return null;
+  }
+
+  return {
+    items: [parsedLegacyItem.data],
+    confidenceNotes: parsedLegacyItem.data.confidenceNotes,
+    missingFields: parsedLegacyItem.data.missingFields,
+    canConfirm: parsedLegacyItem.data.canConfirm,
+  };
 }
 
 export type PreviewResolutionInput = PreviewTransaksiToolInput;

@@ -1,4 +1,5 @@
 import type { UIMessage } from '@tanstack/ai-react';
+import type { TransaksiPreviewGroup } from '#/features/chatbot/chatbot.schema';
 import { photoPlaceholderText } from '@/const/chatbot';
 
 export type RenderedChatMessage = UIMessage & {
@@ -8,6 +9,8 @@ export type RenderedChatMessage = UIMessage & {
 
 const previewStatusMessagePattern =
   /preview transaksi|siap disimpan|masih ada field|masih perlu dicek/i;
+const savedPreviewClaimPattern =
+  /(berhasil disimpan|sudah berhasil disimpan|sudah disimpan|ditambahkan ke tabel)/i;
 
 export function extractMessageText(message: UIMessage) {
   return message.parts
@@ -61,6 +64,33 @@ export function createAssistantMessage(content: string): UIMessage {
       },
     ],
   };
+}
+
+export function sanitizeAssistantPreviewResponseMessage(
+  message: UIMessage,
+  preview: TransaksiPreviewGroup | null,
+) {
+  const text = extractMessageText(message);
+
+  if (
+    message.role !== 'assistant' ||
+    !text ||
+    !preview ||
+    !savedPreviewClaimPattern.test(text)
+  ) {
+    return message;
+  }
+
+  return {
+    id: message.id,
+    role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        content: 'Preview transaksi sudah diperbarui. Cek dulu sebelum disimpan ke tabel.',
+      },
+    ],
+  } satisfies UIMessage;
 }
 
 export function toRenderedChatMessages(

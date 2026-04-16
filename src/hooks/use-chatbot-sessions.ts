@@ -2,7 +2,7 @@ import type { UIMessage } from '@tanstack/ai-react';
 import type {
   ChatSessionDetail,
   ChatSessionSummary,
-  TransaksiPreview,
+  TransaksiPreviewGroup,
 } from '#/features/chatbot/chatbot.schema';
 import {
   createChatbotSession,
@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 type UseChatbotSessionsOptions = {
   userId?: string;
   setMessages: (messages: UIMessage[]) => void;
-  setPendingPreview: (preview: TransaksiPreview | null) => void;
+  setPendingPreview: (preview: TransaksiPreviewGroup | null) => void;
 };
 
 function mergeSessionSummary(

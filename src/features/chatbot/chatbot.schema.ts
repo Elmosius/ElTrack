@@ -7,19 +7,60 @@ export const chatbotPreviewEventName = 'transaksi-preview-ready';
 export const tipeNameSchema = z.enum(['Pengeluaran', 'Penghasilan']);
 export const waktuNameSchema = z.enum(waktuOptionsStatic);
 
+function hasMeaningfulPreviewField(
+  value: Partial<{
+    namaTransaksi: string | null;
+    tanggal: string | null;
+    nominal: string | number | null;
+    waktu: string | null;
+    kategoriName: string | null;
+    metodePembayaranName: string | null;
+    tipeName: string | null;
+    catatan: string | null;
+  }>,
+) {
+  return Boolean(
+    value.namaTransaksi?.trim() ||
+      value.tanggal?.trim() ||
+      value.nominal != null ||
+      value.waktu ||
+      value.kategoriName?.trim() ||
+      value.metodePembayaranName?.trim() ||
+      value.tipeName ||
+      value.catatan?.trim(),
+  );
+}
+
+export const previewTransaksiToolItemInputSchema = z
+  .object({
+    namaTransaksi: z.string().trim().nullable().optional(),
+    tanggal: z.string().trim().nullable().optional(),
+    nominal: z.union([z.number(), z.string()]).nullable().optional(),
+    waktu: waktuNameSchema.nullable().optional(),
+    kategoriName: z.string().trim().nullable().optional(),
+    metodePembayaranName: z.string().trim().nullable().optional(),
+    tipeName: tipeNameSchema.nullable().optional(),
+    catatan: z.string().trim().nullable().optional(),
+    confidenceNotes: z.array(z.string().trim()).optional(),
+  })
+  .superRefine((value, context) => {
+    if (hasMeaningfulPreviewField(value)) {
+      return;
+    }
+
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        'Setiap item preview harus memiliki minimal satu field transaksi yang terisi.',
+    });
+  });
+
 export const previewTransaksiToolInputSchema = z.object({
-  namaTransaksi: z.string().trim().nullable().optional(),
-  tanggal: z.string().trim().nullable().optional(),
-  nominal: z.union([z.number(), z.string()]).nullable().optional(),
-  waktu: waktuNameSchema.nullable().optional(),
-  kategoriName: z.string().trim().nullable().optional(),
-  metodePembayaranName: z.string().trim().nullable().optional(),
-  tipeName: tipeNameSchema.nullable().optional(),
-  catatan: z.string().trim().nullable().optional(),
+  items: z.array(previewTransaksiToolItemInputSchema).min(1),
   confidenceNotes: z.array(z.string().trim()).optional(),
 });
 
-export const transaksiPreviewSchema = z.object({
+export const transaksiPreviewItemSchema = z.object({
   namaTransaksi: z.string().trim().nullable(),
   tanggal: z.string().trim().nullable(),
   nominal: z.number().nullable(),
@@ -31,6 +72,13 @@ export const transaksiPreviewSchema = z.object({
   tipeName: tipeNameSchema.nullable(),
   tipeId: z.string().trim().nullable(),
   catatan: z.string().trim().nullable(),
+  confidenceNotes: z.array(z.string().trim()),
+  missingFields: z.array(z.string().trim()),
+  canConfirm: z.boolean(),
+});
+
+export const transaksiPreviewGroupSchema = z.object({
+  items: z.array(transaksiPreviewItemSchema).min(1),
   confidenceNotes: z.array(z.string().trim()),
   missingFields: z.array(z.string().trim()),
   canConfirm: z.boolean(),
@@ -57,7 +105,8 @@ export const persistAssistantChatMessageSchema = chatSessionInputSchema.extend({
 });
 
 export type PreviewTransaksiToolInput = z.infer<typeof previewTransaksiToolInputSchema>;
-export type TransaksiPreview = z.infer<typeof transaksiPreviewSchema>;
+export type TransaksiPreviewItem = z.infer<typeof transaksiPreviewItemSchema>;
+export type TransaksiPreviewGroup = z.infer<typeof transaksiPreviewGroupSchema>;
 export type ConfirmTransaksiPreviewInput = z.infer<typeof confirmTransaksiPreviewSchema>;
 export type DismissTransaksiPreviewInput = z.infer<typeof dismissTransaksiPreviewSchema>;
 export type PersistAssistantChatMessageInput = z.infer<typeof persistAssistantChatMessageSchema>;
@@ -75,10 +124,18 @@ export type ChatSessionSummary = {
 export type ChatSessionDetail = {
   session: ChatSessionSummary;
   messages: UIMessage[];
-  pendingPreview: TransaksiPreview | null;
+  pendingPreview: TransaksiPreviewGroup | null;
 };
 
 export type ConfirmChatbotPreviewResult = {
   assistantMessage: UIMessage;
   session: ChatSessionSummary;
 };
+
+export function isMeaningfulPreviewItem(
+  item:
+    | PreviewTransaksiToolInput['items'][number]
+    | TransaksiPreviewItem,
+) {
+  return hasMeaningfulPreviewField(item);
+}
