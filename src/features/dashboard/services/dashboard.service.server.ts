@@ -6,7 +6,11 @@ import {
   normalizeDashboardMonth,
   shiftMonth,
 } from '#/lib/dashboard';
-import type { DashboardHomeData, DashboardMonthInput, DashboardTrendPoint } from '../dashboard.schema';
+import type { DashboardMonthInput } from '../dashboard.schema';
+import type {
+  DashboardHomeData,
+  DashboardTrendPoint,
+} from '#/types/dashboard';
 import { mapDashboardTransaksiRecord, type DashboardTransaksiRecord } from '../mappers';
 import { findDashboardTransaksiByUserIdAndDateRange } from '../repositories/dashboard.repository.server';
 

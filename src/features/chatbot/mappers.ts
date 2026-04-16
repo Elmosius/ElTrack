@@ -4,7 +4,7 @@ import type {
   ChatSessionSummary,
   TransaksiPreviewGroup,
   TransaksiPreviewItem,
-} from './chatbot.schema';
+} from '#/types/chatbot';
 
 export type StoredChatMessage = {
   _id?: unknown;

@@ -1,4 +1,4 @@
-export type { SerializedKategori } from './mappers';
+export type { SerializedKategori } from '#/types/transaksi';
 export {
   createKategoriService as createKategori,
   deleteKategoriService as deleteKategori,

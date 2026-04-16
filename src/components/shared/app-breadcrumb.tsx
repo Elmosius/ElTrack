@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import type { BreadCrumbList } from '#/types/breadcrumb';
 import { Breadcrumb, BreadcrumbButton, BreadcrumbList, BreadcrumbSeparator } from '../selia/breadcrumb';
 
 type AppBreadCrumbProps = {

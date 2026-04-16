@@ -10,7 +10,6 @@ import {
   chatbotPreviewEventName,
   previewTransaksiToolInputSchema,
   transaksiPreviewGroupSchema,
-  type TransaksiPreviewGroup,
 } from '../chatbot.schema';
 import { extractPreviewSummary } from '../mappers';
 import {
@@ -19,6 +18,7 @@ import {
   getPendingPreview,
   type ChatbotMasterData,
 } from '../chatbot.shared.server';
+import type { TransaksiPreviewGroup } from '#/types/chatbot';
 import { getChatbotMasterData } from './chatbot-master-data.service.server';
 import { buildResolvedPreview } from './chatbot-preview.service.server';
 import {
@@ -135,7 +135,11 @@ export async function createChatbotStreamService({
     tools: [
       previewTransaksiTool.server(async (args, context) => {
         const normalizedArgs = previewTransaksiToolInputSchema.parse(args);
-        const preview = buildResolvedPreview(normalizedArgs, masterData);
+        const preview = buildResolvedPreview(
+          normalizedArgs,
+          masterData,
+          activePreview,
+        );
         await updateChatSessionPendingPreviewService(
           userId,
           chatSessionId,

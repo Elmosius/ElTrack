@@ -1,6 +1,6 @@
 import { Button } from '#/components/selia/button';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
-import type { DashboardTopCategory } from '#/features/dashboard/dashboard.schema';
+import type { DashboardTopCategory } from '#/types/dashboard';
 import { formatCurrency, formatSignedPercentage, getCategoryTrendTone } from '#/lib/dashboard';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight } from 'lucide-react';

@@ -1,11 +1,6 @@
 import { serializeDate, stringifyId } from '#/lib/serialization';
-
-export type SerializedMetodePembayaran = {
-  _id: string;
-  nama: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
+import type { SerializedMetodePembayaran } from '#/types/transaksi';
+export type { SerializedMetodePembayaran } from '#/types/transaksi';
 
 export function serializeMetodePembayaranDoc(item: {
   _id: unknown;

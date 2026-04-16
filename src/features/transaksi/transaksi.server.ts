@@ -1,4 +1,4 @@
-export type { SerializedTransaksi } from './mappers';
+export type { SerializedTransaksi } from '#/types/transaksi';
 export {
   createTransaksiService as createTransaksi,
   deleteTransaksiService as deleteTransaksi,

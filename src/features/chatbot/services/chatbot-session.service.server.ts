@@ -5,9 +5,9 @@ import {
   sanitizeMessageForStorage,
 } from '#/lib/chatbot';
 import type {
-  ChatSessionDetail,
   PersistAssistantChatMessageInput,
 } from '../chatbot.schema';
+import type { ChatSessionDetail } from '#/types/chatbot';
 import { defaultChatSessionTitle, getPendingPreview } from '../chatbot.shared.server';
 import {
   serializeChatMessage,

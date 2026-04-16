@@ -1,26 +1,6 @@
 import { serializeDate, stringifyId } from '#/lib/serialization';
-
-type SerializedNamedRef = {
-  _id: string;
-  nama: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type SerializedTransaksi = {
-  _id: string;
-  userId: string;
-  namaTransaksi: string;
-  tanggal: string;
-  nominal: number;
-  catatan?: string;
-  waktu?: string | null;
-  kategori?: string | SerializedNamedRef | null;
-  metodePembayaran?: string | SerializedNamedRef | null;
-  tipe?: string | SerializedNamedRef | null;
-  createdAt?: string;
-  updatedAt?: string;
-};
+import type { SerializedNamedRef, SerializedTransaksi } from '#/types/transaksi';
+export type { SerializedNamedRef, SerializedTransaksi } from '#/types/transaksi';
 
 export function serializeNamedRef(
   value: unknown,

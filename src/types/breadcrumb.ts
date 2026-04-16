@@ -1,8 +1,8 @@
-type BreadCrumbList = {
+export type BreadCrumbList = {
   items: BreadCrumbItem[];
 };
 
-type BreadCrumbItem = {
+export type BreadCrumbItem = {
   label: string;
   to?: string;
   active?: boolean;

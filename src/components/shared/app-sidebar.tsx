@@ -6,9 +6,13 @@ import { Coins, LogOut, PlusIcon } from 'lucide-react';
 
 type AppSidebarProps = {
   isSidebarOpen: boolean;
+  onNavigate?: () => void;
 };
 
-export default function AppSidebar({ isSidebarOpen }: AppSidebarProps) {
+export default function AppSidebar({
+  isSidebarOpen,
+  onNavigate,
+}: AppSidebarProps) {
   const route = useLocation();
   const navigate = useNavigate();
 
@@ -42,7 +46,14 @@ export default function AppSidebar({ isSidebarOpen }: AppSidebarProps) {
                 const isActive = route.pathname === to;
 
                 return (
-                  <Link to={to} key={label} preload='render'>
+                  <Link
+                    to={to}
+                    key={label}
+                    preload='render'
+                    onClick={() => {
+                      onNavigate?.();
+                    }}
+                  >
                     <SidebarItem>
                       <SidebarItemButton active={isActive}>
                         {icon}

@@ -3,7 +3,8 @@ import type {
   DeleteTransaksiInput,
   UpdateTransaksiInput,
 } from '../transaksi.schema';
-import { serializeTransaksiDoc, type SerializedTransaksi } from '../mappers';
+import { serializeTransaksiDoc } from '../mappers';
+import type { SerializedTransaksi } from '#/types/transaksi';
 import {
   deleteTransaksiByIdAndUserId,
   findTransaksiListByUserId,

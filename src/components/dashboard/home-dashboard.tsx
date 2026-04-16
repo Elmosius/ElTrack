@@ -1,4 +1,4 @@
-import type { DashboardHomeData } from '#/features/dashboard/dashboard.schema';
+import type { DashboardHomeData } from '#/types/dashboard';
 import type { DashboardTrendMode } from '#/lib/dashboard';
 import { useState } from 'react';
 import { DashboardDistributionCharts } from './dashboard-distribution-charts';

@@ -1,5 +1,5 @@
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
-import type { DashboardRecentTransaction } from '#/features/dashboard/dashboard.schema';
+import type { DashboardRecentTransaction } from '#/types/dashboard';
 import { formatCurrency } from '#/lib/dashboard';
 import { cn } from '@/lib/utils';
 

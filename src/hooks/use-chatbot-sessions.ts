@@ -1,14 +1,14 @@
 import type { UIMessage } from '@tanstack/ai-react';
-import type {
-  ChatSessionDetail,
-  ChatSessionSummary,
-  TransaksiPreviewGroup,
-} from '#/features/chatbot/chatbot.schema';
 import {
   createChatbotSession,
   getChatbotSessionDetail,
   listChatbotSessions,
 } from '#/features/chatbot/chatbot.functions';
+import type {
+  ChatSessionDetail,
+  ChatSessionSummary,
+  TransaksiPreviewGroup,
+} from '#/types/chatbot';
 import { initialMessages } from '@/const/chatbot';
 import { useCallback, useEffect, useState } from 'react';
 

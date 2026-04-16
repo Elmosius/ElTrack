@@ -3,7 +3,8 @@ import type {
   DeleteKategoriInput,
   UpdateKategoriInput,
 } from '../kategori.schema';
-import { serializeKategoriDoc, type SerializedKategori } from '../mappers';
+import { serializeKategoriDoc } from '../mappers';
+import type { SerializedKategori } from '#/types/transaksi';
 import {
   deleteKategoriByIdAndUserId,
   findKategoriByName,

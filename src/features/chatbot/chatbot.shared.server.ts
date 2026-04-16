@@ -3,8 +3,8 @@ import {
   transaksiPreviewGroupSchema,
   transaksiPreviewItemSchema,
   type PreviewTransaksiToolInput,
-  type TransaksiPreviewGroup,
 } from './chatbot.schema';
+import type { TransaksiPreviewGroup } from '#/types/chatbot';
 
 export type NamedOption = {
   id: string;

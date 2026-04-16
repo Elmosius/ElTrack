@@ -1,11 +1,6 @@
 import { serializeDate, stringifyId } from '#/lib/serialization';
-
-export type SerializedTipe = {
-  _id: string;
-  nama: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
+import type { SerializedTipe } from '#/types/transaksi';
+export type { SerializedTipe } from '#/types/transaksi';
 
 export function serializeTipeDoc(item: {
   _id: unknown;

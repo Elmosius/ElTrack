@@ -1,4 +1,4 @@
-import type { ChatSessionSummary } from '#/features/chatbot/chatbot.schema';
+import type { ChatSessionSummary } from '#/types/chatbot';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '../selia/button';
 import {

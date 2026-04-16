@@ -6,10 +6,12 @@ import {
   chatbotPreviewEventName,
   isMeaningfulPreviewItem,
   transaksiPreviewGroupSchema,
-  type ConfirmChatbotPreviewResult,
-  type TransaksiPreviewGroup,
 } from '#/features/chatbot/chatbot.schema';
 import { getErrorMessage } from '#/lib/chatbot';
+import type {
+  ConfirmChatbotPreviewResult,
+  TransaksiPreviewGroup,
+} from '#/types/chatbot';
 import { toastManager } from '@/components/selia/toast';
 import { useState } from 'react';
 

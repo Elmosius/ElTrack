@@ -1,6 +1,6 @@
 import type { UIMessage } from '@tanstack/ai-react';
-import type { TransaksiPreviewGroup } from '#/features/chatbot/chatbot.schema';
 import { photoPlaceholderText } from '@/const/chatbot';
+import type { TransaksiPreviewGroup } from '#/types/chatbot';
 
 export type RenderedChatMessage = UIMessage & {
   text: string;

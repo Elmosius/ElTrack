@@ -1,4 +1,5 @@
-import { serializeMetodePembayaranDoc, type SerializedMetodePembayaran } from '../mappers';
+import { serializeMetodePembayaranDoc } from '../mappers';
+import type { SerializedMetodePembayaran } from '#/types/transaksi';
 import { findMetodePembayaranList } from '../repositories/metode-pembayaran.repository.server';
 
 export async function listMetodePembayaranService(): Promise<

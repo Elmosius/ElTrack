@@ -1,7 +1,7 @@
 import type {
   TransaksiPreviewGroup,
   TransaksiPreviewItem,
-} from '#/features/chatbot/chatbot.schema';
+} from '#/types/chatbot';
 import { isMeaningfulPreviewItem } from '#/features/chatbot/chatbot.schema';
 import { Button } from '../selia/button';
 

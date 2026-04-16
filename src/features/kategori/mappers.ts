@@ -1,12 +1,6 @@
 import { serializeDate, stringifyId } from '#/lib/serialization';
-
-export type SerializedKategori = {
-  _id: string;
-  userId: string;
-  nama: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
+import type { SerializedKategori } from '#/types/transaksi';
+export type { SerializedKategori } from '#/types/transaksi';
 
 export function serializeKategoriDoc(item: {
   _id: unknown;

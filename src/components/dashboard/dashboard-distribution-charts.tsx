@@ -1,6 +1,6 @@
 import { DashboardChart } from '#/components/dashboard/dashboard-chart';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
-import type { DashboardDistributionItem } from '#/features/dashboard/dashboard.schema';
+import type { DashboardDistributionItem } from '#/types/dashboard';
 import { createDonutChartOptions, createPaymentBarChartOptions } from '#/lib/dashboard-chart';
 
 type DashboardDistributionChartsProps = {

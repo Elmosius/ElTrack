@@ -2,7 +2,7 @@ import { DashboardChart } from '#/components/dashboard/dashboard-chart';
 import { Button } from '#/components/selia/button';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
 import { dashboardTrendModes } from '#/const/dashboard';
-import type { DashboardTrendPoint } from '#/features/dashboard/dashboard.schema';
+import type { DashboardTrendPoint } from '#/types/dashboard';
 import type { DashboardTrendMode } from '#/lib/dashboard';
 import { createTrendChartOptions } from '#/lib/dashboard-chart';
 

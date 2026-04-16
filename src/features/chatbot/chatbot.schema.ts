@@ -1,5 +1,11 @@
-import type { UIMessage } from '@tanstack/ai-react';
 import { waktuOptionsStatic } from '#/lib/transaction-table';
+import type {
+  ChatSessionDetail,
+  ChatSessionSummary,
+  ConfirmChatbotPreviewResult,
+  TransaksiPreviewGroup,
+  TransaksiPreviewItem,
+} from '#/types/chatbot';
 import { z } from 'zod';
 
 export const chatbotPreviewEventName = 'transaksi-preview-ready';
@@ -105,31 +111,15 @@ export const persistAssistantChatMessageSchema = chatSessionInputSchema.extend({
 });
 
 export type PreviewTransaksiToolInput = z.infer<typeof previewTransaksiToolInputSchema>;
-export type TransaksiPreviewItem = z.infer<typeof transaksiPreviewItemSchema>;
-export type TransaksiPreviewGroup = z.infer<typeof transaksiPreviewGroupSchema>;
 export type ConfirmTransaksiPreviewInput = z.infer<typeof confirmTransaksiPreviewSchema>;
 export type DismissTransaksiPreviewInput = z.infer<typeof dismissTransaksiPreviewSchema>;
 export type PersistAssistantChatMessageInput = z.infer<typeof persistAssistantChatMessageSchema>;
-
-export type ChatSessionSummary = {
-  id: string;
-  title: string;
-  status: 'active';
-  createdAt?: string;
-  updatedAt?: string;
-  lastMessageAt?: string | null;
-  lastOpenedAt?: string | null;
-};
-
-export type ChatSessionDetail = {
-  session: ChatSessionSummary;
-  messages: UIMessage[];
-  pendingPreview: TransaksiPreviewGroup | null;
-};
-
-export type ConfirmChatbotPreviewResult = {
-  assistantMessage: UIMessage;
-  session: ChatSessionSummary;
+export type {
+  ChatSessionDetail,
+  ChatSessionSummary,
+  ConfirmChatbotPreviewResult,
+  TransaksiPreviewGroup,
+  TransaksiPreviewItem,
 };
 
 export function isMeaningfulPreviewItem(

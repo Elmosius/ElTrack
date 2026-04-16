@@ -3,12 +3,12 @@ import type {
   KeyboardEvent,
   RefObject,
 } from 'react';
+import type { ChatComposerPayload } from './composer';
+import type { RenderedChatMessage } from './messages';
 import type {
   ChatSessionSummary,
   TransaksiPreviewGroup,
-} from '#/features/chatbot/chatbot.schema';
-import type { ChatComposerPayload } from './composer';
-import type { RenderedChatMessage } from './messages';
+} from '#/types/chatbot';
 
 export type ChatPanelHeaderViewModel = {
   sessions: ChatSessionSummary[];
