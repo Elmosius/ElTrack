@@ -4,7 +4,11 @@ import { ChatComposerSection } from './chat-composer-section';
 import { ChatMessageList } from './chat-message-list';
 import { ChatPanelHeader } from './chat-panel-header';
 
-export function ChatPanel() {
+type ChatPanelProps = {
+  isOpen: boolean;
+};
+
+export function ChatPanel({ isOpen }: ChatPanelProps) {
   const { sections } = useChatbotPanel();
 
   return (
@@ -16,7 +20,10 @@ export function ChatPanel() {
     >
       <ChatPanelHeader header={sections.header} />
 
-      <ChatMessageList messageList={sections.messageList} />
+      <ChatMessageList
+        messageList={sections.messageList}
+        isOpen={isOpen}
+      />
 
       <ChatComposerSection composer={sections.composer} />
     </PopoverPopup>
