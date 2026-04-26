@@ -1,6 +1,6 @@
 import { AlertDialog, AlertDialogBody, AlertDialogClose, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogPopup, AlertDialogTitle } from '#/components/selia/alert-dialog';
 import { Button } from '#/components/selia/button';
-import { useTransactionTableDeleteDialog } from '#/hooks/use-transaction-table';
+import { useTransactionTableDeleteDialog } from '#/hooks/transaction-table/use-transaction-table';
 
 export default function TabelAlert() {
   const { isDeleteDialogOpen, selectedCategory, setIsDeleteDialogOpen, clearDeleteTarget, confirmDeleteCategory } = useTransactionTableDeleteDialog();

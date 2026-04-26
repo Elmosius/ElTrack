@@ -9,7 +9,7 @@ import {
   dashboardPaymentChartColors,
   dashboardTrendSeries,
 } from '@/const/dashboard';
-import { formatCurrency } from './dashboard';
+import { formatCurrency } from './index';
 
 export type DashboardChartSeries =
   | ApexAxisChartSeries

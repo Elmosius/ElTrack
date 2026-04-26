@@ -1,5 +1,5 @@
 import DefaultLayout from '#/components/layouts/default';
-import { getSession } from '#/lib/auth.functions';
+import { getSession } from '#/lib/auth/functions';
 import { useSetUser } from '#/stores/user';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { useEffect } from 'react';

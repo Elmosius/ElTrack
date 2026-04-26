@@ -1,99 +1,39 @@
-import { Button } from '#/components/selia/button';
-import { Input } from '#/components/selia/input';
 import { TableBody, TableCell, TableRow } from '#/components/selia/table';
-import { Textarea } from '#/components/selia/textarea';
-import { useTransactionTableBody } from '#/hooks/use-transaction-table';
-import { formatRupiah } from '#/lib/transaction-table';
-import { Trash2 } from 'lucide-react';
-import { CategoryPopover } from './category-popover';
-import { MenuSelectField } from './menu-select-field';
+import { useTransactionTableBody } from '#/hooks/transaction-table/use-transaction-table';
+import { TabelBodyRow } from './tabel-body-row';
 
 export default function TabelBody() {
-  const { filteredRows, waktuOptions, metodePembayaranOptions, tipeOptions, waktuMap, metodePembayaranMap, tipeMap, updateRow, handleNominalChange, handleDeleteRow, saveRow } = useTransactionTableBody();
+  const {
+    filteredRows,
+    waktuOptions,
+    metodePembayaranOptions,
+    tipeOptions,
+    waktuMap,
+    metodePembayaranMap,
+    tipeMap,
+    updateRow,
+    handleNominalChange,
+    handleDeleteRow,
+    saveRow,
+  } = useTransactionTableBody();
 
   return (
     <TableBody>
       {filteredRows.map((row) => (
-        <TableRow key={row.id}>
-          <TableCell>
-            <Input
-              value={row.namaTransaksi}
-              onChange={(event) => updateRow(row.id, { namaTransaksi: event.target.value })}
-              onBlur={() => void saveRow(row.id)}
-              placeholder='Nama / deskripsi transaksi'
-              variant='subtle'
-              className='h-8 shadow-none ring-0 bg-transparent px-0 text-sm placeholder:text-dimmed focus:ring-0 hover:not-data-disabled:not-focus:ring-0'
-            />
-          </TableCell>
-
-          <TableCell>
-            <MenuSelectField
-              value={row.waktuId}
-              options={waktuOptions}
-              displayValue={waktuMap.get(row.waktuId)}
-              onChange={(value) => {
-                updateRow(row.id, { waktuId: value });
-                void saveRow(row.id);
-              }}
-            />
-          </TableCell>
-
-          <TableCell>
-            <Input
-              value={formatRupiah(row.nominal)}
-              onChange={(event) => handleNominalChange(row.id, event.target.value)}
-              onBlur={() => void saveRow(row.id)}
-              placeholder='Rp 0'
-              variant='subtle'
-              className='h-8 shadow-none ring-0 bg-transparent px-0 text-sm placeholder:text-dimmed focus:ring-0 hover:not-data-disabled:not-focus:ring-0'
-            />
-          </TableCell>
-
-          <TableCell>
-            <CategoryPopover row={row} />
-          </TableCell>
-
-          <TableCell>
-            <MenuSelectField
-              value={row.metodePembayaranId}
-              options={metodePembayaranOptions}
-              displayValue={metodePembayaranMap.get(row.metodePembayaranId)}
-              onChange={(value) => {
-                updateRow(row.id, { metodePembayaranId: value });
-                void saveRow(row.id);
-              }}
-            />
-          </TableCell>
-
-          <TableCell>
-            <Textarea
-              value={row.catatan}
-              variant='notion'
-              onChange={(event) => updateRow(row.id, { catatan: event.target.value })}
-              onBlur={() => void saveRow(row.id)}
-              placeholder='Opsional'
-              className='min-h-8 max-h-20 resize-y overflow-y-auto py-2 px-2 rounded-none text-sm'
-            />
-          </TableCell>
-
-          <TableCell>
-            <MenuSelectField
-              value={row.tipeId}
-              options={tipeOptions}
-              displayValue={tipeMap.get(row.tipeId)}
-              onChange={(value) => {
-                updateRow(row.id, { tipeId: value });
-                void saveRow(row.id);
-              }}
-            />
-          </TableCell>
-
-          <TableCell className='text-center'>
-            <Button onClick={() => void handleDeleteRow(row.id)} size='xs-icon' variant='plain' className='size-8 rounded text-muted hover:text-danger hover:bg-accent' aria-label='Hapus baris'>
-              <Trash2 className='size-4' />
-            </Button>
-          </TableCell>
-        </TableRow>
+        <TabelBodyRow
+          key={row.id}
+          row={row}
+          waktuOptions={waktuOptions}
+          metodePembayaranOptions={metodePembayaranOptions}
+          tipeOptions={tipeOptions}
+          waktuLabel={waktuMap.get(row.waktuId)}
+          metodePembayaranLabel={metodePembayaranMap.get(row.metodePembayaranId)}
+          tipeLabel={tipeMap.get(row.tipeId)}
+          updateRow={updateRow}
+          handleNominalChange={handleNominalChange}
+          handleDeleteRow={handleDeleteRow}
+          saveRow={saveRow}
+        />
       ))}
 
       {filteredRows.length === 0 && (

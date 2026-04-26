@@ -2,7 +2,7 @@ import type {
   ChatComposerSectionViewModel,
   ChatComposerViewModel,
 } from '#/lib/chatbot/view-models';
-import { useChatbotComposer } from '#/hooks/use-chatbot-composer';
+import { useChatbotComposer } from '#/hooks/chatbot/use-chatbot-composer';
 import { useMemo } from 'react';
 import { ChatComposer } from './chat-composer';
 

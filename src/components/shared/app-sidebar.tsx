@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupTitle, SidebarHeader, SidebarItem, SidebarItemButton, SidebarList, SidebarMenu } from '#/components/selia/sidebar';
 import { MENU_SIDEBAR } from '#/const/sidebar';
-import { authClient } from '#/lib/auth-client';
+import { authClient } from '#/lib/auth/client';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { Coins, LogOut, PlusIcon } from 'lucide-react';
 

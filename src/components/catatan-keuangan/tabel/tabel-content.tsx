@@ -1,5 +1,5 @@
 import { toastManager } from '#/components/selia/toast';
-import { useTransactionTableContent } from '#/hooks/use-transaction-table';
+import { useTransactionTableContent } from '#/hooks/transaction-table/use-transaction-table';
 import { Button } from '@/components/selia/button';
 import { Table, TableContainer, TableHead, TableHeader, TableRow } from '@/components/selia/table';
 import { Plus } from 'lucide-react';

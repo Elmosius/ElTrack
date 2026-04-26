@@ -1,6 +1,6 @@
 import { Button } from '#/components/selia/button';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
-import { authClient } from '#/lib/auth-client';
+import { authClient } from '#/lib/auth/client';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_auth/auth/login')({

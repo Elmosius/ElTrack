@@ -1,4 +1,4 @@
-import { useChatbotPanel } from '#/hooks/use-chatbot-panel';
+import { useChatbotPanel } from '#/hooks/chatbot/use-chatbot-panel';
 import { PopoverPopup } from '../selia/popover';
 import { ChatComposerSection } from './chat-composer-section';
 import { ChatMessageList } from './chat-message-list';

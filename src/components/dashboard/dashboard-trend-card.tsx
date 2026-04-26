@@ -4,7 +4,7 @@ import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/compon
 import { dashboardTrendModes } from '#/const/dashboard';
 import type { DashboardTrendPoint } from '#/types/dashboard';
 import type { DashboardTrendMode } from '#/lib/dashboard';
-import { createTrendChartOptions } from '#/lib/dashboard-chart';
+import { createTrendChartOptions } from '#/lib/dashboard/chart';
 
 type DashboardTrendCardProps = {
   mode: DashboardTrendMode;

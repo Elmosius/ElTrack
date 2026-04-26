@@ -1,11 +1,16 @@
 import {
-  fileToBase64Payload,
   type ChatComposerPayload,
-  type ChatComposerPart,
 } from '#/lib/chatbot';
-import { maxUploadSizeInBytes } from '@/const/chatbot';
 import { toastManager } from '@/components/selia/toast';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import {
+  useChatbotComposerAutoResize,
+  useChatbotComposerReset,
+} from './use-chatbot-composer.effects';
+import {
+  buildChatComposerPayload,
+  getAttachmentValidationError,
+} from './use-chatbot-composer.helpers';
 
 type UseChatbotComposerOptions = {
   resetVersion: number;
@@ -22,16 +27,7 @@ export function useChatbotComposer({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    const node = textareaRef.current;
-
-    if (!node) {
-      return;
-    }
-
-    node.style.height = '0px';
-    node.style.height = `${Math.min(node.scrollHeight, 144)}px`;
-  }, [draft]);
+  useChatbotComposerAutoResize(textareaRef, draft);
 
   const clearAttachment = useCallback(() => {
     setAttachmentFile(null);
@@ -47,9 +43,7 @@ export function useChatbotComposer({
     clearAttachment();
   }, [clearAttachment]);
 
-  useEffect(() => {
-    resetComposer();
-  }, [resetComposer, resetVersion]);
+  useChatbotComposerReset(resetComposer, resetVersion);
 
   const handleAttachmentSelect = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -61,21 +55,13 @@ export function useChatbotComposer({
       return;
     }
 
-    if (!selectedFile.type.startsWith('image/')) {
-      toastManager.add({
-        type: 'error',
-        title: 'Format file belum didukung',
-        description: 'Upload gambar struk dalam format image.',
-      });
-      clearAttachment();
-      return;
-    }
+    const validationError = getAttachmentValidationError(selectedFile);
 
-    if (selectedFile.size > maxUploadSizeInBytes) {
+    if (validationError) {
       toastManager.add({
         type: 'error',
-        title: 'File terlalu besar',
-        description: 'Maksimal ukuran file asli adalah 8 MB.',
+        title: validationError.title,
+        description: validationError.description,
       });
       clearAttachment();
       return;
@@ -91,43 +77,7 @@ export function useChatbotComposer({
 
   const buildMessagePayload = useCallback(
     async (): Promise<ChatComposerPayload | null> => {
-      const message = draft.trim();
-      const nextAttachmentFile = attachmentFile;
-
-      if (!message && !nextAttachmentFile) {
-        return null;
-      }
-
-      const contentParts: ChatComposerPart[] = [];
-      const promptText =
-        message ||
-        (nextAttachmentFile
-          ? 'Tolong bantu baca struk ini dan siapkan preview transaksi.'
-          : '');
-
-      if (promptText) {
-        contentParts.push({
-          type: 'text',
-          content: promptText,
-        });
-      }
-
-      if (nextAttachmentFile) {
-        const imagePayload = await fileToBase64Payload(nextAttachmentFile);
-
-        contentParts.push({
-          type: 'image',
-          source: {
-            type: 'data',
-            value: imagePayload.value,
-            mimeType: imagePayload.mimeType,
-          },
-        });
-      }
-
-      return contentParts.length === 1 && contentParts[0]?.type === 'text'
-        ? contentParts[0].content || ''
-        : { content: contentParts };
+      return buildChatComposerPayload(draft, attachmentFile);
     },
     [attachmentFile, draft],
   );

@@ -1,4 +1,4 @@
-import { auth } from '#/lib/auth.server';
+import { auth } from './server';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 
 export async function requireSessionUserId() {

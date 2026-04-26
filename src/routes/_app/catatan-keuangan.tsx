@@ -1,5 +1,5 @@
 import { CatatanKeuanganPending } from '#/components/catatan-keuangan/catatan-keuangan-pending';
-import { useHydrateTransactionTable } from '#/hooks/use-transaction-table';
+import { useHydrateTransactionTable } from '#/hooks/transaction-table/use-transaction-table';
 import { buildTransactionTableData } from '#/lib/transaction-table';
 import KalenderSection from '#/components/catatan-keuangan/kalender';
 import TabelSection from '#/components/catatan-keuangan/tabel';

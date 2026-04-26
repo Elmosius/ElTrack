@@ -1,7 +1,7 @@
 import { toServerSentEventsResponse } from '@tanstack/ai';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createFileRoute } from '@tanstack/react-router';
-import { auth } from '#/lib/auth.server';
+import { auth } from '#/lib/auth/server';
 import {
   createChatbotStream,
   persistChatUserMessage,

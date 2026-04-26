@@ -1,4 +1,4 @@
-import { requireSessionUserId } from '#/lib/server-auth';
+import { requireSessionUserId } from '#/lib/auth/session';
 import { createServerFn } from '@tanstack/react-start';
 import {
   createKategoriSchema,

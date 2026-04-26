@@ -1,10 +1,6 @@
-import type { GeminiTextModel } from '@tanstack/ai-gemini';
-import {
-  transaksiPreviewGroupSchema,
-  transaksiPreviewItemSchema,
-  type PreviewTransaksiToolInput,
-} from './chatbot.schema';
 import type { TransaksiPreviewGroup } from '#/types/chatbot';
+import type { GeminiTextModel } from '@tanstack/ai-gemini';
+import { transaksiPreviewGroupSchema, transaksiPreviewItemSchema, type PreviewTransaksiToolInput } from './chatbot.schema';
 
 export type NamedOption = {
   id: string;
@@ -18,23 +14,13 @@ export type ChatbotMasterData = {
 };
 
 export const defaultChatSessionTitle = 'Chat baru';
-const defaultGeminiTextModel: GeminiTextModel = 'gemini-2.5-flash-lite';
-const defaultGeminiVisionModel: GeminiTextModel = 'gemini-2.5-flash';
 
 export function getGeminiTextModel(): GeminiTextModel {
-  return (
-    (process.env.GEMINI_TEXT_MODEL as GeminiTextModel) ||
-    (process.env.GEMINI_MODEL as GeminiTextModel) ||
-    defaultGeminiTextModel
-  );
+  return (process.env.GEMINI_TEXT_MODEL as GeminiTextModel) || (process.env.GEMINI_MODEL as GeminiTextModel);
 }
 
 export function getGeminiVisionModel(): GeminiTextModel {
-  return (
-    (process.env.GEMINI_VISION_MODEL as GeminiTextModel) ||
-    (process.env.GEMINI_MODEL as GeminiTextModel) ||
-    defaultGeminiVisionModel
-  );
+  return (process.env.GEMINI_VISION_MODEL as GeminiTextModel) || (process.env.GEMINI_MODEL as GeminiTextModel);
 }
 
 export function normalizeText(value: string) {
@@ -89,8 +75,7 @@ export function normalizeDate(value: string | null | undefined) {
   if (localMatch) {
     const day = localMatch[1].padStart(2, '0');
     const month = localMatch[2].padStart(2, '0');
-    const year =
-      localMatch[3].length === 2 ? `20${localMatch[3]}` : localMatch[3];
+    const year = localMatch[3].length === 2 ? `20${localMatch[3]}` : localMatch[3];
     return `${year}-${month}-${day}`;
   }
 
@@ -104,13 +89,7 @@ export function normalizeDate(value: string | null | undefined) {
 }
 
 export function uniq(values: Array<string | null | undefined>) {
-  return Array.from(
-    new Set(
-      values
-        .map((value) => cleanText(value))
-        .filter((value): value is string => Boolean(value)),
-    ),
-  );
+  return Array.from(new Set(values.map((value) => cleanText(value)).filter((value): value is string => Boolean(value))));
 }
 
 export function findBestOptionMatch(options: NamedOption[], rawValue: string | null) {
@@ -124,9 +103,7 @@ export function findBestOptionMatch(options: NamedOption[], rawValue: string | n
     return null;
   }
 
-  const exactMatch = options.find(
-    (option) => normalizeText(option.name) === normalizedValue,
-  );
+  const exactMatch = options.find((option) => normalizeText(option.name) === normalizedValue);
 
   if (exactMatch) {
     return exactMatch;
@@ -134,10 +111,7 @@ export function findBestOptionMatch(options: NamedOption[], rawValue: string | n
 
   const looseMatches = options.filter((option) => {
     const normalizedOption = normalizeText(option.name);
-    return (
-      normalizedOption.includes(normalizedValue) ||
-      normalizedValue.includes(normalizedOption)
-    );
+    return normalizedOption.includes(normalizedValue) || normalizedValue.includes(normalizedOption);
   });
 
   return looseMatches.length === 1 ? looseMatches[0] : null;
