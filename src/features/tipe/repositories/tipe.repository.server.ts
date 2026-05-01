@@ -6,3 +6,13 @@ export async function findTipeList() {
 
   return Tipe.find().sort({ createdAt: 1 }).lean();
 }
+
+export async function findTipeByIds(ids: string[]) {
+  await connectDB();
+
+  return Tipe.find({
+    _id: { $in: ids },
+  })
+    .select('_id')
+    .lean();
+}

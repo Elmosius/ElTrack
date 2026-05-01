@@ -1,6 +1,11 @@
 import { Types } from 'mongoose';
+import type { ClientSession } from 'mongoose';
 import { ChatSession } from '#/db/models/chat-session.server';
 import { connectDB } from '#/db/mongoose.server';
+
+type RepositoryOptions = {
+  session?: ClientSession;
+};
 
 export async function findChatSessionByIdAndUserId(
   userId: string,
@@ -68,6 +73,7 @@ export async function updateChatSessionPendingPreviewByIdAndUserId(
   userId: string,
   chatSessionId: string,
   preview: unknown,
+  options: RepositoryOptions = {},
 ) {
   await connectDB();
 
@@ -84,6 +90,7 @@ export async function updateChatSessionPendingPreviewByIdAndUserId(
     },
     {
       returnDocument: 'after',
+      session: options.session,
     },
   );
 }

@@ -1,5 +1,6 @@
 export type { SerializedTransaksi } from '#/types/transaksi';
 export {
+  createManyTransaksiService as createManyTransaksi,
   createTransaksiService as createTransaksi,
   deleteTransaksiService as deleteTransaksi,
   listTransaksiService as listTransaksi,

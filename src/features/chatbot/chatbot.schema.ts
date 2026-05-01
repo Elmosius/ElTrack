@@ -6,6 +6,7 @@ import type {
   TransaksiPreviewGroup,
   TransaksiPreviewItem,
 } from '#/types/chatbot';
+import { objectIdSchema } from '#/lib/object-id';
 import { z } from 'zod';
 
 export const chatbotPreviewEventName = 'transaksi-preview-ready';
@@ -101,7 +102,7 @@ const assistantChatMessageSchema = z.object({
 });
 
 export const chatSessionInputSchema = z.object({
-  chatSessionId: z.string().trim().min(1),
+  chatSessionId: objectIdSchema,
 });
 
 export const confirmTransaksiPreviewSchema = chatSessionInputSchema;

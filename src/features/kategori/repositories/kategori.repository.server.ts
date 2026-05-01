@@ -27,6 +27,20 @@ export async function findKategoriByName(
   }).lean();
 }
 
+export async function findKategoriByIdsAndUserId(
+  userId: string,
+  ids: string[],
+) {
+  await connectDB();
+
+  return Kategori.find({
+    userId,
+    _id: { $in: ids },
+  })
+    .select('_id')
+    .lean();
+}
+
 export async function insertKategori(userId: string, data: CreateKategoriInput) {
   await connectDB();
 

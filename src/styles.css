@@ -314,8 +314,8 @@
   .root {
     isolation: isolate;
   }
-  font-family: 'Quicksand', sans-serif;
   body {
-    @apply text-base bg-background text-foreground;
+    @apply text-base bg-background text-foreground font-medium;
+    font-family: 'Quicksand', sans-serif;
   }
 }

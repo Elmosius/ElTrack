@@ -1,4 +1,6 @@
-import { createTransaksi } from '#/features/transaksi/transaksi.server';
+import { createManyTransaksi } from '#/features/transaksi/transaksi.server';
+import type { CreateTransaksiInput } from '#/features/transaksi/transaksi.schema';
+import { runWithOptionalTransaction } from '#/db/mongoose.server';
 import { createAssistantMessage } from '#/lib/chatbot';
 import type { ConfirmChatbotPreviewResult, TransaksiPreviewGroup, TransaksiPreviewItem } from '#/types/chatbot';
 import { isMeaningfulPreviewItem, type ConfirmTransaksiPreviewInput, type PreviewTransaksiToolInput } from '../chatbot.schema';
@@ -79,22 +81,29 @@ export async function confirmChatbotPreviewService(userId: string, input: Confir
     });
   }
 
-  for (const item of confirmableItems) {
-    await createTransaksi(userId, {
-      namaTransaksi: item.namaTransaksi,
-      tanggal: item.tanggal,
-      waktu: item.waktu,
-      nominal: item.nominal,
-      kategori: item.kategoriId,
-      metodePembayaran: item.metodePembayaranId,
-      catatan: item.catatan ?? undefined,
-      tipe: item.tipeId,
-    });
-  }
+  const transaksiInputs: CreateTransaksiInput[] = confirmableItems.map((item) => ({
+    namaTransaksi: item.namaTransaksi,
+    tanggal: item.tanggal,
+    waktu: item.waktu,
+    nominal: item.nominal,
+    kategori: item.kategoriId,
+    metodePembayaran: item.metodePembayaranId,
+    catatan: item.catatan ?? undefined,
+    tipe: item.tipeId,
+  }));
+
+  const updatedSession = await runWithOptionalTransaction(async (session) => {
+    await createManyTransaksi(userId, transaksiInputs, { session });
+    return updateChatSessionPendingPreviewService(
+      userId,
+      input.chatSessionId,
+      null,
+      { session },
+    );
+  });
 
   const assistantMessage = createAssistantMessage(preview.items.length > 1 ? `${preview.items.length} transaksi berhasil disimpan ke tabel.` : 'Transaksi berhasil disimpan ke tabel.');
   await storeChatMessageForSession(userId, input.chatSessionId, assistantMessage);
-  const updatedSession = await updateChatSessionPendingPreviewService(userId, input.chatSessionId, null);
 
   return {
     assistantMessage,

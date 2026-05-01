@@ -1,4 +1,5 @@
 import type { ChatSessionDetail } from '#/types/chatbot';
+import type { ClientSession } from 'mongoose';
 import { defaultChatSessionTitle, getPendingPreview } from '../chatbot.shared.server';
 import {
   serializeChatMessage,
@@ -64,11 +65,13 @@ export async function updateChatSessionPendingPreviewService(
   userId: string,
   chatSessionId: string,
   preview: unknown,
+  options: { session?: ClientSession } = {},
 ) {
   const session = await updateChatSessionPendingPreviewByIdAndUserId(
     userId,
     chatSessionId,
     preview,
+    options,
   );
 
   if (!session) {

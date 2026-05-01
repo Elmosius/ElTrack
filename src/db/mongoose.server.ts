@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import type { ClientSession } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
@@ -22,4 +23,40 @@ export function connectDB() {
   }
 
   return globalThis.__mongoosePromise;
+}
+
+function isTransactionUnsupportedError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.message.includes('Transaction numbers are only allowed') ||
+    error.message.includes('This MongoDB deployment does not support retryable writes')
+  );
+}
+
+export async function runWithOptionalTransaction<T>(
+  operation: (session?: ClientSession) => Promise<T>,
+) {
+  const connection = await connectDB();
+  const session = await connection.startSession();
+
+  try {
+    let result: T | undefined;
+
+    await session.withTransaction(async () => {
+      result = await operation(session);
+    });
+
+    return result as T;
+  } catch (error) {
+    if (isTransactionUnsupportedError(error)) {
+      return operation();
+    }
+
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 }

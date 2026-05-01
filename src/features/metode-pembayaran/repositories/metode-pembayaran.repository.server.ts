@@ -6,3 +6,13 @@ export async function findMetodePembayaranList() {
 
   return MetodePembayaran.find().sort({ createdAt: 1 }).lean();
 }
+
+export async function findMetodePembayaranByIds(ids: string[]) {
+  await connectDB();
+
+  return MetodePembayaran.find({
+    _id: { $in: ids },
+  })
+    .select('_id')
+    .lean();
+}
