@@ -19,6 +19,7 @@ type PersistAssistantMessageArgs = {
 
 type UseChatbotPanelChatArgs = {
   activeSessionIdRef: MutableRefObject<string | null>;
+  activeRequestIdRef: MutableRefObject<string | null>;
   pendingPreviewRef: MutableRefObject<TransaksiPreviewGroup | null>;
   onCustomEvent: (eventType: string, value: unknown) => void;
   onPersistAssistantMessage: (args: PersistAssistantMessageArgs) => void;
@@ -26,6 +27,7 @@ type UseChatbotPanelChatArgs = {
 
 export function useChatbotPanelChat({
   activeSessionIdRef,
+  activeRequestIdRef,
   pendingPreviewRef,
   onCustomEvent,
   onPersistAssistantMessage,
@@ -35,6 +37,7 @@ export function useChatbotPanelChat({
     connection: fetchServerSentEvents('/api/chat', () => ({
       body: {
         chatSessionId: activeSessionIdRef.current,
+        requestId: activeRequestIdRef.current,
       },
     })),
     initialMessages,

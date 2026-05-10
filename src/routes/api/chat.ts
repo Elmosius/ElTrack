@@ -23,6 +23,7 @@ export const Route = createFileRoute('/api/chat')({
           const body = (await request.json()) as {
             messages?: Array<UIMessage | ModelMessage>;
             chatSessionId?: string;
+            requestId?: string;
           };
 
           if (!body.chatSessionId) {
@@ -41,6 +42,7 @@ export const Route = createFileRoute('/api/chat')({
           const stream = await createChatbotStream({
             userId: session.user.id,
             chatSessionId: body.chatSessionId,
+            requestId: body.requestId || body.chatSessionId,
             messages: body.messages ?? [],
           });
 

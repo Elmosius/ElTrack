@@ -19,6 +19,7 @@ import { useChatbotSessions } from './use-chatbot-sessions';
 export function useChatbotPanel() {
   const latestErrorRef = useRef<string | null>(null);
   const activeSessionIdRef = useRef<string | null>(null);
+  const activeRequestIdRef = useRef<string | null>(null);
   const persistAssistantMessageRef = useRef(
     (_args: PersistAssistantMessageArgs) => {},
   );
@@ -28,6 +29,7 @@ export function useChatbotPanel() {
   const handlePreviewDismissSuccessRef = useRef(async () => {});
   const preview = useChatbotPreview({
     getActiveSessionId: () => activeSessionIdRef.current,
+    getActiveRequestId: () => activeRequestIdRef.current,
     onConfirmSuccess: (result) => handlePreviewConfirmSuccessRef.current(result),
     onDismissSuccess: () => handlePreviewDismissSuccessRef.current(),
   });
@@ -38,6 +40,7 @@ export function useChatbotPanel() {
 
   const chat = useChatbotPanelChat({
     activeSessionIdRef,
+    activeRequestIdRef,
     pendingPreviewRef,
     onCustomEvent: preview.actions.handleCustomEvent,
     onPersistAssistantMessage: (args) => persistAssistantMessageRef.current(args),
@@ -94,6 +97,7 @@ export function useChatbotPanel() {
     handleSelectSession,
   } = useChatbotPanelActions({
     activeSessionIdRef,
+    activeRequestIdRef,
     previewActions: preview.actions,
     sessionsActions: sessions.actions,
     sendMessage: chat.sendMessage,

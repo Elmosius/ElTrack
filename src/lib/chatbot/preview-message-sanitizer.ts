@@ -6,6 +6,23 @@ const savedPreviewClaimPattern =
   /(berhasil disimpan|sudah berhasil disimpan|sudah disimpan|ditambahkan ke tabel)/i;
 const misleadingPreviewCompletionPattern =
   /(semua detail sudah lengkap|preview(?: transaksi)? sudah lengkap|nama transaks(?:i|inya) sekarang|sudah diperbarui.*(?:lengkap|siap))/i;
+const hallucinatedPreviewResponsePattern =
+  /```json[\s\S]*"items"\s*:|preview transaksi[^.?!\n]*(?:siap|ditinjau|disimpan)|"namaTransaksi"\s*:|"metodePembayaran"\s*:/i;
+const safeChatModeResponse =
+  'Aku membaca ini sebagai chat biasa, bukan transaksi. Kalau mau mencatat transaksi, tulis detail transaksinya ya.';
+
+function createAssistantTextMessage(message: UIMessage, content: string) {
+  return {
+    id: message.id,
+    role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        content,
+      },
+    ],
+  } satisfies UIMessage;
+}
 
 function normalizePreviewName(value: string | null | undefined) {
   return (value ?? '')
@@ -71,8 +88,14 @@ export function sanitizeAssistantPreviewResponseMessage(
 ) {
   const text = extractMessageText(message);
 
-  if (message.role !== 'assistant' || !text || !preview) {
+  if (message.role !== 'assistant' || !text) {
     return message;
+  }
+
+  if (!preview) {
+    return hallucinatedPreviewResponsePattern.test(text)
+      ? createAssistantTextMessage(message, safeChatModeResponse)
+      : message;
   }
 
   const claimedTransactionName = extractClaimedTransactionName(text);
@@ -87,17 +110,10 @@ export function sanitizeAssistantPreviewResponseMessage(
     actualTransactionName &&
     claimedTransactionName !== actualTransactionName
   ) {
-    return {
-      id: message.id,
-      role: 'assistant',
-      parts: [
-        {
-          type: 'text',
-          content:
-            'Preview transaksi sudah diperbarui. Cek lagi nama transaksinya sebelum disimpan ke tabel.',
-        },
-      ],
-    } satisfies UIMessage;
+    return createAssistantTextMessage(
+      message,
+      'Preview transaksi sudah diperbarui. Cek lagi nama transaksinya sebelum disimpan ke tabel.',
+    );
   }
 
   if (preview.items.length > 1 && claimedTransactionNames.length > 0) {
@@ -112,47 +128,26 @@ export function sanitizeAssistantPreviewResponseMessage(
     });
 
     if (hasMismatch) {
-      return {
-        id: message.id,
-        role: 'assistant',
-        parts: [
-          {
-            type: 'text',
-            content:
-              'Preview transaksi sudah diperbarui. Cek lagi nama transaksi tiap item sebelum disimpan ke tabel.',
-          },
-        ],
-      } satisfies UIMessage;
+      return createAssistantTextMessage(
+        message,
+        'Preview transaksi sudah diperbarui. Cek lagi nama transaksi tiap item sebelum disimpan ke tabel.',
+      );
     }
   }
 
   if (!preview.canConfirm && misleadingPreviewCompletionPattern.test(text)) {
-    return {
-      id: message.id,
-      role: 'assistant',
-      parts: [
-        {
-          type: 'text',
-          content:
-            'Preview transaksi sudah diperbarui, tapi masih ada field yang perlu dicek sebelum disimpan ke tabel.',
-        },
-      ],
-    } satisfies UIMessage;
+    return createAssistantTextMessage(
+      message,
+      'Preview transaksi sudah diperbarui, tapi masih ada field yang perlu dicek sebelum disimpan ke tabel.',
+    );
   }
 
   if (!savedPreviewClaimPattern.test(text)) {
     return message;
   }
 
-  return {
-    id: message.id,
-    role: 'assistant',
-    parts: [
-      {
-        type: 'text',
-        content:
-          'Preview transaksi sudah diperbarui. Cek dulu sebelum disimpan ke tabel.',
-      },
-    ],
-  } satisfies UIMessage;
+  return createAssistantTextMessage(
+    message,
+    'Preview transaksi sudah diperbarui. Cek dulu sebelum disimpan ke tabel.',
+  );
 }

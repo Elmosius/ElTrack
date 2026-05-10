@@ -4,6 +4,7 @@ import {
 } from '#/features/chatbot/chatbot.functions';
 import {
   chatbotPreviewEventName,
+  chatbotPreviewEventPayloadSchema,
   isMeaningfulPreviewItem,
   transaksiPreviewGroupSchema,
 } from '#/features/chatbot/chatbot.schema';
@@ -17,6 +18,7 @@ import { useState } from 'react';
 
 type UseChatbotPreviewOptions = {
   getActiveSessionId: () => string | null;
+  getActiveRequestId: () => string | null;
   onConfirmSuccess?: (
     result: ConfirmChatbotPreviewResult,
   ) => Promise<void> | void;
@@ -25,6 +27,7 @@ type UseChatbotPreviewOptions = {
 
 export function useChatbotPreview({
   getActiveSessionId,
+  getActiveRequestId,
   onConfirmSuccess,
   onDismissSuccess,
 }: UseChatbotPreviewOptions) {
@@ -38,13 +41,37 @@ export function useChatbotPreview({
       return;
     }
 
+    const payload = chatbotPreviewEventPayloadSchema.safeParse(value);
+    const activeSessionId = getActiveSessionId();
+    const activeRequestId = getActiveRequestId();
+
+    if (payload.success) {
+      if (
+        payload.data.chatSessionId !== activeSessionId ||
+        payload.data.requestId !== activeRequestId
+      ) {
+        return;
+      }
+
+      setMeaningfulPreview(payload.data.preview);
+      return;
+    }
+
+    if (activeRequestId) {
+      return;
+    }
+
     const preview = transaksiPreviewGroupSchema.safeParse(value);
 
     if (!preview.success) {
       return;
     }
 
-    const meaningfulItems = preview.data.items.filter((item) =>
+    setMeaningfulPreview(preview.data);
+  };
+
+  const setMeaningfulPreview = (preview: TransaksiPreviewGroup) => {
+    const meaningfulItems = preview.items.filter((item) =>
       isMeaningfulPreviewItem(item),
     );
 
@@ -53,7 +80,7 @@ export function useChatbotPreview({
     }
 
     setPendingPreview({
-      ...preview.data,
+      ...preview,
       items: meaningfulItems,
     });
   };

@@ -91,6 +91,12 @@ export const transaksiPreviewGroupSchema = z.object({
   canConfirm: z.boolean(),
 });
 
+export const chatbotPreviewEventPayloadSchema = z.object({
+  chatSessionId: objectIdSchema,
+  requestId: z.string().trim().min(1),
+  preview: transaksiPreviewGroupSchema,
+});
+
 const chatMessagePartSchema = z.object({
   type: z.string().trim().min(1),
 }).catchall(z.unknown());

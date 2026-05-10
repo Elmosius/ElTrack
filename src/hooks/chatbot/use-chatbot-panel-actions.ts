@@ -16,6 +16,7 @@ type ChatbotPanelSessionsActions = {
 
 type UseChatbotPanelActionsArgs = {
   activeSessionIdRef: MutableRefObject<string | null>;
+  activeRequestIdRef: MutableRefObject<string | null>;
   previewActions: ChatbotPanelPreviewActions;
   sessionsActions: ChatbotPanelSessionsActions;
   sendMessage: (payload: ChatComposerPayload) => Promise<unknown>;
@@ -23,8 +24,17 @@ type UseChatbotPanelActionsArgs = {
   resetComposer: () => void;
 };
 
+function createChatbotRequestId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export function useChatbotPanelActions({
   activeSessionIdRef,
+  activeRequestIdRef,
   previewActions,
   sessionsActions,
   sendMessage,
@@ -46,6 +56,7 @@ export function useChatbotPanelActions({
           return;
         }
 
+        activeRequestIdRef.current = createChatbotRequestId();
         previewActions.clearPreview();
         await sendMessage(payload);
         await sessionsActions.refreshSessions();
@@ -57,12 +68,19 @@ export function useChatbotPanelActions({
         });
       }
     },
-    [activeSessionIdRef, previewActions, sendMessage, sessionsActions],
+    [
+      activeRequestIdRef,
+      activeSessionIdRef,
+      previewActions,
+      sendMessage,
+      sessionsActions,
+    ],
   );
 
   const handleClearChat = useCallback(async () => {
     stop();
     resetComposer();
+    activeRequestIdRef.current = null;
     const detail = await sessionsActions.createSession();
     activeSessionIdRef.current = detail.session.id;
     previewActions.clearPreview();
@@ -73,6 +91,7 @@ export function useChatbotPanelActions({
       description: 'Session percakapan baru sudah dibuat.',
     });
   }, [
+    activeRequestIdRef,
     activeSessionIdRef,
     previewActions,
     resetComposer,
@@ -93,11 +112,13 @@ export function useChatbotPanelActions({
     async (chatSessionId: string) => {
       stop();
       resetComposer();
+      activeRequestIdRef.current = null;
       previewActions.clearPreview();
       const detail = await sessionsActions.selectSession(chatSessionId);
       activeSessionIdRef.current = detail.session.id;
     },
     [
+      activeRequestIdRef,
       activeSessionIdRef,
       previewActions,
       resetComposer,

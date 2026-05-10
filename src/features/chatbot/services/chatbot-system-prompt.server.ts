@@ -2,7 +2,28 @@ import type { TransaksiPreviewGroup } from '#/types/chatbot';
 import { extractPreviewSummary } from '../mappers';
 import type { ChatbotMasterData } from '../chatbot.shared.server';
 
-export function buildChatbotSystemPrompt(
+export type ChatbotPromptMode = 'chat' | 'preview';
+
+type BuildChatbotSystemPromptOptions = {
+  mode: ChatbotPromptMode;
+  masterData: ChatbotMasterData;
+  activePreview: TransaksiPreviewGroup | null;
+};
+
+function buildChatOnlyPrompt() {
+  const tanggalHariIni = new Date().toISOString().slice(0, 10);
+
+  return [
+    'Kamu adalah ElTrack Assistant, asisten keuangan pribadi dalam bahasa Indonesia.',
+    `Hari ini ${tanggalHariIni}.`,
+    'Jawab chat biasa secara natural, ringkas, dan membantu.',
+    'Kamu boleh menjawab pertanyaan umum selama tetap sopan dan jelas.',
+    'Jika user ingin mencatat transaksi, minta user mengirim detail transaksi seperti nama, nominal, tanggal, metode pembayaran, dan kategori.',
+    'Jangan menampilkan JSON transaksi, tabel transaksi, atau mengatakan catatan sudah siap ditinjau kecuali user jelas meminta pencatatan transaksi.',
+  ].join('\n');
+}
+
+function buildPreviewPrompt(
   masterData: ChatbotMasterData,
   activePreview: TransaksiPreviewGroup | null,
 ) {
@@ -55,4 +76,16 @@ export function buildChatbotSystemPrompt(
   ]
     .filter(Boolean)
     .join('\n');
+}
+
+export function buildChatbotSystemPrompt({
+  mode,
+  masterData,
+  activePreview,
+}: BuildChatbotSystemPromptOptions) {
+  if (mode === 'chat') {
+    return buildChatOnlyPrompt();
+  }
+
+  return buildPreviewPrompt(masterData, activePreview);
 }

@@ -3,6 +3,10 @@ import { photoPlaceholderText } from '@/const/chatbot';
 
 export function sanitizeMessageForStorage(message: UIMessage): UIMessage {
   const sanitizedParts = message.parts.flatMap((part) => {
+    if (part.type === 'text') {
+      return [part];
+    }
+
     if (part.type === 'image') {
       return [
         {
@@ -12,7 +16,7 @@ export function sanitizeMessageForStorage(message: UIMessage): UIMessage {
       ];
     }
 
-    return [part];
+    return [];
   });
 
   return {

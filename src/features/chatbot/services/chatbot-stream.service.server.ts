@@ -17,6 +17,7 @@ import {
 } from '../chatbot.shared.server';
 import { getChatbotMasterData } from './chatbot-master-data.service.server';
 import { buildResolvedPreview } from './chatbot-preview.service.server';
+import { classifyPreviewIntent } from './chatbot-preview-intent.server';
 import { buildChatbotSystemPrompt } from './chatbot-system-prompt.server';
 import {
   getChatSessionOrThrow,
@@ -39,26 +40,55 @@ const previewTransaksiTool = toolDefinition({
 export async function createChatbotStreamService({
   userId,
   chatSessionId,
+  requestId,
   messages,
 }: {
   userId: string;
   chatSessionId: string;
+  requestId: string;
   messages: Array<UIMessage | ModelMessage>;
 }) {
   const session = await getChatSessionOrThrow(userId, chatSessionId);
   const activePreview = getPendingPreview(session.pendingPreview);
   const latestUserMessage = getLatestUserMessageText(messages);
-  const masterData = await getChatbotMasterData(userId);
-  const model = hasImageContent(messages)
-    ? getGeminiVisionModel()
-    : getGeminiTextModel();
+  const hasImage = hasImageContent(messages);
+  const previewIntent = classifyPreviewIntent({
+    latestUserMessage,
+    activePreview,
+    hasImageContent: hasImage,
+  });
+  const previewContext =
+    activePreview && previewIntent === 'update-preview' ? activePreview : null;
 
-  return chat({
+  if (activePreview && previewIntent === 'new-preview') {
+    await updateChatSessionPendingPreviewService(userId, chatSessionId, null);
+  }
+
+  const masterData = await getChatbotMasterData(userId);
+  const model = hasImage ? getGeminiVisionModel() : getGeminiTextModel();
+  const promptMode = previewIntent === 'chat' ? 'chat' : 'preview';
+
+  const chatOptions = {
     adapter: geminiText(model),
     messages: withSystemPrompt(
       messages,
-      buildChatbotSystemPrompt(masterData, activePreview),
+      buildChatbotSystemPrompt({
+        mode: promptMode,
+        masterData,
+        activePreview: previewContext,
+      }),
+      {
+        stripPreviewAssistantText: promptMode === 'chat',
+      },
     ) as never,
+  };
+
+  if (previewIntent === 'chat') {
+    return chat(chatOptions);
+  }
+
+  return chat({
+    ...chatOptions,
     tools: [
       previewTransaksiTool.server(async (args, context) => {
         const normalizedArgs = previewTransaksiToolInputSchema.parse(args);
@@ -66,7 +96,7 @@ export async function createChatbotStreamService({
           normalizedArgs,
           masterData,
           {
-            activePreview,
+            activePreview: previewContext,
             latestUserMessage,
           },
         );
@@ -75,7 +105,11 @@ export async function createChatbotStreamService({
           chatSessionId,
           preview,
         );
-        context?.emitCustomEvent(chatbotPreviewEventName, preview);
+        context?.emitCustomEvent(chatbotPreviewEventName, {
+          chatSessionId,
+          requestId,
+          preview,
+        });
         return preview;
       }),
     ],
