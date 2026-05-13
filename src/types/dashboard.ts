@@ -1,3 +1,5 @@
+import type { BalanceSummary } from './balance';
+
 export type DashboardTrendPoint = {
   label: string;
   expenses: number;
@@ -31,6 +33,7 @@ export type DashboardTopCategory = {
 
 export type DashboardHomeData = {
   selectedMonth: string;
+  balance: BalanceSummary;
   overview: {
     balance: number;
     expenses: number;

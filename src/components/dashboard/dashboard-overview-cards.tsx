@@ -14,7 +14,7 @@ type DashboardOverviewCardsProps = {
 const overviewItems = [
   {
     key: 'balance',
-    label: 'Total Saldo',
+    label: 'Arus Bersih Bulan Ini',
     icon: WalletCards,
     tone: 'text-primary',
   },

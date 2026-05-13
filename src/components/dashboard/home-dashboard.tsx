@@ -1,6 +1,7 @@
 import type { DashboardHomeData } from '#/types/dashboard';
 import type { DashboardTrendMode } from '#/lib/dashboard';
 import { useState } from 'react';
+import { DashboardBalanceSection } from './dashboard-balance-section';
 import { DashboardDistributionCharts } from './dashboard-distribution-charts';
 import { DashboardHeader } from './dashboard-header';
 import { DashboardOverviewCards } from './dashboard-overview-cards';
@@ -22,6 +23,8 @@ export function HomeDashboard({ data, onMonthChange }: HomeDashboardProps) {
         selectedMonth={data.selectedMonth}
         onMonthChange={onMonthChange}
       />
+
+      <DashboardBalanceSection balance={data.balance} />
 
       <DashboardOverviewCards overview={data.overview} />
 
