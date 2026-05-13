@@ -1,8 +1,9 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupTitle, SidebarHeader, SidebarItem, SidebarItemButton, SidebarList, SidebarMenu } from '#/components/selia/sidebar';
+import { AppLogo } from '#/components/shared/app-logo';
 import { MENU_SIDEBAR } from '#/const/sidebar';
 import { authClient } from '#/lib/auth/client';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
-import { Coins, LogOut, PlusIcon } from 'lucide-react';
+import { LogOut, PlusIcon } from 'lucide-react';
 
 type AppSidebarProps = {
   isSidebarOpen: boolean;
@@ -29,8 +30,8 @@ export default function AppSidebar({
   return (
     <Sidebar className={`overflow-hidden border-r border-b border-gray-200 rounded-lg py-4 z-10 transition-[width,opacity] duration-300 ease-out ${isSidebarOpen ? 'w-50 opacity-100 lg:w-70' : 'w-0 opacity-0'}`} size={'loose'}>
       <SidebarHeader className='mx-2'>
-        <h1 className='text-2xl tracking-tight flex gap-2'>
-          <Coins className='text-primary size-4' />
+        <h1 className='flex items-center gap-2 text-2xl tracking-tight'>
+          <AppLogo className='size-5 text-primary' />
           ElTrack
         </h1>
       </SidebarHeader>
