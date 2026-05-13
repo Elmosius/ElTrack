@@ -13,7 +13,7 @@ Tujuan utama ElTrack adalah membuat pencatatan keuangan harian terasa lebih sede
 
 ## Release
 
-Version: **1.0.0-beta.5**
+Version: **1.0.0-beta.6**
 
 Status: **Beta**
 
