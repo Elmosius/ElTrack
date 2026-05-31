@@ -49,6 +49,7 @@ export async function createChatbotStreamService({
   messages: Array<UIMessage | ModelMessage>;
 }) {
   const session = await getChatSessionOrThrow(userId, chatSessionId);
+  let requestStartedAt = session.updatedAt?.getTime?.() ?? Date.now();
   const activePreview = getPendingPreview(session.pendingPreview);
   const latestUserMessage = getLatestUserMessageText(messages);
   const hasImage = hasImageContent(messages);
@@ -61,7 +62,14 @@ export async function createChatbotStreamService({
     activePreview && previewIntent === 'update-preview' ? activePreview : null;
 
   if (activePreview && previewIntent === 'new-preview') {
-    await updateChatSessionPendingPreviewService(userId, chatSessionId, null);
+    const clearedSession = await updateChatSessionPendingPreviewService(
+      userId,
+      chatSessionId,
+      null,
+    );
+    requestStartedAt = clearedSession.updatedAt
+      ? new Date(clearedSession.updatedAt).getTime()
+      : Date.now();
   }
 
   const masterData = await getChatbotMasterData(userId);
@@ -100,6 +108,14 @@ export async function createChatbotStreamService({
             latestUserMessage,
           },
         );
+        const latestSession = await getChatSessionOrThrow(userId, chatSessionId);
+        const latestUpdatedAt =
+          latestSession.updatedAt?.getTime?.() ?? requestStartedAt;
+
+        if (latestUpdatedAt > requestStartedAt) {
+          return preview;
+        }
+
         await updateChatSessionPendingPreviewService(
           userId,
           chatSessionId,
@@ -113,6 +129,6 @@ export async function createChatbotStreamService({
         return preview;
       }),
     ],
-    agentLoopStrategy: maxIterations(5),
+    agentLoopStrategy: maxIterations(1),
   });
 }

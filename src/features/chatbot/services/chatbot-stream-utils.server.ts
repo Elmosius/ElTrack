@@ -3,6 +3,7 @@ import {
   type ModelMessage,
   type UIMessage,
 } from '@tanstack/ai';
+import { isPreviewDismissedMarker } from '#/lib/chatbot/dismiss-marker';
 
 type UiMessagePart = UIMessage['parts'][number];
 type ModelMessageContentPart = Exclude<
@@ -104,8 +105,9 @@ export function sanitizeMessagesForModel(
   options: SanitizeMessagesForModelOptions = {},
 ): Array<UIMessage | ModelMessage> {
   const sanitizedMessages: Array<UIMessage | ModelMessage> = [];
+  const activeMessages = getMessagesAfterLastPreviewDismissal(messages);
 
-  for (const message of messages) {
+  for (const message of activeMessages) {
     if (shouldStripPreviewAssistantHistory(message, options)) {
       continue;
     }
@@ -125,6 +127,27 @@ export function sanitizeMessagesForModel(
   }
 
   return sanitizedMessages;
+}
+
+function getMessagesAfterLastPreviewDismissal(
+  messages: Array<UIMessage | ModelMessage>,
+) {
+  let lastDismissalIndex = -1;
+
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index];
+
+    if (message && isPreviewDismissedMarker(message)) {
+      lastDismissalIndex = index;
+      break;
+    }
+  }
+
+  if (lastDismissalIndex < 0) {
+    return messages;
+  }
+
+  return messages.slice(lastDismissalIndex + 1);
 }
 
 export function withSystemPrompt(

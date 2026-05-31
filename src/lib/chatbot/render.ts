@@ -1,4 +1,5 @@
 import type { UIMessage } from '@tanstack/ai-react';
+import { isPreviewDismissedMarker } from './dismiss-marker';
 
 export type RenderedChatMessage = UIMessage & {
   text: string;
@@ -28,6 +29,7 @@ export function toRenderedChatMessages(
   messages: UIMessage[],
 ): RenderedChatMessage[] {
   return messages
+    .filter((message) => !isPreviewDismissedMarker(message))
     .map((message) => ({
       ...message,
       text: extractMessageText(message),

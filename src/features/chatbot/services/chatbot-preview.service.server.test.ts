@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TransaksiPreviewGroup } from '#/types/chatbot';
+import { previewDismissedMarkerText } from '#/lib/chatbot';
 
 const mocks = vi.hoisted(() => ({
   createManyTransaksi: vi.fn(),
@@ -23,7 +24,11 @@ vi.mock('./chatbot-session.service.server', () => ({
   updateChatSessionPendingPreviewService: mocks.updateChatSessionPendingPreviewService,
 }));
 
-const { confirmChatbotPreviewService } = await import('./chatbot-preview.service.server');
+const {
+  buildResolvedPreview,
+  confirmChatbotPreviewService,
+  dismissChatbotPreviewService,
+} = await import('./chatbot-preview.service.server');
 
 const userId = 'user-1';
 const chatSessionId = '507f1f77bcf86cd799439011';
@@ -124,5 +129,82 @@ describe('confirmChatbotPreviewService', () => {
 
     expect(mocks.updateChatSessionPendingPreviewService).not.toHaveBeenCalled();
     expect(mocks.storeChatMessageForSession).not.toHaveBeenCalled();
+  });
+});
+
+describe('dismissChatbotPreviewService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getChatSessionOrThrow.mockResolvedValue({ pendingPreview: preview });
+    mocks.updateChatSessionPendingPreviewService.mockResolvedValue(sessionSummary);
+    mocks.storeChatMessageForSession.mockResolvedValue({});
+  });
+
+  it('clears pending preview and stores an internal dismissal marker', async () => {
+    await expect(
+      dismissChatbotPreviewService(userId, chatSessionId),
+    ).resolves.toEqual({
+      session: sessionSummary,
+      cleared: true,
+    });
+
+    expect(mocks.updateChatSessionPendingPreviewService).toHaveBeenCalledWith(
+      userId,
+      chatSessionId,
+      null,
+    );
+    expect(mocks.storeChatMessageForSession).toHaveBeenCalledWith(
+      userId,
+      chatSessionId,
+      expect.objectContaining({
+        role: 'system',
+        parts: [{ type: 'text', content: previewDismissedMarkerText }],
+      }),
+    );
+  });
+});
+
+describe('buildResolvedPreview', () => {
+  it('fills deterministic fallback fields for partial Gemini tool args', () => {
+    const result = buildResolvedPreview(
+      {
+        items: [
+          {
+            tanggal: '2026-05-31',
+            waktu: 'Pagi',
+            nominal: 30000,
+          },
+        ],
+      },
+      {
+        kategori: [{ id: kategoriId, name: 'Bensin' }],
+        metodePembayaran: [{ id: metodePembayaranId, name: 'Tunai' }],
+        tipe: [{ id: tipeId, name: 'Pengeluaran' }],
+      },
+      {
+        latestUserMessage:
+          'Tolong catat dong aku tadi pagi isi bensin 30rbu pake tunai',
+      },
+    );
+
+    expect(result).toMatchObject({
+      canConfirm: true,
+      items: [
+        {
+          namaTransaksi: 'isi bensin',
+          tanggal: '2026-05-31',
+          waktu: 'Pagi',
+          nominal: 30000,
+          kategoriName: 'Bensin',
+          kategoriId,
+          metodePembayaranName: 'Tunai',
+          metodePembayaranId,
+          tipeName: 'Pengeluaran',
+          tipeId,
+          canConfirm: true,
+        },
+      ],
+    });
+    expect(result.missingFields).toEqual([]);
   });
 });

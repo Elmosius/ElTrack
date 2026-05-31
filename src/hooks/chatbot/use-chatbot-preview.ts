@@ -19,6 +19,7 @@ import { useState } from 'react';
 type UseChatbotPreviewOptions = {
   getActiveSessionId: () => string | null;
   getActiveRequestId: () => string | null;
+  onDismissStart?: () => Promise<void> | void;
   onConfirmSuccess?: (
     result: ConfirmChatbotPreviewResult,
   ) => Promise<void> | void;
@@ -28,6 +29,7 @@ type UseChatbotPreviewOptions = {
 export function useChatbotPreview({
   getActiveSessionId,
   getActiveRequestId,
+  onDismissStart,
   onConfirmSuccess,
   onDismissSuccess,
 }: UseChatbotPreviewOptions) {
@@ -125,6 +127,7 @@ export function useChatbotPreview({
   const handleDismissPreview = async () => {
     const chatSessionId = getActiveSessionId();
     setPendingPreview(null);
+    await onDismissStart?.();
 
     if (!chatSessionId) {
       return;

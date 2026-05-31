@@ -114,6 +114,12 @@ export function extractInitialTransactionNameFromUserMessage(
     return null;
   }
 
+  const activityName = extractKnownActivityTransactionName(normalized);
+
+  if (activityName) {
+    return activityName;
+  }
+
   const compactValue = normalized
     .replace(/\bnama transaksi(?:nya)?\b/g, ' ')
     .replace(/\btransaksi(?:nya)?\b/g, ' ')
@@ -129,6 +135,35 @@ export function extractInitialTransactionNameFromUserMessage(
     stopMatch > 0 ? compactValue.slice(0, stopMatch).trim() : compactValue;
 
   return sanitizeTransactionNameCandidate(truncatedValue);
+}
+
+function extractKnownActivityTransactionName(normalized: string) {
+  const knownActivities = [
+    /\bisi\s+bensin\b/,
+    /\btambal\s+ban(?:g)?\b/,
+    /\bmakan(?:\s+(?:pagi|siang|sore|malam))?\b/,
+    /\bminum(?:\s+(?:pagi|siang|sore|malam))?\b/,
+    /\bbelanja(?:\s+[a-z0-9-]+)?\b/,
+    /\btop\s*up\s+[a-z0-9-]+\b/,
+  ];
+
+  for (const pattern of knownActivities) {
+    const match = normalized.match(pattern);
+
+    if (!match?.[0]) {
+      continue;
+    }
+
+    const candidate = sanitizeTransactionNameCandidate(match[0], {
+      maxWords: 4,
+    });
+
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return null;
 }
 
 export function extractRenameTransactionNameFromUserMessage(

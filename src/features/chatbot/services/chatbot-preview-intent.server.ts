@@ -1,5 +1,5 @@
-import { normalizeText } from '../chatbot.shared.server';
 import type { TransaksiPreviewGroup } from '#/types/chatbot';
+import { normalizeText } from '../chatbot.shared.server';
 
 export type PreviewIntent = 'new-preview' | 'update-preview' | 'chat';
 
@@ -8,6 +8,9 @@ const nominalPattern =
 
 const createPreviewRequestPattern =
   /\b(catat|catetin|masukin|tambahkan|buatkan|buat)\b/;
+
+const explicitCreatePreviewRequestPattern =
+  /\b(catat|catetin|masukin|tambahkan|buatkan)\b|\bbuat\s+(?:catatan|transaksi)\b/;
 
 const transactionDetailPattern =
   /\b(beli|bayar|isi|tambal|top up|topup|transfer|gajian|terima|dapat|makan|minum|cash|tunai|qris|bank|bensin|struk)\b/;
@@ -23,6 +26,9 @@ const smallTalkPattern =
 
 const smallTalkPhrasePattern =
   /^(apa kabar|selamat pagi|selamat siang|selamat sore|selamat malam)(\s+.*)?$/;
+
+const questionPattern =
+  /\?|^(?:apa|apakah|berapa|gimana|bagaimana)\b|\b(?:cukup|berapa\s+km|buat\s+sehari|untuk\s+sehari)\b/;
 
 function hasNumberedList(text: string) {
   return /(?:^|\s)\d+[.)]\s+\S+/.test(text);
@@ -74,6 +80,13 @@ function looksLikeNewTransaction(text: string, hasImageContent: boolean) {
 
   if (/\b(struk|receipt|foto)\b/.test(text)) {
     return true;
+  }
+
+  if (
+    questionPattern.test(text) &&
+    !explicitCreatePreviewRequestPattern.test(text)
+  ) {
+    return false;
   }
 
   if (

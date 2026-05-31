@@ -1,5 +1,6 @@
 import { persistChatbotAssistantSessionMessage } from '#/features/chatbot/chatbot.functions';
 import type { ConfirmChatbotPreviewResult } from '#/types/chatbot';
+import { createPreviewDismissedMarkerMessage } from '#/lib/chatbot';
 import { useUser } from '#/stores/user';
 import { useRouter } from '@tanstack/react-router';
 import { useCallback, useRef, useState } from 'react';
@@ -26,10 +27,12 @@ export function useChatbotPanel() {
   const handlePreviewConfirmSuccessRef = useRef(
     async (_result: ConfirmChatbotPreviewResult) => {},
   );
+  const handlePreviewDismissStartRef = useRef(async () => {});
   const handlePreviewDismissSuccessRef = useRef(async () => {});
   const preview = useChatbotPreview({
     getActiveSessionId: () => activeSessionIdRef.current,
     getActiveRequestId: () => activeRequestIdRef.current,
+    onDismissStart: () => handlePreviewDismissStartRef.current(),
     onConfirmSuccess: (result) => handlePreviewConfirmSuccessRef.current(result),
     onDismissSuccess: () => handlePreviewDismissSuccessRef.current(),
   });
@@ -79,6 +82,15 @@ export function useChatbotPanel() {
       await router.invalidate();
     },
   );
+  useSyncedRefValue(handlePreviewDismissStartRef, async () => {
+    activeRequestIdRef.current = null;
+    const nextMessages = [
+      ...chat.latestMessagesRef.current,
+      createPreviewDismissedMarkerMessage(),
+    ];
+    chat.latestMessagesRef.current = nextMessages;
+    chat.setMessages(nextMessages);
+  });
   useSyncedRefValue(handlePreviewDismissSuccessRef, async () => {
     await sessions.actions.refreshSessions();
   });

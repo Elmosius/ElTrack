@@ -105,8 +105,9 @@ export function useChatbotPanelActions({
   }, [previewActions, stop]);
 
   const handleDismissPreview = useCallback(async () => {
+    stop();
     await previewActions.handleDismissPreview();
-  }, [previewActions]);
+  }, [previewActions, stop]);
 
   const handleSelectSession = useCallback(
     async (chatSessionId: string) => {

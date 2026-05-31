@@ -78,6 +78,11 @@ describe('classifyPreviewIntent', () => {
     expect(classify('tolong catat makan 25 ribu qris')).toBe('new-preview');
   });
 
+  it('keeps transaction-like questions as regular chat', () => {
+    expect(classify('makan 25 ribu cukup ga buat sehari?', null)).toBe('chat');
+    expect(classify('bensin 30 ribu cukup berapa km?', null)).toBe('chat');
+  });
+
   it('does not create preview intent for regular chat without active preview', () => {
     expect(classify('halo', null)).toBe('chat');
   });

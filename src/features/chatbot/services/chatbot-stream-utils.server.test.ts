@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { UIMessage } from '@tanstack/ai';
+import { previewDismissedMarkerText } from '#/lib/chatbot';
 import { sanitizeMessagesForModel } from './chatbot-stream-utils.server';
 
 describe('sanitizeMessagesForModel', () => {
@@ -65,6 +66,34 @@ describe('sanitizeMessagesForModel', () => {
     ).toEqual([
       {
         id: 'user-chat',
+        role: 'user',
+        parts: [{ type: 'text', content: 'test' }],
+      },
+    ]);
+  });
+
+  it('drops all history before the latest preview dismissal marker', () => {
+    const messages = [
+      {
+        id: 'old-user',
+        role: 'user',
+        parts: [{ type: 'text', content: 'Tolong catat isi bensin' }],
+      },
+      {
+        id: 'dismissed',
+        role: 'system',
+        parts: [{ type: 'text', content: previewDismissedMarkerText }],
+      },
+      {
+        id: 'new-user',
+        role: 'user',
+        parts: [{ type: 'text', content: 'test' }],
+      },
+    ] as unknown as UIMessage[];
+
+    expect(sanitizeMessagesForModel(messages)).toEqual([
+      {
+        id: 'new-user',
         role: 'user',
         parts: [{ type: 'text', content: 'test' }],
       },
