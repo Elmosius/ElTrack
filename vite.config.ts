@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { nitro } from 'nitro/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -10,12 +9,14 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
     devtools(),
-    tsconfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
     tanstackStart(),
-    nitro(),
+    nitro({ serverDir: 'server' }),
     viteReact(),
     VitePWA({
       injectRegister: false,
