@@ -1,8 +1,7 @@
 const localhostOrigin = 'http://localhost:3000';
 
-type AuthEnvironment = Pick<
-  NodeJS.ProcessEnv,
-  'BETTER_AUTH_SECRET' | 'BETTER_AUTH_URL' | 'NODE_ENV'
+export type AuthEnvironment = Partial<
+  Record<'BETTER_AUTH_SECRET' | 'BETTER_AUTH_URL' | 'NODE_ENV', string>
 >;
 
 function normalizeOrigin(value: string) {
