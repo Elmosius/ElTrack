@@ -1,3 +1,5 @@
+import type { KantongSummaryItem } from './kantong';
+
 export type BalanceBucket = 'cash' | 'non_cash';
 
 export type BalanceSettings = {
@@ -22,4 +24,5 @@ export type BalanceSummary = {
   cashExpenses: number;
   nonCashIncome: number;
   nonCashExpenses: number;
+  kantongs: KantongSummaryItem[];
 };

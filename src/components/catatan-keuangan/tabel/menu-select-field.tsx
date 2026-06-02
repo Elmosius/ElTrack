@@ -24,6 +24,11 @@ export function MenuSelectField({ value, options, displayValue, placeholder = 'P
       />
       <MenuPopup size='compact' align='start'>
         <MenuRadioGroup value={value} onValueChange={(next) => onChange(next)}>
+          {options.length === 0 && (
+            <div className='px-3 py-2 text-sm text-dimmed'>
+              Belum ada opsi tersedia.
+            </div>
+          )}
           {options.map((option) => (
             <MenuRadioItem key={option.id} value={option.id} className={'text-sm'}>
               {option.name}

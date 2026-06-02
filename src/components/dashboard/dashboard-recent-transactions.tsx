@@ -34,7 +34,7 @@ export function DashboardRecentTransactions({ transactions }: DashboardRecentTra
               </div>
 
               <div className='flex shrink-0 flex-col items-end gap-2'>
-                <span className={cn('rounded-full px-2 py-1 text-[11px] font-medium', item.tipeName === 'Pengeluaran' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary')}>{item.tipeName}</span>
+                <span className={cn('rounded-full px-2 py-1 text-xs font-medium', item.tipeName === 'Pengeluaran' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary')}>{item.tipeName}</span>
                 <p className='text-sm font-semibold'>{formatCurrency(item.nominal)}</p>
               </div>
             </div>

@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   insertTransaksiMany: vi.fn(),
   updateTransaksiById: vi.fn(),
   findKategoriByIdsAndUserId: vi.fn(),
+  findKantongByIdsAndUserId: vi.fn(),
   findMetodePembayaranByIds: vi.fn(),
   findTipeByIds: vi.fn(),
 }));
@@ -22,6 +23,10 @@ vi.mock('../repositories/transaksi.repository.server', () => ({
 
 vi.mock('#/features/kategori/repositories/kategori.repository.server', () => ({
   findKategoriByIdsAndUserId: mocks.findKategoriByIdsAndUserId,
+}));
+
+vi.mock('#/features/kantong/repositories/kantong.repository.server', () => ({
+  findKantongByIdsAndUserId: mocks.findKantongByIdsAndUserId,
 }));
 
 vi.mock('#/features/metode-pembayaran/repositories/metode-pembayaran.repository.server', () => ({
@@ -43,6 +48,7 @@ const kategoriId = '507f1f77bcf86cd799439011';
 const metodePembayaranId = '507f1f77bcf86cd799439012';
 const tipeId = '507f1f77bcf86cd799439013';
 const transaksiId = '507f1f77bcf86cd799439014';
+const kantongId = '507f1f77bcf86cd799439016';
 
 const baseInput: CreateTransaksiInput = {
   namaTransaksi: 'Kopi',
@@ -50,7 +56,7 @@ const baseInput: CreateTransaksiInput = {
   waktu: 'Pagi',
   nominal: 25000,
   kategori: kategoriId,
-  metodePembayaran: metodePembayaranId,
+  kantong: kantongId,
   catatan: undefined,
   tipe: tipeId,
 };
@@ -67,6 +73,7 @@ function transaksiDoc(input: CreateTransaksiInput, id = transaksiId) {
 
 function mockValidReferences() {
   mocks.findKategoriByIdsAndUserId.mockResolvedValue([{ _id: kategoriId }]);
+  mocks.findKantongByIdsAndUserId.mockResolvedValue([{ _id: kantongId }]);
   mocks.findMetodePembayaranByIds.mockResolvedValue([{ _id: metodePembayaranId }]);
   mocks.findTipeByIds.mockResolvedValue([{ _id: tipeId }]);
 }
@@ -86,10 +93,25 @@ describe('transaksi service reference validation', () => {
     expect(mocks.insertTransaksi).not.toHaveBeenCalled();
   });
 
-  it('rejects invalid global reference ids before saving', async () => {
-    mocks.findMetodePembayaranByIds.mockResolvedValue([]);
+  it('rejects invalid Kantong reference ids before saving', async () => {
+    mocks.findKantongByIdsAndUserId.mockResolvedValue([]);
 
     await expect(createTransaksiService(userId, baseInput)).rejects.toThrow(
+      'Kantong tidak ditemukan.',
+    );
+    expect(mocks.insertTransaksi).not.toHaveBeenCalled();
+  });
+
+  it('keeps legacy metode pembayaran validation for old transactions', async () => {
+    const legacyInput: CreateTransaksiInput = {
+      ...baseInput,
+      kantong: undefined,
+      metodePembayaran: metodePembayaranId,
+    };
+
+    mocks.findMetodePembayaranByIds.mockResolvedValue([]);
+
+    await expect(createTransaksiService(userId, legacyInput)).rejects.toThrow(
       'Metode pembayaran tidak ditemukan.',
     );
     expect(mocks.insertTransaksi).not.toHaveBeenCalled();

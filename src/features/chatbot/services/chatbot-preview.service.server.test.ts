@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   createManyTransaksi: vi.fn(),
   runWithOptionalTransaction: vi.fn(),
   getChatSessionOrThrow: vi.fn(),
+  getChatbotMasterData: vi.fn(),
   storeChatMessageForSession: vi.fn(),
   updateChatSessionPendingPreviewService: vi.fn(),
 }));
@@ -24,10 +25,15 @@ vi.mock('./chatbot-session.service.server', () => ({
   updateChatSessionPendingPreviewService: mocks.updateChatSessionPendingPreviewService,
 }));
 
+vi.mock('./chatbot-master-data.service.server', () => ({
+  getChatbotMasterData: mocks.getChatbotMasterData,
+}));
+
 const {
   buildResolvedPreview,
   confirmChatbotPreviewService,
   dismissChatbotPreviewService,
+  patchChatbotPreviewItemService,
 } = await import('./chatbot-preview.service.server');
 
 const userId = 'user-1';
@@ -35,6 +41,9 @@ const chatSessionId = '507f1f77bcf86cd799439011';
 const kategoriId = '507f1f77bcf86cd799439012';
 const metodePembayaranId = '507f1f77bcf86cd799439013';
 const tipeId = '507f1f77bcf86cd799439014';
+const bensinKategoriId = '507f1f77bcf86cd799439015';
+const qrisKantongId = '507f1f77bcf86cd799439016';
+const penghasilanTipeId = '507f1f77bcf86cd799439017';
 const sessionSummary = {
   id: chatSessionId,
   title: 'Chat baru',
@@ -84,6 +93,103 @@ const preview: TransaksiPreviewGroup = {
   missingFields: [],
   canConfirm: true,
 };
+
+const masterData = {
+  kategori: [
+    { id: kategoriId, name: 'Makan' },
+    { id: bensinKategoriId, name: 'Bensin' },
+  ],
+  metodePembayaran: [
+    { id: metodePembayaranId, name: 'Tunai' },
+    { id: qrisKantongId, name: 'QRIS' },
+  ],
+  tipe: [
+    { id: tipeId, name: 'Pengeluaran' },
+    { id: penghasilanTipeId, name: 'Penghasilan' },
+  ],
+};
+
+describe('patchChatbotPreviewItemService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getChatSessionOrThrow.mockResolvedValue({ pendingPreview: preview });
+    mocks.getChatbotMasterData.mockResolvedValue(masterData);
+    mocks.updateChatSessionPendingPreviewService.mockResolvedValue(sessionSummary);
+  });
+
+  it('updates one preview item by index without changing the other items', async () => {
+    const result = await patchChatbotPreviewItemService(userId, {
+      chatSessionId,
+      itemIndex: 1,
+      patch: {
+        nominal: 'Rp 17.000',
+        kategoriId: bensinKategoriId,
+        metodePembayaranId: qrisKantongId,
+        tipeId: penghasilanTipeId,
+      },
+    });
+
+    expect(result.items[0]).toMatchObject({
+      namaTransaksi: 'Kopi',
+      nominal: 25000,
+      kategoriId,
+      metodePembayaranId,
+      tipeId,
+    });
+    expect(result.items[1]).toMatchObject({
+      namaTransaksi: 'Teh',
+      nominal: 17000,
+      kategoriName: 'Bensin',
+      kategoriId: bensinKategoriId,
+      metodePembayaranName: 'QRIS',
+      metodePembayaranId: qrisKantongId,
+      tipeName: 'Penghasilan',
+      tipeId: penghasilanTipeId,
+      canConfirm: true,
+    });
+    expect(mocks.updateChatSessionPendingPreviewService).toHaveBeenCalledWith(
+      userId,
+      chatSessionId,
+      result,
+    );
+  });
+
+  it('recalculates missing fields when a required value is cleared', async () => {
+    const result = await patchChatbotPreviewItemService(userId, {
+      chatSessionId,
+      itemIndex: 0,
+      patch: {
+        namaTransaksi: null,
+      },
+    });
+
+    expect(result.canConfirm).toBe(false);
+    expect(result.items[0]).toMatchObject({
+      namaTransaksi: null,
+      canConfirm: false,
+    });
+    expect(result.items[0]?.missingFields).toContain(
+      'Nama transaksi belum terisi.',
+    );
+    expect(result.missingFields).toContain(
+      'Transaksi 1: Nama transaksi belum terisi.',
+    );
+  });
+
+  it('rejects invalid option ids instead of saving a broken preview', async () => {
+    await expect(
+      patchChatbotPreviewItemService(userId, {
+        chatSessionId,
+        itemIndex: 0,
+        patch: {
+          kategoriId: '507f1f77bcf86cd799439099',
+        },
+      }),
+    ).rejects.toThrow('Kategori tidak ditemukan.');
+
+    expect(mocks.updateChatSessionPendingPreviewService).not.toHaveBeenCalled();
+  });
+});
 
 describe('confirmChatbotPreviewService', () => {
   beforeEach(() => {

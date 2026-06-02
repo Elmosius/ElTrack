@@ -77,7 +77,7 @@ export function CardTitle({ className, ...props }: React.ComponentProps<'h3'>) {
   return (
     <h3
       data-slot="card-title"
-      className={cn('text-lg font-semibold leading-none', className)}
+      className={cn('text-base font-semibold leading-none', className)}
       {...props}
     />
   );

@@ -15,7 +15,7 @@ export async function findDashboardTransaksiByUserIdAndDateRange(
       $lte: endDate,
     },
   })
-    .populate('kategori metodePembayaran tipe')
+    .populate('kategori kantong metodePembayaran tipe')
     .sort({ tanggal: -1, createdAt: -1 })
     .lean();
 }

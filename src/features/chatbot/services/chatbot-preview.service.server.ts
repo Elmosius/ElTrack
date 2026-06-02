@@ -13,6 +13,7 @@ import type {
 import {
   isMeaningfulPreviewItem,
   type ConfirmTransaksiPreviewInput,
+  type PatchTransaksiPreviewItemInput,
   type PreviewTransaksiToolInput,
 } from '../chatbot.schema';
 import {
@@ -35,6 +36,8 @@ import {
 } from './chatbot-preview-item-resolver.server';
 import { mergePreviewItems } from './chatbot-preview-merge.server';
 import { applyDeterministicPreviewFallbacks } from './chatbot-preview-detail-fallback.server';
+import { getChatbotMasterData } from './chatbot-master-data.service.server';
+import { buildPatchedPreviewGroup } from './chatbot-preview-patch.server';
 
 type ConfirmableTransaksiPreviewItem = TransaksiPreviewItem & {
   namaTransaksi: string;
@@ -106,6 +109,34 @@ export function buildResolvedPreview(
   };
 }
 
+export async function patchChatbotPreviewItemService(
+  userId: string,
+  input: PatchTransaksiPreviewItemInput,
+): Promise<TransaksiPreviewGroup> {
+  const session = await getChatSessionOrThrow(userId, input.chatSessionId);
+  const preview = getPendingPreview(session.pendingPreview);
+
+  if (!preview) {
+    throw new Error('Preview transaksi tidak ditemukan.');
+  }
+
+  const masterData = await getChatbotMasterData(userId);
+  const nextPreview = buildPatchedPreviewGroup(
+    preview,
+    input.itemIndex,
+    input.patch,
+    masterData,
+  );
+
+  await updateChatSessionPendingPreviewService(
+    userId,
+    input.chatSessionId,
+    nextPreview,
+  );
+
+  return nextPreview;
+}
+
 export async function confirmChatbotPreviewService(
   userId: string,
   input: ConfirmTransaksiPreviewInput,
@@ -150,7 +181,7 @@ export async function confirmChatbotPreviewService(
     waktu: item.waktu,
     nominal: item.nominal,
     kategori: item.kategoriId,
-    metodePembayaran: item.metodePembayaranId,
+    kantong: item.metodePembayaranId,
     catatan: item.catatan ?? undefined,
     tipe: item.tipeId,
   }));

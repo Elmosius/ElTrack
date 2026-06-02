@@ -11,6 +11,7 @@ export type TransactionTableStore = {
   selectedDate: string;
   categories: Kategori[];
   waktuOptions: SelectOption[];
+  kantongOptions: SelectOption[];
   metodePembayaranOptions: SelectOption[];
   tipeOptions: SelectOption[];
   categoryMode: CategoryEditorMode;

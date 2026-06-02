@@ -125,13 +125,16 @@ export function useChatbotPanel() {
     isLoading: chat.isLoading,
     renderedMessages: chat.renderedMessages,
     pendingPreview: preview.state.pendingPreview,
+    previewOptions: preview.state.previewOptions,
     isConfirmingPreview: preview.state.isConfirmingPreview,
+    isPatchingPreview: preview.state.isPatchingPreview,
     composerResetVersion,
     handleSend,
     handleClearChat,
     handleSelectSession,
     handleConfirmPreview,
     handleDismissPreview,
+    handlePatchPreviewItem: preview.actions.handlePatchPreviewItem,
   });
 
   return {

@@ -20,7 +20,7 @@ export function ChatPreviewInfoBox({
   const titleClass = tone === 'warning' ? '' : 'text-foreground';
 
   return (
-    <div className={`mt-3 rounded-lg border px-2.5 py-2 text-[11px] ${toneClass}`}>
+    <div className={`mt-3 rounded-lg border px-2.5 py-2 text-xs ${toneClass}`}>
       <p className={`font-medium ${titleClass}`}>{title}</p>
       <ul className='mt-1 list-disc pl-4'>
         {items.map((item) => (

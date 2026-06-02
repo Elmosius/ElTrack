@@ -9,7 +9,7 @@ type CreateTransactionRowOptions = {
   tanggal?: string;
   defaultCategoryId?: string;
   defaultWaktuId?: string;
-  defaultMetodePembayaranId?: string;
+  defaultKantongId?: string;
   defaultTipeId?: string;
 };
 
@@ -17,7 +17,7 @@ export function createTransactionRow({
   tanggal = getTodayDateString(),
   defaultCategoryId = '',
   defaultWaktuId = '',
-  defaultMetodePembayaranId = '',
+  defaultKantongId = '',
   defaultTipeId = '',
 }: CreateTransactionRowOptions): TransaksiRow {
   return {
@@ -27,7 +27,8 @@ export function createTransactionRow({
     waktuId: defaultWaktuId,
     nominal: '',
     kategoriId: defaultCategoryId,
-    metodePembayaranId: defaultMetodePembayaranId,
+    kantongId: defaultKantongId,
+    metodePembayaranId: '',
     catatan: '',
     tipeId: defaultTipeId,
   };
@@ -48,7 +49,8 @@ export function toTransaksiMutationInput(row: TransaksiRow) {
     waktu: row.waktuId,
     nominal: Number(sanitizeNominal(row.nominal) || 0),
     kategori: row.kategoriId,
-    metodePembayaran: row.metodePembayaranId,
+    kantong: row.kantongId || undefined,
+    metodePembayaran: row.kantongId ? undefined : row.metodePembayaranId,
     catatan: row.catatan.trim() || undefined,
     tipe: row.tipeId,
   };

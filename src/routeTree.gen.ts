@@ -13,6 +13,7 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AppKantongRouteImport } from './routes/_app/kantong'
 import { Route as AppCatatanKeuanganRouteImport } from './routes/_app/catatan-keuangan'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthAuthLoginRouteImport } from './routes/_auth/auth.login'
@@ -35,6 +36,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppKantongRoute = AppKantongRouteImport.update({
+  id: '/kantong',
+  path: '/kantong',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppCatatanKeuanganRoute = AppCatatanKeuanganRouteImport.update({
   id: '/catatan-keuangan',
   path: '/catatan-keuangan',
@@ -54,6 +60,7 @@ const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/catatan-keuangan': typeof AppCatatanKeuanganRoute
+  '/kantong': typeof AppKantongRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/catatan-keuangan': typeof AppCatatanKeuanganRoute
+  '/kantong': typeof AppKantongRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_app/catatan-keuangan': typeof AppCatatanKeuanganRoute
+  '/_app/kantong': typeof AppKantongRoute
   '/api/chat': typeof ApiChatRoute
   '/_app/': typeof AppIndexRoute
   '/_auth/auth/login': typeof AuthAuthLoginRoute
@@ -80,16 +89,24 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/catatan-keuangan'
+    | '/kantong'
     | '/api/chat'
     | '/auth/login'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catatan-keuangan' | '/api/chat' | '/auth/login' | '/api/auth/$'
+  to:
+    | '/'
+    | '/catatan-keuangan'
+    | '/kantong'
+    | '/api/chat'
+    | '/auth/login'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
     | '/_app/catatan-keuangan'
+    | '/_app/kantong'
     | '/api/chat'
     | '/_app/'
     | '/_auth/auth/login'
@@ -133,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/kantong': {
+      id: '/_app/kantong'
+      path: '/kantong'
+      fullPath: '/kantong'
+      preLoaderRoute: typeof AppKantongRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/catatan-keuangan': {
       id: '/_app/catatan-keuangan'
       path: '/catatan-keuangan'
@@ -159,11 +183,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppCatatanKeuanganRoute: typeof AppCatatanKeuanganRoute
+  AppKantongRoute: typeof AppKantongRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppCatatanKeuanganRoute: AppCatatanKeuanganRoute,
+  AppKantongRoute: AppKantongRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

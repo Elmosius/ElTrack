@@ -4,14 +4,17 @@ import {
   chatSessionInputSchema,
   confirmTransaksiPreviewSchema,
   dismissTransaksiPreviewSchema,
+  patchTransaksiPreviewItemSchema,
   persistAssistantChatMessageSchema,
 } from './chatbot.schema';
 import {
   confirmChatbotPreview,
   createChatSession,
   dismissChatbotPreview,
+  getChatbotPreviewEditOptions,
   getChatSessionDetail,
   listChatSessions,
+  patchChatbotPreviewItem,
   persistAssistantChatMessage,
 } from './chatbot.server';
 
@@ -28,6 +31,13 @@ export const getChatbotSessionDetail = createServerFn({ method: 'POST' })
     const userId = await requireSessionUserId();
     return (await getChatSessionDetail(userId, data.chatSessionId)) as any;
   });
+
+export const getChatbotPreviewOptions = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const userId = await requireSessionUserId();
+    return (await getChatbotPreviewEditOptions(userId)) as any;
+  },
+);
 
 export const createChatbotSession = createServerFn({ method: 'POST' }).handler(
   async () => {
@@ -48,6 +58,13 @@ export const dismissChatbotPreviewSession = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const userId = await requireSessionUserId();
     return (await dismissChatbotPreview(userId, data.chatSessionId)) as any;
+  });
+
+export const patchChatbotPreviewItemDraft = createServerFn({ method: 'POST' })
+  .inputValidator(patchTransaksiPreviewItemSchema)
+  .handler(async ({ data }) => {
+    const userId = await requireSessionUserId();
+    return (await patchChatbotPreviewItem(userId, data)) as any;
   });
 
 export const persistChatbotAssistantSessionMessage = createServerFn({

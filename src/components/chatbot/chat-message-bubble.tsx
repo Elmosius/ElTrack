@@ -21,7 +21,7 @@ export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
         {message.text ? <p className='whitespace-pre-wrap'>{message.text}</p> : null}
         {message.imageCount > 0 ? (
           <p
-            className={`mt-1 text-[10px] ${
+            className={`mt-1 text-xs ${
               message.role === 'user'
                 ? 'text-primary-foreground/80'
                 : 'text-muted'

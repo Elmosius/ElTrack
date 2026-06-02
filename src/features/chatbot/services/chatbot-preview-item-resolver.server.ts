@@ -39,7 +39,7 @@ function buildMissingFields(preview: ResolvedPreviewItemBase) {
 
   if (!preview.metodePembayaranId) {
     missingFields.push(
-      'Metode pembayaran belum cocok dengan daftar yang tersedia.',
+      'Kantong belum cocok dengan daftar yang tersedia.',
     );
   }
 
@@ -96,7 +96,7 @@ export function buildResolvedPreviewItem(
         ? `Kategori "${kategoriName}" belum cocok dengan daftar kategori yang tersedia.`
         : null,
       metodePembayaranName && !matchedMetodePembayaran
-        ? `Metode pembayaran "${metodePembayaranName}" belum cocok dengan daftar metode pembayaran yang tersedia.`
+        ? `Kantong "${metodePembayaranName}" belum cocok dengan daftar kantong yang tersedia.`
         : null,
       tipeName && !matchedTipe
         ? `Tipe "${tipeName}" belum cocok dengan daftar tipe yang tersedia.`

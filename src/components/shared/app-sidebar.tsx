@@ -30,7 +30,7 @@ export default function AppSidebar({
   return (
     <Sidebar className={`overflow-hidden border-r border-b border-gray-200 rounded-lg py-4 z-10 transition-[width,opacity] duration-300 ease-out ${isSidebarOpen ? 'w-50 opacity-100 lg:w-70' : 'w-0 opacity-0'}`} size={'loose'}>
       <SidebarHeader className='mx-2'>
-        <h1 className='flex items-center gap-2 text-2xl tracking-tight'>
+        <h1 className='flex items-center gap-2 text-base tracking-tight'>
           <AppLogo className='size-5 text-primary' />
           ElTrack
         </h1>

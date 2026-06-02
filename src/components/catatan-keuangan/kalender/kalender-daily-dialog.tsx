@@ -5,7 +5,7 @@ import { Button } from '@/components/selia/button';
 import { Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogTitle } from '@/components/selia/dialog';
 
 export default function KalenderDailyDialog() {
-  const { dialogDate, isDialogOpen, setIsDialogOpen, dailyTransactions, categoryMap, waktuMap, metodePembayaranMap, tipeMap, dailyTotal } = useKalenderDailyDialog();
+  const { dialogDate, isDialogOpen, setIsDialogOpen, dailyTransactions, categoryMap, waktuMap, kantongMap, metodePembayaranMap, tipeMap, dailyTotal } = useKalenderDailyDialog();
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -28,7 +28,11 @@ export default function KalenderDailyDialog() {
                 <span>{waktuMap.get(row.waktuId) || '-'}</span>
                 <span>{categoryMap.get(row.kategoriId) || kalenderTexts.unknownCategory}</span>
                 <span>{tipeMap.get(row.tipeId) || '-'}</span>
-                <span>{metodePembayaranMap.get(row.metodePembayaranId) || '-'}</span>
+                <span>
+                  {kantongMap.get(row.kantongId) ??
+                    metodePembayaranMap.get(row.metodePembayaranId) ??
+                    '-'}
+                </span>
               </div>
               <p className='mt-2 text-sm font-semibold'>{formatRupiah(row.nominal) || 'Rp 0'}</p>
               {row.catatan && <p className='mt-1 text-xs text-dimmed'>{row.catatan}</p>}

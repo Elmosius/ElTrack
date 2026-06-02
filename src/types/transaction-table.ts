@@ -15,6 +15,7 @@ export type TransaksiRow = {
   waktuId: string;
   nominal: string;
   kategoriId: string;
+  kantongId: string;
   metodePembayaranId: string;
   catatan: string;
   tipeId: string;
@@ -26,6 +27,7 @@ export type TransactionTableData = {
   rows: TransaksiRow[];
   categories: Kategori[];
   waktuOptions: SelectOption[];
+  kantongOptions: SelectOption[];
   metodePembayaranOptions: SelectOption[];
   tipeOptions: SelectOption[];
 };

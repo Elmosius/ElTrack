@@ -7,6 +7,7 @@ import { serializeTransaksiDoc } from '../mappers';
 import type { SerializedTransaksi } from '#/types/transaksi';
 import { stringifyId } from '#/lib/serialization';
 import { findKategoriByIdsAndUserId } from '#/features/kategori/repositories/kategori.repository.server';
+import { findKantongByIdsAndUserId } from '#/features/kantong/repositories/kantong.repository.server';
 import { findMetodePembayaranByIds } from '#/features/metode-pembayaran/repositories/metode-pembayaran.repository.server';
 import { findTipeByIds } from '#/features/tipe/repositories/tipe.repository.server';
 import type { ClientSession } from 'mongoose';
@@ -24,11 +25,11 @@ type ServiceOptions = {
 
 type TransaksiReferenceInput = Pick<
   CreateTransaksiInput,
-  'kategori' | 'metodePembayaran' | 'tipe'
+  'kategori' | 'kantong' | 'metodePembayaran' | 'tipe'
 >;
 
-function unique(values: string[]) {
-  return Array.from(new Set(values));
+function unique(values: Array<string | undefined>) {
+  return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
 }
 
 function toIdSet(items: Array<{ _id: unknown }>) {
@@ -40,21 +41,28 @@ async function ensureTransaksiReferencesExist(
   list: TransaksiReferenceInput[],
 ) {
   const kategoriIds = unique(list.map((item) => item.kategori));
+  const kantongIds = unique(list.map((item) => item.kantong));
   const metodePembayaranIds = unique(list.map((item) => item.metodePembayaran));
   const tipeIds = unique(list.map((item) => item.tipe));
 
-  const [kategoriList, metodePembayaranList, tipeList] = await Promise.all([
+  const [kategoriList, kantongList, metodePembayaranList, tipeList] = await Promise.all([
     findKategoriByIdsAndUserId(userId, kategoriIds),
+    findKantongByIdsAndUserId(userId, kantongIds),
     findMetodePembayaranByIds(metodePembayaranIds),
     findTipeByIds(tipeIds),
   ]);
 
   const kategoriIdSet = toIdSet(kategoriList);
+  const kantongIdSet = toIdSet(kantongList);
   const metodePembayaranIdSet = toIdSet(metodePembayaranList);
   const tipeIdSet = toIdSet(tipeList);
 
   if (kategoriIds.some((id) => !kategoriIdSet.has(id))) {
     throw new Error('Kategori tidak ditemukan.');
+  }
+
+  if (kantongIds.some((id) => !kantongIdSet.has(id))) {
+    throw new Error('Kantong tidak ditemukan.');
   }
 
   if (metodePembayaranIds.some((id) => !metodePembayaranIdSet.has(id))) {

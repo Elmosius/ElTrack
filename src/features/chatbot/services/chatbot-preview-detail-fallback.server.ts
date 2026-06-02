@@ -66,13 +66,23 @@ function resolveFallbackMetodePembayaranName(
   }
 
   if (normalizedMessage.includes('qris')) {
-    return findAvailableOptionName(masterData.metodePembayaran, ['QRIS']);
+    return findAvailableOptionName(masterData.metodePembayaran, [
+      'QRIS',
+      'Non-cash',
+      'Non cash',
+    ]);
   }
 
   if (hasAnyAlias(normalizedMessage, ['transfer', 'bank'])) {
     return findAvailableOptionName(masterData.metodePembayaran, [
-      'Transfer Bank',
       'Bank',
+      'Transfer Bank',
+      'BCA',
+      'Mandiri',
+      'BRI',
+      'BNI',
+      'Non-cash',
+      'Non cash',
     ]);
   }
 
@@ -98,6 +108,12 @@ function resolveFallbackMetodePembayaranName(
       'E-Wallet',
       'E Wallet',
       'Dompet Digital',
+      'GoPay',
+      'OVO',
+      'Dana',
+      'ShopeePay',
+      'Non-cash',
+      'Non cash',
     ]);
   }
 

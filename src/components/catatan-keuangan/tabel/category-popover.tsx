@@ -71,7 +71,7 @@ export function CategoryPopover({ row }: CategoryPopoverProps) {
           onSave={handleSaveCategory}
         />
 
-        {categoryMode === 'idle' && categoryError ? <p className='text-[11px] text-danger px-1'>{categoryError}</p> : null}
+        {categoryMode === 'idle' && categoryError ? <p className='text-xs text-danger px-1'>{categoryError}</p> : null}
       </PopoverPopup>
     </Popover>
   );

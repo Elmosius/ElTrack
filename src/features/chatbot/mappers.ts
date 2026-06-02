@@ -49,7 +49,7 @@ function extractPreviewItemSummary(preview: TransaksiPreviewItem, index: number)
     `Waktu: ${preview.waktu ?? '-'}`,
     `Nominal: ${preview.nominal != null ? String(preview.nominal) : '-'}`,
     `Kategori: ${preview.kategoriName ?? '-'}`,
-    `Metode pembayaran: ${preview.metodePembayaranName ?? '-'}`,
+    `Kantong: ${preview.metodePembayaranName ?? '-'}`,
     `Tipe: ${preview.tipeName ?? '-'}`,
     `Catatan: ${preview.catatan ?? '-'}`,
   ];

@@ -19,7 +19,7 @@ export default function AppHeader({ toggleSidebar }: AppHeaderProps) {
             <SidebarOpen className='size-4 text-muted' />
           </Button>
 
-          <span className='text-2xl'>Hello {user?.name || 'User'}!</span>
+          <span className='text-base'>Hello {user?.name || 'User'}!</span>
         </div>
         <Menu>
           <MenuTrigger>

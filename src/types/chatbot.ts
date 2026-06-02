@@ -27,6 +27,29 @@ export type TransaksiPreviewGroup = {
   canConfirm: boolean;
 };
 
+export type TransaksiPreviewItemPatch = Partial<{
+  namaTransaksi: string | null;
+  tanggal: string | null;
+  nominal: string | number | null;
+  waktu: WaktuName | null;
+  kategoriId: string | null;
+  metodePembayaranId: string | null;
+  tipeId: string | null;
+  catatan: string | null;
+}>;
+
+export type ChatbotPreviewOption = {
+  id: string;
+  name: string;
+};
+
+export type ChatbotPreviewEditOptions = {
+  waktu: ChatbotPreviewOption[];
+  kategori: ChatbotPreviewOption[];
+  kantong: ChatbotPreviewOption[];
+  tipe: ChatbotPreviewOption[];
+};
+
 export type ChatSessionSummary = {
   id: string;
   title: string;

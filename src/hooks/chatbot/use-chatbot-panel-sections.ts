@@ -4,7 +4,12 @@ import type {
   ChatPanelHeaderViewModel,
 } from '#/lib/chatbot/view-models';
 import type { RenderedChatMessage } from '#/lib/chatbot/messages';
-import type { ChatSessionSummary, TransaksiPreviewGroup } from '#/types/chatbot';
+import type {
+  ChatbotPreviewEditOptions,
+  ChatSessionSummary,
+  TransaksiPreviewItemPatch,
+  TransaksiPreviewGroup,
+} from '#/types/chatbot';
 import { useMemo } from 'react';
 
 type UseChatbotPanelSectionsArgs = {
@@ -15,13 +20,19 @@ type UseChatbotPanelSectionsArgs = {
   isLoading: boolean;
   renderedMessages: RenderedChatMessage[];
   pendingPreview: TransaksiPreviewGroup | null;
+  previewOptions: ChatbotPreviewEditOptions | null;
   isConfirmingPreview: boolean;
+  isPatchingPreview: boolean;
   composerResetVersion: number;
   handleSend: ChatComposerSectionViewModel['onSubmit'];
   handleClearChat: () => Promise<void>;
   handleSelectSession: (chatSessionId: string) => Promise<void>;
   handleConfirmPreview: () => Promise<void>;
   handleDismissPreview: () => Promise<void>;
+  handlePatchPreviewItem: (
+    itemIndex: number,
+    patch: TransaksiPreviewItemPatch,
+  ) => Promise<boolean>;
 };
 
 export function useChatbotPanelSections({
@@ -32,13 +43,16 @@ export function useChatbotPanelSections({
   isLoading,
   renderedMessages,
   pendingPreview,
+  previewOptions,
   isConfirmingPreview,
+  isPatchingPreview,
   composerResetVersion,
   handleSend,
   handleClearChat,
   handleSelectSession,
   handleConfirmPreview,
   handleDismissPreview,
+  handlePatchPreviewItem,
 }: UseChatbotPanelSectionsArgs) {
   const isSessionBusy = isBootstrapping || isSwitchingSession;
   const isHeaderLoading = isSessionBusy || isLoading;
@@ -66,16 +80,22 @@ export function useChatbotPanelSections({
       messages: renderedMessages,
       isLoading,
       preview: pendingPreview,
+      previewOptions,
       isConfirmingPreview,
+      isPatchingPreview,
       onConfirmPreview: handleConfirmPreview,
       onDismissPreview: handleDismissPreview,
+      onPatchPreviewItem: handlePatchPreviewItem,
     }),
     [
       handleConfirmPreview,
       handleDismissPreview,
+      handlePatchPreviewItem,
       isConfirmingPreview,
+      isPatchingPreview,
       isLoading,
       pendingPreview,
+      previewOptions,
       renderedMessages,
     ],
   );

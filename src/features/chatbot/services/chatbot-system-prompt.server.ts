@@ -30,7 +30,7 @@ function buildPreviewPrompt(
   const tanggalHariIni = new Date().toISOString().slice(0, 10);
   const kategoriList =
     masterData.kategori.map((item) => item.name).join(', ') || '-';
-  const metodePembayaranList =
+  const kantongList =
     masterData.metodePembayaran.map((item) => item.name).join(', ') || '-';
   const tipeList = masterData.tipe.map((item) => item.name).join(', ') || '-';
 
@@ -45,11 +45,11 @@ function buildPreviewPrompt(
     'Untuk transaksi teks sederhana, namaTransaksi harus diisi dari aktivitas inti user, misalnya "isi bensin", "tambal ban", atau "makan siang". Jangan biarkan namaTransaksi kosong jika aktivitas utamanya sudah jelas dari pesan user.',
     'Jika baru tahu sebagian detail, tetap isi field yang sudah diketahui dan biarkan sisanya null.',
     'Jika pertanyaan user bukan tentang membuat transaksi, jawab secara natural tanpa memanggil tool.',
-    'Saat memanggil tool, gunakan nilai yang paling sesuai dengan daftar yang tersedia.',
+    'Saat memanggil tool, gunakan Kantong sebagai sumber dana transaksi. Jika user menyebut "tunai", cocokkan ke Kantong tunai; jika user menyebut nama seperti BCA, GoPay, Dana, atau Non-cash, cocokkan ke Kantong yang tersedia.',
     'Gunakan format tanggal YYYY-MM-DD jika kamu berhasil menebaknya.',
     'Jika tidak yakin, isi null daripada mengarang.',
     `Daftar kategori yang tersedia: ${kategoriList}.`,
-    `Daftar metode pembayaran yang tersedia: ${metodePembayaranList}.`,
+    `Daftar Kantong yang tersedia: ${kantongList}.`,
     `Daftar tipe yang tersedia: ${tipeList}.`,
     'Daftar waktu yang tersedia: Pagi, Siang, Sore, Malam.',
     activePreview
@@ -72,7 +72,7 @@ function buildPreviewPrompt(
       : null,
     'Aplikasi hanya menyimpan transaksi ke tabel setelah user menekan tombol konfirmasi di UI. Kamu tidak boleh mengatakan transaksi sudah berhasil disimpan, ditambahkan ke tabel, atau selesai disimpan kecuali sistem benar-benar memberi tahu hal itu.',
     'Setelah tool berhasil dipanggil, berikan jawaban singkat dan ramah yang menjelaskan apakah preview sudah siap ditinjau, sudah diperbarui, atau masih ada field yang perlu dicek.',
-    'Jangan mengarang ID atau membuat kategori/metode baru.',
+    'Jangan mengarang ID atau membuat kategori/kantong baru.',
   ]
     .filter(Boolean)
     .join('\n');

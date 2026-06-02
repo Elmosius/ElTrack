@@ -41,6 +41,7 @@ export function serializeTransaksiDoc(item: {
   catatan?: string;
   waktu?: unknown;
   kategori?: unknown;
+  kantong?: unknown;
   metodePembayaran?: unknown;
   tipe?: unknown;
   createdAt?: Date | string;
@@ -57,6 +58,7 @@ export function serializeTransaksiDoc(item: {
     updatedAt: serializeDate(item.updatedAt) ?? undefined,
     waktu: item.waktu == null ? item.waktu : stringifyId(item.waktu),
     kategori: serializeNamedRef(item.kategori),
+    kantong: serializeNamedRef(item.kantong),
     metodePembayaran: serializeNamedRef(item.metodePembayaran),
     tipe: serializeNamedRef(item.tipe),
   };

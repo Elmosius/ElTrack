@@ -47,12 +47,12 @@ export function ChatComposer({ composer }: ChatComposerProps) {
           className='min-h-0 max-h-36 resize-none overflow-y-auto pl-1 pr-0 py-0 text-xs leading-5 placeholder:text-dimmed '
         />
         {attachmentName ? (
-          <p className='mt-2 truncate text-[10px] text-muted'>
+          <p className='mt-2 truncate text-xs text-muted'>
             Foto dipilih: {attachmentName}
           </p>
         ) : null}
         <div className='mt-2 flex items-center justify-between'>
-          <p className='inline-flex items-center gap-1 text-[10px] text-muted'>
+          <p className='inline-flex items-center gap-1 text-xs text-muted'>
             <CornerDownLeft className='size-3' />
             Enter kirim, Shift+Enter baris baru
           </p>

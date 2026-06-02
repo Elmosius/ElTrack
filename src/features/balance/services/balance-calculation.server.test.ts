@@ -55,5 +55,6 @@ describe('buildBalanceSummary', () => {
     expect(summary.cashExpenses).toBe(25000);
     expect(summary.nonCashIncome).toBe(100000);
     expect(summary.nonCashExpenses).toBe(30000);
+    expect(summary.kantongs).toEqual([]);
   });
 });

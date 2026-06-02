@@ -109,7 +109,7 @@ export function SidebarContent({ className, render, ...props }: useRender.Compon
 
 export function SidebarLogo({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot='sidebar-logo' className={cn('flex items-center gap-2.5 select-none text-lg text-foreground', className)} {...props}>
+    <div data-slot='sidebar-logo' className={cn('flex items-center gap-2.5 select-none text-base text-foreground', className)} {...props}>
       {children}
     </div>
   );

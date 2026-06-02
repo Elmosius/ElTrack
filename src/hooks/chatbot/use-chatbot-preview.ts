@@ -1,6 +1,8 @@
 import {
   confirmChatbotPreviewTransaksi,
   dismissChatbotPreviewSession,
+  getChatbotPreviewOptions,
+  patchChatbotPreviewItemDraft,
 } from '#/features/chatbot/chatbot.functions';
 import {
   chatbotPreviewEventName,
@@ -10,11 +12,13 @@ import {
 } from '#/features/chatbot/chatbot.schema';
 import { getErrorMessage } from '#/lib/chatbot';
 import type {
+  ChatbotPreviewEditOptions,
   ConfirmChatbotPreviewResult,
+  TransaksiPreviewItemPatch,
   TransaksiPreviewGroup,
 } from '#/types/chatbot';
 import { toastManager } from '@/components/selia/toast';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type UseChatbotPreviewOptions = {
   getActiveSessionId: () => string | null;
@@ -36,7 +40,34 @@ export function useChatbotPreview({
   const [pendingPreview, setPendingPreview] = useState<TransaksiPreviewGroup | null>(
     null,
   );
+  const [previewOptions, setPreviewOptions] =
+    useState<ChatbotPreviewEditOptions | null>(null);
   const [isConfirmingPreview, setIsConfirmingPreview] = useState(false);
+  const [pendingPatchCount, setPendingPatchCount] = useState(0);
+  const patchQueueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const isPatchingPreview = pendingPatchCount > 0;
+
+  useEffect(() => {
+    if (!pendingPreview || previewOptions) {
+      return;
+    }
+
+    let isActive = true;
+
+    void getChatbotPreviewOptions()
+      .then((options: ChatbotPreviewEditOptions) => {
+        if (isActive) {
+          setPreviewOptions(options);
+        }
+      })
+      .catch((optionsError) => {
+        console.error('Load chatbot preview options error:', optionsError);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [pendingPreview, previewOptions]);
 
   const handleCustomEvent = (eventType: string, value: unknown) => {
     if (eventType !== chatbotPreviewEventName) {
@@ -94,7 +125,8 @@ export function useChatbotPreview({
       !chatSessionId ||
       !pendingPreview ||
       !pendingPreview.canConfirm ||
-      isConfirmingPreview
+      isConfirmingPreview ||
+      isPatchingPreview
     ) {
       return;
     }
@@ -147,15 +179,64 @@ export function useChatbotPreview({
     }
   };
 
+  const runPatchPreviewItem = async (
+    itemIndex: number,
+    patch: TransaksiPreviewItemPatch,
+  ) => {
+    const chatSessionId = getActiveSessionId();
+
+    if (!chatSessionId) {
+      return false;
+    }
+
+    try {
+      setPendingPatchCount((current) => current + 1);
+      const nextPreview = (await patchChatbotPreviewItemDraft({
+        data: {
+          chatSessionId,
+          itemIndex,
+          patch,
+        },
+      })) as TransaksiPreviewGroup;
+
+      setMeaningfulPreview(nextPreview);
+      return true;
+    } catch (patchError) {
+      toastManager.add({
+        type: 'error',
+        title: 'Gagal memperbarui preview',
+        description: getErrorMessage(patchError),
+      });
+      return false;
+    } finally {
+      setPendingPatchCount((current) => Math.max(0, current - 1));
+    }
+  };
+
+  const handlePatchPreviewItem = (
+    itemIndex: number,
+    patch: TransaksiPreviewItemPatch,
+  ) => {
+    const nextPatch = patchQueueRef.current
+      .catch(() => undefined)
+      .then(() => runPatchPreviewItem(itemIndex, patch));
+
+    patchQueueRef.current = nextPatch;
+    return nextPatch;
+  };
+
   return {
     state: {
       pendingPreview,
+      previewOptions,
       isConfirmingPreview,
+      isPatchingPreview,
     },
     actions: {
       handleCustomEvent,
       handleConfirmPreview,
       handleDismissPreview,
+      handlePatchPreviewItem,
       clearPreview() {
         setPendingPreview(null);
       },

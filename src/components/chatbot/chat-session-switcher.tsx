@@ -75,7 +75,7 @@ export function ChatSessionSwitcher({
         className='w-72 max-h-72 overflow-y-auto'
       >
         <MenuGroup>
-          <MenuGroupLabel className='px-2 py-1 text-[11px]'>
+          <MenuGroupLabel className='px-2 py-1 text-xs'>
             Riwayat percakapan
           </MenuGroupLabel>
           {sessions.length > 0 ? (
@@ -92,7 +92,7 @@ export function ChatSessionSwitcher({
                   <span className='w-full truncate text-xs font-medium text-foreground'>
                     {session.title}
                   </span>
-                  <span className='mt-0.5 text-[10px] text-muted'>
+                  <span className='mt-0.5 text-xs text-muted'>
                     {formatSessionMeta(session)}
                   </span>
                 </MenuRadioItem>

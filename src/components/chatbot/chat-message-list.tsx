@@ -18,9 +18,12 @@ export function ChatMessageList({
     messages,
     isLoading,
     preview,
+    previewOptions,
     isConfirmingPreview,
+    isPatchingPreview,
     onConfirmPreview,
     onDismissPreview,
+    onPatchPreviewItem,
   } = messageList;
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   let hiddenPreviewMessageIndex = -1;
@@ -73,9 +76,12 @@ export function ChatMessageList({
       {preview ? (
         <ChatPreviewCard
           preview={preview}
+          previewOptions={previewOptions}
           isConfirming={isConfirmingPreview}
+          isPatching={isPatchingPreview}
           onConfirm={onConfirmPreview}
           onDismiss={onDismissPreview}
+          onPatchItem={onPatchPreviewItem}
         />
       ) : null}
     </div>

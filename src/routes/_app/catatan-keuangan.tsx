@@ -1,12 +1,13 @@
 import { CatatanKeuanganPending } from '#/components/catatan-keuangan/catatan-keuangan-pending';
-import { useHydrateTransactionTable } from '#/hooks/transaction-table/use-transaction-table';
-import { buildTransactionTableData } from '#/lib/transaction-table';
 import KalenderSection from '#/components/catatan-keuangan/kalender';
 import TabelSection from '#/components/catatan-keuangan/tabel';
+import { getListKantong } from '#/features/kantong/kantong.functions';
 import { getListKategori } from '#/features/kategori/kategori.functions';
 import { getListMetodePembayaran } from '#/features/metode-pembayaran/metode-pembayaran.functions';
 import { getListTipe } from '#/features/tipe/tipe.functions';
 import { getListTransaksi } from '#/features/transaksi/transaksi.functions';
+import { useHydrateTransactionTable } from '#/hooks/transaction-table/use-transaction-table';
+import { buildTransactionTableData } from '#/lib/transaction-table';
 import { Tabs, TabsItem, TabsList, TabsPanel } from '@/components/selia/tabs';
 import AppBreadCrumb from '@/components/shared/app-breadcrumb';
 import { createFileRoute } from '@tanstack/react-router';
@@ -16,21 +17,12 @@ export const Route = createFileRoute('/_app/catatan-keuangan')({
   component: RouteComponent,
   pendingComponent: CatatanKeuanganPending,
   loader: async () => {
-    const [
-      listTipe,
-      listKategori,
-      listMetodePembayaran,
-      listTransaksi,
-    ] = await Promise.all([
-      getListTipe(),
-      getListKategori(),
-      getListMetodePembayaran(),
-      getListTransaksi(),
-    ]);
+    const [listTipe, listKategori, listKantong, listMetodePembayaran, listTransaksi] = await Promise.all([getListTipe(), getListKategori(), getListKantong(), getListMetodePembayaran(), getListTransaksi()]);
 
     return buildTransactionTableData({
       listTipe,
       listKategori,
+      listKantong,
       listMetodePembayaran,
       listTransaksi,
     });

@@ -1,4 +1,5 @@
 import { Banknote, Landmark, WalletCards } from 'lucide-react';
+import { formatRupiah, sanitizeNominal } from '#/lib/transaction-table';
 
 export const balanceSetupToastCopy = {
   invalid: {
@@ -7,7 +8,7 @@ export const balanceSetupToastCopy = {
   },
   success: {
     title: 'Saldo awal tersimpan',
-    description: 'Balance akan dihitung dari transaksi berikutnya.',
+    description: 'Kantong awal akan dipakai untuk transaksi berikutnya.',
   },
   error: {
     title: 'Gagal menyimpan saldo',
@@ -33,15 +34,19 @@ export const balanceCards = [
   {
     key: 'nonCashBalance',
     label: 'Non-cash',
-    description: 'Bank, QRIS, e-wallet',
+    description: 'Bank, QRIS, e-wallet, dan Kantong lain',
     icon: Landmark,
     tone: 'text-sky-600',
   },
 ] as const;
 
 export function parseBalanceInput(value: string) {
-  const normalized = Number(value);
+  const normalized = Number(sanitizeNominal(value) || 0);
   return Number.isFinite(normalized) && normalized >= 0
     ? Math.round(normalized)
     : null;
+}
+
+export function formatBalanceInput(value: string) {
+  return formatRupiah(value);
 }

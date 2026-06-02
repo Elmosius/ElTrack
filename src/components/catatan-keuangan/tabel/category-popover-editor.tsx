@@ -34,7 +34,7 @@ export function CategoryPopoverEditor({
     <div className='space-y-2 w-full'>
       <p className='text-xs text-muted'>{mode === 'add' ? 'Tambah kategori baru' : 'Edit nama kategori'}</p>
       <Input value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder='Nama kategori' className='h-8 text-sm px-2.5' />
-      {error ? <p className='text-[11px] text-danger'>{error}</p> : null}
+      {error ? <p className='text-xs text-danger'>{error}</p> : null}
       <div className='flex items-center justify-end gap-1.5'>
         <Button size='xs' variant='plain' className='text-sm' onClick={onCancel}>
           <X className='size-3.5' />

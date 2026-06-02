@@ -111,6 +111,26 @@ export const chatSessionInputSchema = z.object({
   chatSessionId: objectIdSchema,
 });
 
+const previewPatchObjectIdSchema = objectIdSchema.nullable().optional();
+
+export const patchTransaksiPreviewItemSchema = chatSessionInputSchema.extend({
+  itemIndex: z.number().int().nonnegative(),
+  patch: z
+    .object({
+      namaTransaksi: z.string().trim().nullable().optional(),
+      tanggal: z.string().trim().nullable().optional(),
+      nominal: z.union([z.number(), z.string()]).nullable().optional(),
+      waktu: waktuNameSchema.nullable().optional(),
+      kategoriId: previewPatchObjectIdSchema,
+      metodePembayaranId: previewPatchObjectIdSchema,
+      tipeId: previewPatchObjectIdSchema,
+      catatan: z.string().trim().nullable().optional(),
+    })
+    .refine((value) => Object.keys(value).length > 0, {
+      message: 'Minimal satu field preview perlu dikirim.',
+    }),
+});
+
 export const confirmTransaksiPreviewSchema = chatSessionInputSchema;
 export const dismissTransaksiPreviewSchema = chatSessionInputSchema;
 export const persistAssistantChatMessageSchema = chatSessionInputSchema.extend({
@@ -118,6 +138,7 @@ export const persistAssistantChatMessageSchema = chatSessionInputSchema.extend({
 });
 
 export type PreviewTransaksiToolInput = z.infer<typeof previewTransaksiToolInputSchema>;
+export type PatchTransaksiPreviewItemInput = z.infer<typeof patchTransaksiPreviewItemSchema>;
 export type ConfirmTransaksiPreviewInput = z.infer<typeof confirmTransaksiPreviewSchema>;
 export type DismissTransaksiPreviewInput = z.infer<typeof dismissTransaksiPreviewSchema>;
 export type PersistAssistantChatMessageInput = z.infer<typeof persistAssistantChatMessageSchema>;

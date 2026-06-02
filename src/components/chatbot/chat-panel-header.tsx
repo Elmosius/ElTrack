@@ -32,7 +32,7 @@ export function ChatPanelHeader({ header }: ChatPanelHeaderProps) {
         </div>
 
         <div className='flex items-center justify-center gap-2'>
-          <span className='inline-flex items-center gap-1.5 rounded-full bg-accent px-2 py-1 text-[10px] font-medium text-muted'>
+          <span className='inline-flex items-center gap-1.5 rounded-full bg-accent px-2 py-1 text-xs font-medium text-muted'>
             <Carrot className='size-3' />
             AI
           </span>

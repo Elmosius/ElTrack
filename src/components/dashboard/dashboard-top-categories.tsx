@@ -1,7 +1,7 @@
 import { Button } from '#/components/selia/button';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card';
-import type { DashboardTopCategory } from '#/types/dashboard';
 import { formatCurrency, formatSignedPercentage, getCategoryTrendTone } from '#/lib/dashboard';
+import type { DashboardTopCategory } from '#/types/dashboard';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export function DashboardTopCategories({ categories, isEmpty }: DashboardTopCate
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Top Kategori</CardTitle>
+          <CardTitle className='text-base'>Top Kategori</CardTitle>
           <CardDescription className='text-sm'>Kategori pengeluaran terbesar bulan ini beserta perbandingan dengan bulan sebelumnya.</CardDescription>
         </div>
       </CardHeader>

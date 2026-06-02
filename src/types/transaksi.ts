@@ -14,6 +14,7 @@ export type SerializedTransaksi = {
   catatan?: string;
   waktu?: string | null;
   kategori?: string | SerializedNamedRef | null;
+  kantong?: string | SerializedNamedRef | null;
   metodePembayaran?: string | SerializedNamedRef | null;
   tipe?: string | SerializedNamedRef | null;
   createdAt?: string;

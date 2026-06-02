@@ -15,7 +15,7 @@ export async function findTransaksiListByUserId(userId: string) {
   await connectDB();
 
   return Transaksi.find({ userId })
-    .populate('kategori metodePembayaran tipe')
+    .populate('kategori kantong metodePembayaran tipe')
     .sort({ createdAt: 1 })
     .lean();
 }
@@ -62,24 +62,38 @@ export async function updateTransaksiById(
   options: RepositoryOptions = {},
 ) {
   await connectDB();
+  const updateFields: Record<string, unknown> = {
+    namaTransaksi: data.namaTransaksi,
+    tanggal: data.tanggal,
+    waktu: data.waktu,
+    nominal: data.nominal,
+    kategori: data.kategori,
+    catatan: data.catatan,
+    tipe: data.tipe,
+  };
+  const unsetFields: Record<string, 1> = {};
+
+  if (data.kantong) {
+    updateFields.kantong = data.kantong;
+    unsetFields.metodePembayaran = 1;
+  } else if (data.metodePembayaran) {
+    updateFields.metodePembayaran = data.metodePembayaran;
+    unsetFields.kantong = 1;
+  }
 
   return Transaksi.findOneAndUpdate(
     {
       _id: data.id,
       userId,
     },
-    {
-      $set: {
-        namaTransaksi: data.namaTransaksi,
-        tanggal: data.tanggal,
-        waktu: data.waktu,
-        nominal: data.nominal,
-        kategori: data.kategori,
-        metodePembayaran: data.metodePembayaran,
-        catatan: data.catatan,
-        tipe: data.tipe,
-      },
-    },
+    Object.keys(unsetFields).length > 0
+      ? {
+          $set: updateFields,
+          $unset: unsetFields,
+        }
+      : {
+          $set: updateFields,
+        },
     {
       returnDocument: 'after',
       runValidators: true,

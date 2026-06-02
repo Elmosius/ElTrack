@@ -33,10 +33,14 @@ const transaksiSchema = new Schema(
       ref: 'Kategori',
       required: true,
     },
+    kantong: {
+      type: Schema.Types.ObjectId,
+      ref: 'Kantong',
+      index: true,
+    },
     metodePembayaran: {
       type: Schema.Types.ObjectId,
       ref: 'MetodePembayaran',
-      required: true,
     },
     catatan: {
       type: String,

@@ -1,7 +1,10 @@
 import type {
+  ChatbotPreviewEditOptions,
+  TransaksiPreviewItemPatch,
   TransaksiPreviewGroup,
 } from '#/types/chatbot';
 import { isMeaningfulPreviewItem } from '#/features/chatbot/chatbot.schema';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from '../selia/button';
 import { ChatPreviewInfoBox } from './chat-preview-info-box';
 import { ChatPreviewItemCard } from './chat-preview-item-card';
@@ -9,19 +12,54 @@ import { ChatPreviewStatusBadge } from './chat-preview-status-badge';
 
 type ChatPreviewCardProps = {
   preview: TransaksiPreviewGroup;
+  previewOptions: ChatbotPreviewEditOptions | null;
   isConfirming: boolean;
+  isPatching: boolean;
   onConfirm: () => void;
   onDismiss: () => void;
+  onPatchItem: (
+    itemIndex: number,
+    patch: TransaksiPreviewItemPatch,
+  ) => Promise<boolean>;
 };
 
 export function ChatPreviewCard({
   preview,
+  previewOptions,
   isConfirming,
+  isPatching,
   onConfirm,
   onDismiss,
+  onPatchItem,
 }: ChatPreviewCardProps) {
+  const [dirtyItemIndexes, setDirtyItemIndexes] = useState<Set<number>>(
+    () => new Set(),
+  );
   const visibleItems = preview.items.filter((item) =>
     isMeaningfulPreviewItem(item),
+  );
+  const hasUnsyncedEdits = dirtyItemIndexes.size > 0;
+  const isPreviewSyncing = isPatching || hasUnsyncedEdits;
+
+  useEffect(() => {
+    setDirtyItemIndexes(new Set());
+  }, [preview]);
+
+  const handleDirtyChange = useCallback(
+    (itemIndex: number, isDirty: boolean) => {
+      setDirtyItemIndexes((current) => {
+        const next = new Set(current);
+
+        if (isDirty) {
+          next.add(itemIndex);
+        } else {
+          next.delete(itemIndex);
+        }
+
+        return next;
+      });
+    },
+    [],
   );
 
   return (
@@ -31,7 +69,7 @@ export function ChatPreviewCard({
           <p className='font-medium text-foreground'>
             Preview transaksi ({visibleItems.length})
           </p>
-          <p className='mt-1 text-[10px] text-muted'>
+          <p className='mt-1 text-xs text-muted'>
             Cek dulu sebelum disimpan ke tabel.
           </p>
         </div>
@@ -45,9 +83,13 @@ export function ChatPreviewCard({
       <div className='mt-3 space-y-2'>
         {visibleItems.map((item, index) => (
           <ChatPreviewItemCard
-            key={`${item.namaTransaksi || 'transaksi'}-${index}`}
+            key={`preview-item-${index}`}
             item={item}
             index={index}
+            options={previewOptions}
+            isPatching={isPatching}
+            onPatchItem={onPatchItem}
+            onDirtyChange={handleDirtyChange}
           />
         ))}
       </div>
@@ -77,10 +119,14 @@ export function ChatPreviewCard({
           size='sm'
           variant='primary'
           className='ring-0 text-xs'
-          disabled={!preview.canConfirm || isConfirming}
+          disabled={!preview.canConfirm || isConfirming || isPreviewSyncing}
           onClick={onConfirm}
         >
-          {isConfirming ? 'Menyimpan...' : 'Konfirmasi simpan'}
+          {isPreviewSyncing
+            ? 'Menyimpan edit...'
+            : isConfirming
+              ? 'Menyimpan...'
+              : 'Konfirmasi simpan'}
         </Button>
       </div>
     </div>

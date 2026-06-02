@@ -1,20 +1,21 @@
 import type { SelectOption, TransaksiRow } from '#/types/transaction-table';
-import { Button } from '#/components/selia/button';
-import { Input } from '#/components/selia/input';
 import { TableCell, TableRow } from '#/components/selia/table';
-import { Textarea } from '#/components/selia/textarea';
-import { formatRupiah } from '#/lib/transaction-table';
-import { Trash2 } from 'lucide-react';
 import { CategoryPopover } from './category-popover';
 import { MenuSelectField } from './menu-select-field';
+import {
+  DeleteRowButton,
+  NominalField,
+  NoteField,
+  TransactionNameField,
+} from './tabel-body-row-fields';
 
 type TabelBodyRowProps = {
   row: TransaksiRow;
   waktuOptions: readonly SelectOption[];
-  metodePembayaranOptions: readonly SelectOption[];
+  kantongOptions: readonly SelectOption[];
   tipeOptions: readonly SelectOption[];
   waktuLabel?: string;
-  metodePembayaranLabel?: string;
+  kantongLabel?: string;
   tipeLabel?: string;
   updateRow: (rowId: string, patch: Partial<TransaksiRow>) => void;
   handleNominalChange: (rowId: string, value: string) => void;
@@ -22,16 +23,13 @@ type TabelBodyRowProps = {
   saveRow: (rowId: string) => Promise<void>;
 };
 
-const inputClassName =
-  'h-8 shadow-none ring-0 bg-transparent px-0 text-sm placeholder:text-dimmed focus:ring-0 hover:not-data-disabled:not-focus:ring-0';
-
 export function TabelBodyRow({
   row,
   waktuOptions,
-  metodePembayaranOptions,
+  kantongOptions,
   tipeOptions,
   waktuLabel,
-  metodePembayaranLabel,
+  kantongLabel,
   tipeLabel,
   updateRow,
   handleNominalChange,
@@ -39,7 +37,7 @@ export function TabelBodyRow({
   saveRow,
 }: TabelBodyRowProps) {
   const handleSelectChange = (
-    field: 'waktuId' | 'metodePembayaranId' | 'tipeId',
+    field: 'waktuId' | 'kantongId' | 'tipeId',
     value: string,
   ) => {
     updateRow(row.id, { [field]: value });
@@ -49,15 +47,10 @@ export function TabelBodyRow({
   return (
     <TableRow>
       <TableCell>
-        <Input
-          value={row.namaTransaksi}
-          onChange={(event) =>
-            updateRow(row.id, { namaTransaksi: event.target.value })
-          }
-          onBlur={() => void saveRow(row.id)}
-          placeholder='Nama / deskripsi transaksi'
-          variant='subtle'
-          className={inputClassName}
+        <TransactionNameField
+          row={row}
+          updateRow={updateRow}
+          saveRow={saveRow}
         />
       </TableCell>
 
@@ -71,13 +64,10 @@ export function TabelBodyRow({
       </TableCell>
 
       <TableCell>
-        <Input
-          value={formatRupiah(row.nominal)}
-          onChange={(event) => handleNominalChange(row.id, event.target.value)}
-          onBlur={() => void saveRow(row.id)}
-          placeholder='Rp 0'
-          variant='subtle'
-          className={inputClassName}
+        <NominalField
+          row={row}
+          handleNominalChange={handleNominalChange}
+          saveRow={saveRow}
         />
       </TableCell>
 
@@ -87,23 +77,20 @@ export function TabelBodyRow({
 
       <TableCell>
         <MenuSelectField
-          value={row.metodePembayaranId}
-          options={metodePembayaranOptions}
-          displayValue={metodePembayaranLabel}
+          value={row.kantongId}
+          options={kantongOptions}
+          displayValue={kantongLabel}
           onChange={(value) =>
-            handleSelectChange('metodePembayaranId', value)
+            handleSelectChange('kantongId', value)
           }
         />
       </TableCell>
 
       <TableCell>
-        <Textarea
-          value={row.catatan}
-          variant='notion'
-          onChange={(event) => updateRow(row.id, { catatan: event.target.value })}
-          onBlur={() => void saveRow(row.id)}
-          placeholder='Opsional'
-          className='min-h-8 max-h-20 resize-y overflow-y-auto py-2 px-2 rounded-none text-sm'
+        <NoteField
+          row={row}
+          updateRow={updateRow}
+          saveRow={saveRow}
         />
       </TableCell>
 
@@ -117,15 +104,10 @@ export function TabelBodyRow({
       </TableCell>
 
       <TableCell className='text-center'>
-        <Button
-          onClick={() => void handleDeleteRow(row.id)}
-          size='xs-icon'
-          variant='plain'
-          className='size-8 rounded text-muted hover:text-danger hover:bg-accent'
-          aria-label='Hapus baris'
-        >
-          <Trash2 className='size-4' />
-        </Button>
+        <DeleteRowButton
+          rowId={row.id}
+          handleDeleteRow={handleDeleteRow}
+        />
       </TableCell>
     </TableRow>
   );

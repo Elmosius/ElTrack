@@ -6,9 +6,10 @@ export default function TabelBody() {
   const {
     filteredRows,
     waktuOptions,
-    metodePembayaranOptions,
+    kantongOptions,
     tipeOptions,
     waktuMap,
+    kantongMap,
     metodePembayaranMap,
     tipeMap,
     updateRow,
@@ -24,10 +25,13 @@ export default function TabelBody() {
           key={row.id}
           row={row}
           waktuOptions={waktuOptions}
-          metodePembayaranOptions={metodePembayaranOptions}
+          kantongOptions={kantongOptions}
           tipeOptions={tipeOptions}
           waktuLabel={waktuMap.get(row.waktuId)}
-          metodePembayaranLabel={metodePembayaranMap.get(row.metodePembayaranId)}
+          kantongLabel={
+            kantongMap.get(row.kantongId) ??
+            metodePembayaranMap.get(row.metodePembayaranId)
+          }
           tipeLabel={tipeMap.get(row.tipeId)}
           updateRow={updateRow}
           handleNominalChange={handleNominalChange}

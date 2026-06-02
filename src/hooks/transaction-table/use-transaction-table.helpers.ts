@@ -1,7 +1,7 @@
 import type { SelectOption, TransaksiRow } from '#/types/transaction-table';
 import type { TransactionTableStore } from '#/stores/transaction-table.store.types';
 
-export function createOptionMap(options: SelectOption[]) {
+export function createOptionMap(options: readonly SelectOption[]) {
   return new Map(options.map((option) => [option.id, option.name]));
 }
 

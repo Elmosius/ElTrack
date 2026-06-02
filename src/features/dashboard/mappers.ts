@@ -15,6 +15,8 @@ export type DashboardTransaksiRecord = {
   kategoriName: string;
   metodePembayaranId: string;
   metodePembayaranName: string;
+  kantongId: string;
+  kantongName: string;
   tipeId: string;
   tipeName: string;
   createdAt: string | null;
@@ -48,9 +50,13 @@ export function mapDashboardTransaksiRecord(item: {
   waktu?: string | null;
   kategori?: unknown;
   metodePembayaran?: unknown;
+  kantong?: unknown;
   tipe?: unknown;
   createdAt?: Date | string;
 }): DashboardTransaksiRecord {
+  const kantongId = getNamedRefId(item.kantong);
+  const kantongName = getNamedRefName(item.kantong);
+
   return {
     id: stringifyId(item._id),
     namaTransaksi: item.namaTransaksi ?? '',
@@ -59,8 +65,10 @@ export function mapDashboardTransaksiRecord(item: {
     waktu: item.waktu ?? '',
     kategoriId: getNamedRefId(item.kategori),
     kategoriName: getNamedRefName(item.kategori),
-    metodePembayaranId: getNamedRefId(item.metodePembayaran),
-    metodePembayaranName: getNamedRefName(item.metodePembayaran),
+    metodePembayaranId: kantongId || getNamedRefId(item.metodePembayaran),
+    metodePembayaranName: kantongName || getNamedRefName(item.metodePembayaran),
+    kantongId,
+    kantongName,
     tipeId: getNamedRefId(item.tipe),
     tipeName: getNamedRefName(item.tipe),
     createdAt: serializeDate(item.createdAt) ?? null,

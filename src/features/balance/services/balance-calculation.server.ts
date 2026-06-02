@@ -44,6 +44,7 @@ export function createEmptyBalanceSummary(
     cashExpenses: 0,
     nonCashIncome: 0,
     nonCashExpenses: 0,
+    kantongs: [],
   };
 }
 

@@ -30,7 +30,7 @@ export default function TabelContent() {
               <TableHead className='w-40 text-sm'>Waktu</TableHead>
               <TableHead className='w-52 text-sm'>Nominal</TableHead>
               <TableHead className='w-64 text-sm'>Kategori</TableHead>
-              <TableHead className='w-60 text-sm'>Metode Pembayaran</TableHead>
+              <TableHead className='w-60 text-sm'>Kantong</TableHead>
               <TableHead className='w-72 text-sm'>Catatan</TableHead>
               <TableHead className='w-44 text-sm'>Tipe</TableHead>
               <TableHead className='w-24 text-center text-sm'>Aksi</TableHead>

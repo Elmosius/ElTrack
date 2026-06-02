@@ -4,13 +4,16 @@ import { useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import {
   createFilteredRows,
-  createOptionMap,
   selectTransactionTableBodyActions,
   selectTransactionTableCategoryPopoverActions,
   selectTransactionTableContent,
   selectTransactionTableDeleteDialog,
   selectTransactionTableHeader,
 } from './use-transaction-table.helpers';
+import {
+  useTransactionTableBodyOptionMaps,
+  useTransactionTableOptionMap,
+} from './use-transaction-table-options';
 
 export function useHydrateTransactionTable(data: TransactionTableData) {
   const hydrateData = useTransactionTableStore((state) => state.hydrateData);
@@ -42,7 +45,7 @@ export function useTransactionTable() {
   const syncError = actions.syncError;
   const isDeleteDialogOpen = actions.isDeleteDialogOpen;
 
-  const categoryMap = useMemo(() => createOptionMap(categories), [categories]);
+  const categoryMap = useTransactionTableOptionMap(categories);
   const filteredRows = useMemo(
     () => createFilteredRows(rows, selectedDate),
     [rows, selectedDate],
@@ -83,6 +86,7 @@ export function useTransactionTableBody() {
   const rows = useTransactionTableStore((state) => state.rows);
   const selectedDate = useTransactionTableStore((state) => state.selectedDate);
   const waktuOptions = useTransactionTableStore((state) => state.waktuOptions);
+  const kantongOptions = useTransactionTableStore((state) => state.kantongOptions);
   const metodePembayaranOptions = useTransactionTableStore((state) => state.metodePembayaranOptions);
   const tipeOptions = useTransactionTableStore((state) => state.tipeOptions);
   const actions = useTransactionTableStore(
@@ -93,19 +97,26 @@ export function useTransactionTableBody() {
     () => createFilteredRows(rows, selectedDate),
     [rows, selectedDate],
   );
-  const waktuMap = useMemo(() => createOptionMap(waktuOptions), [waktuOptions]);
-  const metodePembayaranMap = useMemo(
-    () => createOptionMap(metodePembayaranOptions),
-    [metodePembayaranOptions],
-  );
-  const tipeMap = useMemo(() => createOptionMap(tipeOptions), [tipeOptions]);
+  const {
+    waktuMap,
+    kantongMap,
+    metodePembayaranMap,
+    tipeMap,
+  } = useTransactionTableBodyOptionMaps({
+    waktuOptions,
+    kantongOptions,
+    metodePembayaranOptions,
+    tipeOptions,
+  });
 
   return {
     filteredRows,
     waktuOptions,
+    kantongOptions,
     metodePembayaranOptions,
     tipeOptions,
     waktuMap,
+    kantongMap,
     metodePembayaranMap,
     tipeMap,
     ...actions,
@@ -141,7 +152,7 @@ export function useTransactionTableCategoryPopover() {
     useShallow(selectTransactionTableCategoryPopoverActions),
   );
 
-  const categoryMap = useMemo(() => createOptionMap(categories), [categories]);
+  const categoryMap = useTransactionTableOptionMap(categories);
 
   return {
     categories,

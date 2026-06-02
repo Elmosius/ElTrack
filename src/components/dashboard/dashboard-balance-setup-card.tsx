@@ -14,6 +14,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import {
   balanceSetupToastCopy,
+  formatBalanceInput,
   parseBalanceInput,
 } from './dashboard-balance.helpers';
 
@@ -80,8 +81,8 @@ export function DashboardBalanceSetupCard({
         <div>
           <CardTitle className='text-base'>Aktifkan Balance</CardTitle>
           <CardDescription className='mt-2 text-sm'>
-            Masukkan kondisi uangmu saat ini. Transaksi lama tidak akan ikut
-            dihitung.
+            Masukkan kondisi uangmu saat ini. Sistem akan membuat Kantong
+            Tunai dan Non-cash sebagai saldo awal.
           </CardDescription>
         </div>
       </CardHeader>
@@ -93,22 +94,18 @@ export function DashboardBalanceSetupCard({
           <label className='space-y-2'>
             <span className='text-sm font-medium'>Saldo cash</span>
             <Input
-              min={0}
-              type='number'
               inputMode='numeric'
-              placeholder='500000'
-              value={openingCash}
+              placeholder='Rp 500.000'
+              value={formatBalanceInput(openingCash)}
               onChange={(event) => setOpeningCash(event.target.value)}
             />
           </label>
           <label className='space-y-2'>
             <span className='text-sm font-medium'>Saldo non-cash</span>
             <Input
-              min={0}
-              type='number'
               inputMode='numeric'
-              placeholder='500000'
-              value={openingNonCash}
+              placeholder='Rp 500.000'
+              value={formatBalanceInput(openingNonCash)}
               onChange={(event) => setOpeningNonCash(event.target.value)}
             />
           </label>

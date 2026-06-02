@@ -11,7 +11,7 @@ export function ChatPreviewStatusBadge({
 }: ChatPreviewStatusBadgeProps) {
   return (
     <span
-      className={`rounded-full px-2 py-1 text-[10px] font-medium ${
+      className={`rounded-full px-2 py-1 text-xs font-medium ${
         isReady ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
       }`}
     >

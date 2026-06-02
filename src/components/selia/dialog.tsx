@@ -85,7 +85,7 @@ export function DialogTitle({
     <BaseDialog.Title
       data-slot="dialog-title"
       {...props}
-      className={cn('text-xl font-semibold', className)}
+      className={cn('text-base font-semibold', className)}
     >
       {children}
     </BaseDialog.Title>

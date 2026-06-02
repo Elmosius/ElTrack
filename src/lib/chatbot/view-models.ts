@@ -6,7 +6,9 @@ import type {
 import type { ChatComposerPayload } from './composer';
 import type { RenderedChatMessage } from './messages';
 import type {
+  ChatbotPreviewEditOptions,
   ChatSessionSummary,
+  TransaksiPreviewItemPatch,
   TransaksiPreviewGroup,
 } from '#/types/chatbot';
 
@@ -22,9 +24,15 @@ export type ChatMessageListViewModel = {
   messages: RenderedChatMessage[];
   isLoading: boolean;
   preview: TransaksiPreviewGroup | null;
+  previewOptions: ChatbotPreviewEditOptions | null;
   isConfirmingPreview: boolean;
+  isPatchingPreview: boolean;
   onConfirmPreview: () => void;
   onDismissPreview: () => void;
+  onPatchPreviewItem: (
+    itemIndex: number,
+    patch: TransaksiPreviewItemPatch,
+  ) => Promise<boolean>;
 };
 
 export type ChatComposerViewModel = {

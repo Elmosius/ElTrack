@@ -1,4 +1,4 @@
-import { Banknote, Home } from 'lucide-react';
+import { Banknote, Home, WalletCards } from 'lucide-react';
 
 export const MENU_SIDEBAR = [
   {
@@ -10,6 +10,10 @@ export const MENU_SIDEBAR = [
     label: 'Catatan Keuangan',
     icon: <Banknote className='size-4' />,
     to: '/catatan-keuangan'
+  },
+  {
+    label: 'Kantong',
+    icon: <WalletCards className='size-4' />,
+    to: '/kantong'
   }
 ];
-

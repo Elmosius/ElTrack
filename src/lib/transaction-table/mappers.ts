@@ -19,6 +19,7 @@ type RawTransaksiDoc = {
   waktu?: NamedDoc | string | null;
   nominal?: number | null;
   kategori?: NamedDoc | string | null;
+  kantong?: NamedDoc | string | null;
   metodePembayaran?: NamedDoc | string | null;
   catatan?: string | null;
   tipe?: NamedDoc | string | null;
@@ -27,6 +28,7 @@ type RawTransaksiDoc = {
 type BuildTransactionTableDataArgs = {
   listTipe: NamedDoc[];
   listKategori: NamedDoc[];
+  listKantong: NamedDoc[];
   listMetodePembayaran: NamedDoc[];
   listTransaksi: RawTransaksiDoc[];
 };
@@ -73,6 +75,7 @@ export function mapTransaksiDocToRow(doc: RawTransaksiDoc): TransaksiRow {
     waktuId: getNamedDocId(doc.waktu),
     nominal: doc.nominal != null ? String(doc.nominal) : '',
     kategoriId: getNamedDocId(doc.kategori),
+    kantongId: getNamedDocId(doc.kantong),
     metodePembayaranId: getNamedDocId(doc.metodePembayaran),
     catatan: doc.catatan ?? '',
     tipeId: getNamedDocId(doc.tipe),
@@ -82,6 +85,7 @@ export function mapTransaksiDocToRow(doc: RawTransaksiDoc): TransaksiRow {
 export function buildTransactionTableData({
   listTipe,
   listKategori,
+  listKantong,
   listMetodePembayaran,
   listTransaksi,
 }: BuildTransactionTableDataArgs): TransactionTableData {
@@ -89,6 +93,7 @@ export function buildTransactionTableData({
     rows: listTransaksi.map(mapTransaksiDocToRow),
     categories: listKategori.map(mapKategoriDocToOption),
     waktuOptions: waktuOptionsStatic.map((name) => ({ id: name, name })),
+    kantongOptions: listKantong.map(mapNamedDocToOption),
     metodePembayaranOptions: listMetodePembayaran.map(mapNamedDocToOption),
     tipeOptions: listTipe.map(mapNamedDocToOption),
   };

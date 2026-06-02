@@ -85,7 +85,7 @@ export function AlertDialogTitle({
     <BaseAlertDialog.Title
       data-slot="alert-dialog-title"
       {...props}
-      className={cn('text-xl font-semibold', className)}
+      className={cn('text-base font-semibold', className)}
     >
       {children}
     </BaseAlertDialog.Title>

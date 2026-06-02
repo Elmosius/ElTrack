@@ -10,7 +10,7 @@ type DashboardHeaderProps = {
 export function DashboardHeader({ selectedMonth, onMonthChange }: DashboardHeaderProps) {
   return (
     <div className='flex w-full justify-between items-center gap-4 rounded-2xl bg-linear-to-br from-primary/10 via-card to-card p-5 ring ring-card-border'>
-      <h1 className='text-xl font-semibold '>Ringkasan {formatMonthLabel(selectedMonth)}</h1>
+      <h1 className='text-base font-semibold '>Ringkasan {formatMonthLabel(selectedMonth)}</h1>
 
       <div className='flex w-full flex-col gap-2 sm:w-56'>
         <label htmlFor='dashboard-month' className='inline-flex items-center gap-2 text-xs font-medium text-muted'>

@@ -10,7 +10,7 @@ type DashboardDistributionChartsProps = {
 
 export function DashboardDistributionCharts({ categoryDistribution, paymentMethodDistribution }: DashboardDistributionChartsProps) {
   return (
-    <div className='grid gap-4 xl:grid-cols-[1.15fr_0.85fr]'>
+    <div className='grid gap-4 xl:grid-cols-[1.15fr_1fr]'>
       <Card>
         <CardHeader>
           <div>
@@ -26,8 +26,8 @@ export function DashboardDistributionCharts({ categoryDistribution, paymentMetho
       <Card>
         <CardHeader>
           <div>
-            <CardTitle className='text-base'>Pengeluaran per Metode Pembayaran</CardTitle>
-            <CardDescription className='text-sm'>Bandingkan kanal pembayaran yang paling sering dipakai untuk belanja.</CardDescription>
+            <CardTitle className='text-base'>Pengeluaran per Kantong</CardTitle>
+            <CardDescription className='text-sm'>Bandingkan Kantong yang paling sering dipakai untuk belanja.</CardDescription>
           </div>
         </CardHeader>
         <CardBody className='p-4'>
