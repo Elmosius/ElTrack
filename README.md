@@ -13,7 +13,7 @@ Tujuan utama ElTrack adalah membuat pencatatan keuangan harian terasa lebih sede
 
 ## Release
 
-Version: **1.0.0-beta.8**
+Version: **1.0.0-beta.9**
 
 Status: **Beta**
 
@@ -41,6 +41,9 @@ Fokus versi sekarang:
   - mode tabel
   - mode kalender
   - tambah, ubah, hapus transaksi
+- Manajemen Kantong:
+  - pencatatan saldo dan sumber dana
+  - transfer antar kantong (pemindahan dana)
 - Master data:
   - kategori
   - metode pembayaran
