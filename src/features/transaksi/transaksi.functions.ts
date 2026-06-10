@@ -4,12 +4,14 @@ import {
   createTransaksiSchema,
   deleteTransaksiSchema,
   updateTransaksiSchema,
+  createTransferKantongSchema,
 } from './transaksi.schema';
 import {
   createTransaksi,
   deleteTransaksi,
   listTransaksi,
   updateTransaksi,
+  createTransferKantong,
 } from './transaksi.server';
 
 export const getListTransaksi = createServerFn({ method: 'GET' }).handler(
@@ -38,4 +40,11 @@ export const deleteTransaksiById = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const userId = await requireSessionUserId();
     return deleteTransaksi(userId, data);
+  });
+
+export const postTransferKantong = createServerFn({ method: 'POST' })
+  .inputValidator(createTransferKantongSchema)
+  .handler(async ({ data }) => {
+    const userId = await requireSessionUserId();
+    return createTransferKantong(userId, data);
   });

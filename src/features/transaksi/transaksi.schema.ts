@@ -12,6 +12,7 @@ export const createTransaksiSchema = z
     metodePembayaran: objectIdSchema.optional(),
     catatan: z.string().trim().optional(),
     tipe: objectIdSchema,
+    transferId: z.string().optional(),
   })
   .superRefine((value, context) => {
     if (value.kantong || value.metodePembayaran) {
@@ -37,3 +38,24 @@ export const deleteTransaksiSchema = z.object({
 
 export type UpdateTransaksiInput = z.infer<typeof updateTransaksiSchema>;
 export type DeleteTransaksiInput = z.infer<typeof deleteTransaksiSchema>;
+
+export const createTransferKantongSchema = z
+  .object({
+    sourceKantongId: objectIdSchema,
+    destKantongId: objectIdSchema,
+    nominal: z.number().nonnegative('Nominal tidak boleh negatif'),
+    tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Tanggal transaksi tidak valid'),
+    waktu: z.string().min(1, 'Waktu wajib dipilih'),
+    catatan: z.string().trim().optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.sourceKantongId === value.destKantongId) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Kantong asal dan tujuan tidak boleh sama',
+        path: ['destKantongId'],
+      });
+    }
+  });
+
+export type CreateTransferKantongInput = z.infer<typeof createTransferKantongSchema>;

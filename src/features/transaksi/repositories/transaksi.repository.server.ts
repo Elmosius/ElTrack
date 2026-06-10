@@ -116,3 +116,20 @@ export async function deleteTransaksiByIdAndUserId(
     session: options.session,
   });
 }
+
+export async function findTransaksiByIdAndUserId(
+  id: string,
+  userId: string,
+) {
+  await connectDB();
+  return Transaksi.findOne({ _id: id, userId }).lean();
+}
+
+export async function deleteTransaksiByTransferIdAndUserId(
+  transferId: string,
+  userId: string,
+  options: RepositoryOptions = {},
+) {
+  await connectDB();
+  return Transaksi.deleteMany({ transferId, userId }, { session: options.session });
+}

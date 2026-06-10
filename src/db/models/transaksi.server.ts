@@ -51,6 +51,10 @@ const transaksiSchema = new Schema(
       ref: 'Tipe',
       required: true,
     },
+    transferId: {
+      type: String,
+      index: true,
+    },
   },
   {
     timestamps: true,

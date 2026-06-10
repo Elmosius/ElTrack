@@ -19,6 +19,7 @@ export type SerializedTransaksi = {
   tipe?: string | SerializedNamedRef | null;
   createdAt?: string;
   updatedAt?: string;
+  transferId?: string;
 };
 
 export type SerializedKategori = {

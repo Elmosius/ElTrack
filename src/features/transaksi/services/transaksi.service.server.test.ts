@@ -3,10 +3,12 @@ import type { CreateTransaksiInput, UpdateTransaksiInput } from '../transaksi.sc
 
 const mocks = vi.hoisted(() => ({
   deleteTransaksiByIdAndUserId: vi.fn(),
+  findTransaksiByIdAndUserId: vi.fn(),
   findTransaksiListByUserId: vi.fn(),
   insertTransaksi: vi.fn(),
   insertTransaksiMany: vi.fn(),
   updateTransaksiById: vi.fn(),
+  deleteTransaksiByTransferIdAndUserId: vi.fn(),
   findKategoriByIdsAndUserId: vi.fn(),
   findKantongByIdsAndUserId: vi.fn(),
   findMetodePembayaranByIds: vi.fn(),
@@ -15,10 +17,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../repositories/transaksi.repository.server', () => ({
   deleteTransaksiByIdAndUserId: mocks.deleteTransaksiByIdAndUserId,
+  findTransaksiByIdAndUserId: mocks.findTransaksiByIdAndUserId,
   findTransaksiListByUserId: mocks.findTransaksiListByUserId,
   insertTransaksi: mocks.insertTransaksi,
   insertTransaksiMany: mocks.insertTransaksiMany,
   updateTransaksiById: mocks.updateTransaksiById,
+  deleteTransaksiByTransferIdAndUserId: mocks.deleteTransaksiByTransferIdAndUserId,
 }));
 
 vi.mock('#/features/kategori/repositories/kategori.repository.server', () => ({
@@ -124,6 +128,11 @@ describe('transaksi service reference validation', () => {
       namaTransaksi: 'Makan siang',
     };
     mocks.insertTransaksi.mockResolvedValue(transaksiDoc(baseInput));
+    mocks.findTransaksiByIdAndUserId.mockResolvedValue({
+      _id: transaksiId,
+      userId,
+      ...baseInput,
+    });
     mocks.updateTransaksiById.mockResolvedValue(transaksiDoc(updateInput));
 
     await expect(createTransaksiService(userId, baseInput)).resolves.toMatchObject({

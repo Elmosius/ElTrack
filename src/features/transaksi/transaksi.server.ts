@@ -6,3 +6,4 @@ export {
   listTransaksiService as listTransaksi,
   updateTransaksiService as updateTransaksi,
 } from './services/transaksi.service.server';
+export { transferAntarKantongService as createTransferKantong } from './services/transfer.service.server';

@@ -11,12 +11,15 @@ import { findKantongByIdsAndUserId } from '#/features/kantong/repositories/kanto
 import { findMetodePembayaranByIds } from '#/features/metode-pembayaran/repositories/metode-pembayaran.repository.server';
 import { findTipeByIds } from '#/features/tipe/repositories/tipe.repository.server';
 import type { ClientSession } from 'mongoose';
+import { runWithOptionalTransaction } from '#/db/mongoose.server';
 import {
   deleteTransaksiByIdAndUserId,
   findTransaksiListByUserId,
   insertTransaksi,
   insertTransaksiMany,
   updateTransaksiById,
+  findTransaksiByIdAndUserId,
+  deleteTransaksiByTransferIdAndUserId,
 } from '../repositories/transaksi.repository.server';
 
 type ServiceOptions = {
@@ -110,6 +113,16 @@ export async function updateTransaksiService(
   data: UpdateTransaksiInput,
   options: ServiceOptions = {},
 ): Promise<SerializedTransaksi> {
+  const existing = await findTransaksiByIdAndUserId(data.id, userId);
+
+  if (!existing) {
+    throw new Error('Transaksi tidak ditemukan.');
+  }
+
+  if (existing.transferId) {
+    throw new Error('Transaksi transfer tidak dapat diubah sebagian. Silakan hapus dan buat ulang transfer.');
+  }
+
   await ensureTransaksiReferencesExist(userId, [data]);
   const transaksi = await updateTransaksiById(userId, data, options);
 
@@ -125,10 +138,22 @@ export async function deleteTransaksiService(
   data: DeleteTransaksiInput,
   options: ServiceOptions = {},
 ) {
-  const transaksi = await deleteTransaksiByIdAndUserId(userId, data, options);
+  const existing = await findTransaksiByIdAndUserId(data.id, userId);
 
-  if (!transaksi) {
+  if (!existing) {
     throw new Error('Transaksi tidak ditemukan.');
+  }
+
+  if (existing.transferId) {
+    if (options.session) {
+      await deleteTransaksiByTransferIdAndUserId(existing.transferId, userId, options);
+    } else {
+      await runWithOptionalTransaction(async (session) => {
+        await deleteTransaksiByTransferIdAndUserId(existing.transferId!, userId, { session });
+      });
+    }
+  } else {
+    await deleteTransaksiByIdAndUserId(userId, data, options);
   }
 
   return {
