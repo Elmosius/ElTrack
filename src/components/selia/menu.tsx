@@ -21,6 +21,7 @@ export const menuPopupVariants = cva(
     'data-[ending-style]:opacity-0 data-[ending-style]:scale-90',
     'data-[starting-style]:opacity-0 data-[starting-style]:scale-90',
     '**:data-[slot=item]:p-0 min-w-32',
+    'max-h-[min(var(--available-height),24rem)] overflow-y-auto overscroll-contain',
   ],
   {
     variants: {
@@ -67,6 +68,8 @@ export function MenuPopup({
   anchor,
   sticky,
   positionMethod,
+  collisionPadding,
+  collisionAvoidance,
   size,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
@@ -77,6 +80,8 @@ export function MenuPopup({
   anchor?: BaseMenu.Positioner.Props['anchor'];
   sticky?: BaseMenu.Positioner.Props['sticky'];
   positionMethod?: BaseMenu.Positioner.Props['positionMethod'];
+  collisionPadding?: BaseMenu.Positioner.Props['collisionPadding'];
+  collisionAvoidance?: BaseMenu.Positioner.Props['collisionAvoidance'];
 } & VariantProps<typeof menuPopupVariants>) {
   return (
     <BaseMenu.Portal>
@@ -85,10 +90,12 @@ export function MenuPopup({
         align={align}
         alignOffset={alignOffset}
         side={side}
-        sideOffset={sideOffset || 6}
+        sideOffset={sideOffset ?? 6}
         anchor={anchor}
         sticky={sticky}
         positionMethod={positionMethod}
+        collisionPadding={collisionPadding ?? 12}
+        collisionAvoidance={collisionAvoidance}
       >
         <BaseMenu.Popup
           data-slot="menu-popup"

@@ -29,37 +29,40 @@ export function CategoryPopover({ row }: CategoryPopoverProps) {
       <PopoverPopup
         side='bottom'
         align='start'
-        className='z-50 min-w-64 max-w-[min(90vw,20rem)] p-3 gap-2.5'
+        collisionPadding={16}
+        className='z-50 min-w-64 max-w-[min(90vw,20rem)] max-h-[min(var(--available-height),32rem)] overflow-hidden p-3 gap-2.5'
       >
-        <div className='space-y-1'>
+        <div className='flex min-h-0 w-full flex-1 flex-col gap-1'>
           <p className='text-xs font-medium text-muted px-1'>Pilih Kategori</p>
-          {hasCategories ? (
-            categories.map((category) => {
-              const isSelected = row.kategoriId === category.id;
+          <div className='min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pr-1'>
+            {hasCategories ? (
+              categories.map((category) => {
+                const isSelected = row.kategoriId === category.id;
 
-              return (
-                <CategoryPopoverOption
-                  key={category.id}
-                  category={category}
-                  isSelected={isSelected}
-                  onSelect={() => {
-                    setIsOpen(false);
-                    updateRow(row.id, { kategoriId: category.id });
-                    void saveRow(row.id);
-                  }}
-                  onEdit={() => handleEditCategory(category)}
-                  onDelete={() => requestDeleteCategory(category)}
-                />
-              );
-            })
-          ) : (
-            <div className='rounded border border-dashed border-border px-3 py-2 text-xs text-muted'>
-              Belum ada kategori tersimpan. Tambah kategori dulu, lalu pilih dari daftar ini.
-            </div>
-          )}
+                return (
+                  <CategoryPopoverOption
+                    key={category.id}
+                    category={category}
+                    isSelected={isSelected}
+                    onSelect={() => {
+                      setIsOpen(false);
+                      updateRow(row.id, { kategoriId: category.id });
+                      void saveRow(row.id);
+                    }}
+                    onEdit={() => handleEditCategory(category)}
+                    onDelete={() => requestDeleteCategory(category)}
+                  />
+                );
+              })
+            ) : (
+              <div className='rounded border border-dashed border-border px-3 py-2 text-xs text-muted'>
+                Belum ada kategori tersimpan. Tambah kategori dulu, lalu pilih dari daftar ini.
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className='h-px bg-popover-separator' />
+        <div className='h-px w-full shrink-0 bg-popover-separator' />
 
         <CategoryPopoverEditor
           mode={categoryMode}

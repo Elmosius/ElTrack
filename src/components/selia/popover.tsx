@@ -25,6 +25,8 @@ export function PopoverPopup({
   anchor,
   sticky,
   positionMethod,
+  collisionPadding,
+  collisionAvoidance,
   ...props
 }: React.ComponentProps<typeof BasePopover.Popup> & {
   align?: BasePopover.Positioner.Props['align'];
@@ -34,6 +36,8 @@ export function PopoverPopup({
   anchor?: BasePopover.Positioner.Props['anchor'];
   sticky?: BasePopover.Positioner.Props['sticky'];
   positionMethod?: BasePopover.Positioner.Props['positionMethod'];
+  collisionPadding?: BasePopover.Positioner.Props['collisionPadding'];
+  collisionAvoidance?: BasePopover.Positioner.Props['collisionAvoidance'];
 }) {
   return (
     <BasePopover.Portal>
@@ -41,10 +45,12 @@ export function PopoverPopup({
         align={align}
         alignOffset={alignOffset}
         side={side}
-        sideOffset={sideOffset || 12}
+        sideOffset={sideOffset ?? 12}
         anchor={anchor}
         sticky={sticky}
         positionMethod={positionMethod}
+        collisionPadding={collisionPadding}
+        collisionAvoidance={collisionAvoidance}
       >
         <BasePopover.Popup
           data-slot="popover-popup"
