@@ -20,6 +20,7 @@ export type SerializedTransaksi = {
   createdAt?: string;
   updatedAt?: string;
   transferId?: string;
+  langgananId?: string;
 };
 
 export type SerializedKategori = {

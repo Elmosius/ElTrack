@@ -55,6 +55,11 @@ const transaksiSchema = new Schema(
       type: String,
       index: true,
     },
+    langgananId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Langganan',
+      index: true,
+    },
   },
   {
     timestamps: true,

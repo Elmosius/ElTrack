@@ -8,6 +8,7 @@ import { DashboardOverviewCards } from './dashboard-overview-cards';
 import { DashboardRecentTransactions } from './dashboard-recent-transactions';
 import { DashboardTopCategories } from './dashboard-top-categories';
 import { DashboardTrendCard } from './dashboard-trend-card';
+import { LanggananReminderSection } from '../langganan/langganan-reminder-section';
 
 type HomeDashboardProps = {
   data: DashboardHomeData;
@@ -27,6 +28,8 @@ export function HomeDashboard({ data, onMonthChange }: HomeDashboardProps) {
       <DashboardBalanceSection balance={data.balance} />
 
       <DashboardOverviewCards overview={data.overview} />
+
+      <LanggananReminderSection reminders={data.langgananReminders} compact />
 
       <DashboardTrendCard
         mode={trendMode}

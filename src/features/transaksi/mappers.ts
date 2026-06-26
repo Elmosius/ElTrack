@@ -47,6 +47,7 @@ export function serializeTransaksiDoc(item: {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   transferId?: string;
+  langgananId?: unknown;
 }): SerializedTransaksi {
   return {
     _id: stringifyId(item._id),
@@ -63,5 +64,6 @@ export function serializeTransaksiDoc(item: {
     metodePembayaran: serializeNamedRef(item.metodePembayaran),
     tipe: serializeNamedRef(item.tipe),
     transferId: item.transferId,
+    langgananId: item.langgananId ? stringifyId(item.langgananId) : undefined,
   };
 }

@@ -54,6 +54,7 @@ export function GoalsPage({ data }: GoalsPageProps) {
 
       {editingGoal && (
         <GoalForm
+          key={editingGoal._id}
           initialGoal={editingGoal}
           kantongs={data.kantongs}
           mediaSuggestions={data.mediaSuggestions}

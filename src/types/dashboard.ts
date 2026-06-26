@@ -1,4 +1,5 @@
 import type { BalanceSummary } from './balance';
+import type { LanggananReminderItem } from './langganan';
 
 export type DashboardTrendPoint = {
   label: string;
@@ -48,5 +49,6 @@ export type DashboardHomeData = {
   paymentMethodDistribution: DashboardDistributionItem[];
   recentTransactions: DashboardRecentTransaction[];
   topCategories: DashboardTopCategory[];
+  langgananReminders: LanggananReminderItem[];
   isEmpty: boolean;
 };
