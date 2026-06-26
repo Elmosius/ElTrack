@@ -13,7 +13,7 @@ Tujuan utama ElTrack adalah membuat pencatatan keuangan harian terasa lebih sede
 
 ## Release
 
-Version: **1.0.0-beta.10**
+Version: **1.0.0-beta.11**
 
 Status: **Beta**
 
@@ -23,6 +23,7 @@ Fokus versi sekarang:
 - pencatatan transaksi
 - dashboard home
 - Goals untuk target menabung dan investasi berbasis Kantong
+- Langganan untuk subscription dan tagihan rutin dengan reminder in-app
 - dropdown Catatan Keuangan mobile yang aman untuk opsi panjang
 - chatbot AI dasar
 
@@ -50,6 +51,11 @@ Fokus versi sekarang:
   - target menabung dan investasi berbasis Kantong
   - progress otomatis dari saldo Kantong terkait
   - media bebas seperti Reksadana, Tabungan Bank, Deposito, Emas, Saham, atau Crypto
+- Langganan:
+  - catatan subscription aktif dan tagihan rutin
+  - reminder in-app untuk H-N, H-1, hari H, dan overdue
+  - catat pembayaran manual ke transaksi pengeluaran
+  - kategori Langganan otomatis saat pembayaran dicatat
 - Master data:
   - kategori
   - metode pembayaran
@@ -77,6 +83,7 @@ src/
     dashboard/            # UI dashboard home
     catatan-keuangan/     # UI tabel & kalender transaksi
     layouts/              # layout aplikasi
+    langganan/            # UI subscription dan reminder
     selia/                # primitive UI reusable
     shared/               # shared app components
   const/                  # konstanta aplikasi
@@ -84,6 +91,7 @@ src/
   features/               # backend per feature (repository/service/functions)
     chatbot/
     dashboard/
+    langganan/
     kategori/
     metode-pembayaran/
     tipe/
