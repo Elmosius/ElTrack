@@ -7,6 +7,7 @@ import {
 import type { DashboardMonthInput } from '../dashboard.schema';
 import type { DashboardHomeData } from '#/types/dashboard';
 import { getBalanceSummary } from '#/features/balance/balance.server';
+import { getLanggananPageDataService } from '#/features/langganan/services/langganan.service.server';
 import { mapDashboardTransaksiRecord } from '../mappers';
 import { findDashboardTransaksiByUserIdAndDateRange } from '../repositories/dashboard.repository.server';
 import {
@@ -28,13 +29,14 @@ export async function getDashboardHomeDataService(
   const previousMonth = shiftMonth(selectedMonth, -1);
   const earliestTrendMonth = shiftMonth(selectedMonth, -5);
 
-  const [rawItems, balance] = await Promise.all([
+  const [rawItems, balance, langgananData] = await Promise.all([
     findDashboardTransaksiByUserIdAndDateRange(
       userId,
       getMonthStart(earliestTrendMonth),
       selectedMonthEnd,
     ),
     getBalanceSummary(userId),
+    getLanggananPageDataService(userId),
   ]);
   const items = rawItems.map((item) => mapDashboardTransaksiRecord(item));
   const selectedItems = items.filter(
@@ -59,6 +61,7 @@ export async function getDashboardHomeDataService(
     ),
     recentTransactions: buildRecentTransactions(selectedItems),
     topCategories: buildTopCategories(selectedItems, previousItems),
+    langgananReminders: langgananData.reminders,
     isEmpty: selectedItems.length === 0,
   };
 }

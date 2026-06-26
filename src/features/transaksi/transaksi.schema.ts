@@ -13,6 +13,7 @@ export const createTransaksiSchema = z
     catatan: z.string().trim().optional(),
     tipe: objectIdSchema,
     transferId: z.string().optional(),
+    langgananId: objectIdSchema.optional(),
   })
   .superRefine((value, context) => {
     if (value.kantong || value.metodePembayaran) {

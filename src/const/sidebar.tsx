@@ -1,4 +1,4 @@
-import { Banknote, Home, Target, WalletCards } from 'lucide-react';
+import { Banknote, BellRing, Home, Target, WalletCards } from 'lucide-react';
 
 export const MENU_SIDEBAR = [
   {
@@ -20,5 +20,10 @@ export const MENU_SIDEBAR = [
     label: 'Goals',
     icon: <Target className='size-4' />,
     to: '/goals'
+  },
+  {
+    label: 'Langganan',
+    icon: <BellRing className='size-4' />,
+    to: '/langganan'
   }
 ];
