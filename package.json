@@ -41,6 +41,7 @@
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.1.18",
+    "web-push": "^3.6.7",
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
@@ -52,6 +53,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^6.0.2",
     "jsdom": "^28.1.0",
     "nitro": "^3.0.260311-beta",

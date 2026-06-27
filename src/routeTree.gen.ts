@@ -17,6 +17,7 @@ import { Route as AppLanggananRouteImport } from './routes/_app/langganan'
 import { Route as AppKantongRouteImport } from './routes/_app/kantong'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
 import { Route as AppCatatanKeuanganRouteImport } from './routes/_app/catatan-keuangan'
+import { Route as ApiCronLanggananPushRemindersRouteImport } from './routes/api/cron/langganan-push-reminders'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthAuthLoginRouteImport } from './routes/_auth/auth.login'
 
@@ -58,6 +59,12 @@ const AppCatatanKeuanganRoute = AppCatatanKeuanganRouteImport.update({
   path: '/catatan-keuangan',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const ApiCronLanggananPushRemindersRoute =
+  ApiCronLanggananPushRemindersRouteImport.update({
+    id: '/api/cron/langganan-push-reminders',
+    path: '/api/cron/langganan-push-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/langganan-push-reminders': typeof ApiCronLanggananPushRemindersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
@@ -88,6 +96,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/langganan-push-reminders': typeof ApiCronLanggananPushRemindersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,6 +110,7 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_auth/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/langganan-push-reminders': typeof ApiCronLanggananPushRemindersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/auth/login'
     | '/api/auth/$'
+    | '/api/cron/langganan-push-reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/auth/login'
     | '/api/auth/$'
+    | '/api/cron/langganan-push-reminders'
   id:
     | '__root__'
     | '/_app'
@@ -135,6 +147,7 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_auth/auth/login'
     | '/api/auth/$'
+    | '/api/cron/langganan-push-reminders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,6 +155,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCronLanggananPushRemindersRoute: typeof ApiCronLanggananPushRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCatatanKeuanganRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/api/cron/langganan-push-reminders': {
+      id: '/api/cron/langganan-push-reminders'
+      path: '/api/cron/langganan-push-reminders'
+      fullPath: '/api/cron/langganan-push-reminders'
+      preLoaderRoute: typeof ApiCronLanggananPushRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -256,6 +277,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCronLanggananPushRemindersRoute: ApiCronLanggananPushRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

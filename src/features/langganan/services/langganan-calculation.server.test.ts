@@ -4,6 +4,7 @@ import {
   buildLanggananViewItems,
   calculateNextDueDate,
   calculateReminderStatus,
+  getLanggananReminderMilestone,
 } from './langganan-calculation.server';
 
 const baseLangganan = {
@@ -58,6 +59,57 @@ describe('langganan calculation', () => {
         now: new Date('2026-06-28T08:00:00.000Z'),
       }),
     ).toBe('due-soon');
+  });
+
+  it('returns reminder milestones without duplicate H-N values', () => {
+    expect(
+      getLanggananReminderMilestone({
+        status: 'aktif',
+        nextDueDate: '2026-06-28',
+        reminderDays: 3,
+        now: new Date('2026-06-25T08:00:00.000Z'),
+      }),
+    ).toBe('h-n');
+    expect(
+      getLanggananReminderMilestone({
+        status: 'aktif',
+        nextDueDate: '2026-06-28',
+        reminderDays: 3,
+        now: new Date('2026-06-26T08:00:00.000Z'),
+      }),
+    ).toBeNull();
+    expect(
+      getLanggananReminderMilestone({
+        status: 'aktif',
+        nextDueDate: '2026-06-28',
+        reminderDays: 1,
+        now: new Date('2026-06-27T08:00:00.000Z'),
+      }),
+    ).toBe('h-1');
+    expect(
+      getLanggananReminderMilestone({
+        status: 'aktif',
+        nextDueDate: '2026-06-28',
+        reminderDays: 0,
+        now: new Date('2026-06-28T08:00:00.000Z'),
+      }),
+    ).toBe('due');
+    expect(
+      getLanggananReminderMilestone({
+        status: 'aktif',
+        nextDueDate: '2026-06-20',
+        reminderDays: 3,
+        now: new Date('2026-06-28T08:00:00.000Z'),
+      }),
+    ).toBe('overdue');
+    expect(
+      getLanggananReminderMilestone({
+        status: 'dijeda',
+        nextDueDate: '2026-06-20',
+        reminderDays: 3,
+        now: new Date('2026-06-28T08:00:00.000Z'),
+      }),
+    ).toBeNull();
   });
 
   it('marks active subscriptions as overdue after due date', () => {

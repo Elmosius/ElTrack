@@ -3,6 +3,19 @@ import type { KantongSummaryItem } from './kantong';
 export type LanggananFrequency = 'bulanan' | 'tahunan';
 export type LanggananStatus = 'aktif' | 'dijeda';
 export type LanggananReminderStatus = 'paused' | 'overdue' | 'due-soon' | 'safe';
+export type LanggananReminderMilestone = 'h-n' | 'h-1' | 'due' | 'overdue';
+
+export type LanggananPushStatus =
+  | 'unsupported'
+  | 'denied'
+  | 'active'
+  | 'inactive';
+
+export type LanggananPushState = {
+  status: LanggananPushStatus;
+  vapidPublicKey: string | null;
+  activeSubscriptionCount: number;
+};
 
 export type SerializedLangganan = {
   _id: string;
@@ -47,4 +60,5 @@ export type LanggananPageData = {
   summary: LanggananSummary;
   kantongs: KantongSummaryItem[];
   isKantongConfigured: boolean;
+  push: LanggananPushState;
 };
