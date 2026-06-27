@@ -53,6 +53,7 @@ const config = defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        importScripts: ['push-sw.js'],
         navigateFallback: null,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
         runtimeCaching: [],

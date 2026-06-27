@@ -35,6 +35,7 @@ import {
   buildLanggananViewItems,
   calculateNextDueDate,
 } from './langganan-calculation.server';
+import { getLanggananPushStateService } from './langganan-push.service.server';
 
 const langgananKategoriName = 'Langganan';
 
@@ -97,6 +98,7 @@ export async function getLanggananPageDataService(
     findLanggananListByUserId(userId),
     getKantongPageDataService(userId),
   ]);
+  const push = await getLanggananPushStateService(userId);
   const serializedItems = langgananList.map((item) => serializeLanggananDoc(item));
   const viewItems = buildLanggananViewItems({
     items: serializedItems,
@@ -109,6 +111,7 @@ export async function getLanggananPageDataService(
     summary: buildLanggananSummary(viewItems),
     kantongs: kantongData.activeItems,
     isKantongConfigured: kantongData.isConfigured,
+    push,
   };
 }
 

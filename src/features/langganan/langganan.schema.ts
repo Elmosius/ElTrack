@@ -40,8 +40,24 @@ export const payLanggananSchema = z.object({
   tanggal: dueDateSchema.optional(),
 });
 
+export const pushSubscriptionSchema = z.object({
+  endpoint: z.string().trim().url('Endpoint push tidak valid'),
+  expirationTime: z.number().nullable().optional(),
+  keys: z.object({
+    p256dh: z.string().trim().min(1, 'Push key p256dh wajib ada'),
+    auth: z.string().trim().min(1, 'Push key auth wajib ada'),
+  }),
+  userAgent: z.string().trim().optional(),
+});
+
+export const deletePushSubscriptionSchema = z.object({
+  endpoint: z.string().trim().url('Endpoint push tidak valid'),
+});
+
 export type CreateLanggananInput = z.infer<typeof createLanggananSchema>;
 export type UpdateLanggananInput = z.infer<typeof updateLanggananSchema>;
 export type DeleteLanggananInput = z.infer<typeof deleteLanggananSchema>;
 export type SetLanggananStatusInput = z.infer<typeof setLanggananStatusSchema>;
 export type PayLanggananInput = z.infer<typeof payLanggananSchema>;
+export type PushSubscriptionInput = z.infer<typeof pushSubscriptionSchema>;
+export type DeletePushSubscriptionInput = z.infer<typeof deletePushSubscriptionSchema>;

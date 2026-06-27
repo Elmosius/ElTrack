@@ -3,15 +3,20 @@ import { createServerFn } from '@tanstack/react-start';
 import {
   createLanggananSchema,
   deleteLanggananSchema,
+  deletePushSubscriptionSchema,
   payLanggananSchema,
+  pushSubscriptionSchema,
   setLanggananStatusSchema,
   updateLanggananSchema,
 } from './langganan.schema';
 import {
   createLangganan,
   deleteLangganan,
+  deleteLanggananPushSubscription,
   getLanggananPageData,
+  getLanggananPushState,
   payLangganan,
+  saveLanggananPushSubscription,
   setLanggananStatus,
   updateLangganan,
 } from './langganan.server';
@@ -56,4 +61,27 @@ export const deleteLanggananById = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const userId = await requireSessionUserId();
     return deleteLangganan(userId, data);
+  });
+
+export const getLanggananPushNotificationState = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  const userId = await requireSessionUserId();
+  return getLanggananPushState(userId);
+});
+
+export const postLanggananPushSubscription = createServerFn({ method: 'POST' })
+  .inputValidator(pushSubscriptionSchema)
+  .handler(async ({ data }) => {
+    const userId = await requireSessionUserId();
+    return saveLanggananPushSubscription(userId, data);
+  });
+
+export const deleteLanggananPushSubscriptionByEndpoint = createServerFn({
+  method: 'POST',
+})
+  .inputValidator(deletePushSubscriptionSchema)
+  .handler(async ({ data }) => {
+    const userId = await requireSessionUserId();
+    return deleteLanggananPushSubscription(userId, data);
   });
