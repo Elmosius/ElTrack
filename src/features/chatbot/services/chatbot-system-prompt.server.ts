@@ -1,6 +1,10 @@
 import type { TransaksiPreviewGroup } from '#/types/chatbot';
 import { extractPreviewSummary } from '../mappers';
 import type { ChatbotMasterData } from '../chatbot.shared.server';
+import {
+  buildChatbotFinancialContextPrompt,
+  type ChatbotFinancialContext,
+} from './chatbot-financial-context.server';
 
 export type ChatbotPromptMode = 'chat' | 'preview';
 
@@ -8,9 +12,28 @@ type BuildChatbotSystemPromptOptions = {
   mode: ChatbotPromptMode;
   masterData: ChatbotMasterData;
   activePreview: TransaksiPreviewGroup | null;
+  financialContext: ChatbotFinancialContext | null;
 };
 
-function buildChatOnlyPrompt() {
+function buildReadOnlyInsightPrompt(
+  financialContext: ChatbotFinancialContext | null,
+) {
+  if (!financialContext) {
+    return null;
+  }
+
+  return [
+    'Kamu boleh membantu user memahami kondisi finansialnya dari konteks ElTrack yang tersedia.',
+    'Fokus utama insight adalah saran hemat yang spesifik, realistis, dan bisa dilakukan.',
+    'Saat memberi saran hemat, prioritaskan kategori yang naik, pengeluaran terbesar, langganan due/overdue, dan progress goal yang tertinggal.',
+    'Jangan menyarankan investasi spesifik, keputusan finansial berisiko tinggi, atau klaim kepastian hasil.',
+    'Kamu hanya boleh membaca data. Kamu tidak boleh mengubah Kantong, Goals, Langganan, kategori, transaksi, atau saldo.',
+    'Jika data belum cukup, katakan bahwa insight masih terbatas dan berikan saran pencatatan yang praktis.',
+    buildChatbotFinancialContextPrompt(financialContext),
+  ].join('\n');
+}
+
+function buildChatOnlyPrompt(financialContext: ChatbotFinancialContext | null) {
   const tanggalHariIni = new Date().toISOString().slice(0, 10);
 
   return [
@@ -18,9 +41,10 @@ function buildChatOnlyPrompt() {
     `Hari ini ${tanggalHariIni}.`,
     'Jawab chat biasa secara natural, ringkas, dan membantu.',
     'Kamu boleh menjawab pertanyaan umum selama tetap sopan dan jelas.',
+    buildReadOnlyInsightPrompt(financialContext),
     'Jika user ingin mencatat transaksi, minta user mengirim detail transaksi seperti nama, nominal, tanggal, metode pembayaran, dan kategori.',
     'Jangan menampilkan JSON transaksi, tabel transaksi, atau mengatakan catatan sudah siap ditinjau kecuali user jelas meminta pencatatan transaksi.',
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 function buildPreviewPrompt(
@@ -82,9 +106,10 @@ export function buildChatbotSystemPrompt({
   mode,
   masterData,
   activePreview,
+  financialContext,
 }: BuildChatbotSystemPromptOptions) {
   if (mode === 'chat') {
-    return buildChatOnlyPrompt();
+    return buildChatOnlyPrompt(financialContext);
   }
 
   return buildPreviewPrompt(masterData, activePreview);

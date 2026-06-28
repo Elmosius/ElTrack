@@ -11,6 +11,7 @@ export function ChatComposer({ composer }: ChatComposerProps) {
   const {
     draft,
     attachmentName,
+    quickPrompts,
     isLoading,
     isDisabled,
     textareaRef,
@@ -19,11 +20,32 @@ export function ChatComposer({ composer }: ChatComposerProps) {
     onComposerKeyDown,
     onAttachmentSelect,
     onAttachmentClick,
+    onQuickPrompt,
     onSend,
   } = composer;
+  const shouldShowQuickPrompts = !draft && !attachmentName && quickPrompts.length > 0;
 
   return (
     <div className='w-full border-t border-popover-separator px-3.5 py-3'>
+      {shouldShowQuickPrompts ? (
+        <div className='-mx-1 mb-1.5 overflow-x-auto px-1 py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='flex w-max gap-1.5'>
+            {quickPrompts.map((prompt) => (
+              <Button
+                key={prompt}
+                type='button'
+                size='xs'
+                variant='outline'
+                className='shrink-0 rounded-full text-xs shadow-none'
+                disabled={isLoading || isDisabled}
+                onClick={() => onQuickPrompt(prompt)}
+              >
+                {prompt}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className='rounded-xl border border-input-border/80 bg-input/50 px-2.5 py-2 transition-[border-color,box-shadow] focus-within:border-primary/65 focus-within:shadow-sm'>
         <input
           ref={fileInputRef}

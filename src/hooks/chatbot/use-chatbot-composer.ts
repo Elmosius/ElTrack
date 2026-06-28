@@ -104,6 +104,20 @@ export function useChatbotComposer({
     }
   }, [buildMessagePayload, onSubmit, resetComposer]);
 
+  const handleQuickPrompt = useCallback(
+    async (prompt: string) => {
+      const normalizedPrompt = prompt.trim();
+
+      if (!normalizedPrompt) {
+        return;
+      }
+
+      resetComposer();
+      await onSubmit(normalizedPrompt);
+    },
+    [onSubmit, resetComposer],
+  );
+
   const handleComposerKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key !== 'Enter' || event.shiftKey) {
@@ -126,6 +140,7 @@ export function useChatbotComposer({
       handleAttachmentSelect,
       handleAttachmentClick,
       handleComposerKeyDown,
+      handleQuickPrompt,
       handleSend,
     },
     refs: {

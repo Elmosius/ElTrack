@@ -38,6 +38,7 @@ export type ChatMessageListViewModel = {
 export type ChatComposerViewModel = {
   draft: string;
   attachmentName: string;
+  quickPrompts: readonly string[];
   isLoading: boolean;
   isDisabled: boolean;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
@@ -46,6 +47,7 @@ export type ChatComposerViewModel = {
   onComposerKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
   onAttachmentSelect: (event: ChangeEvent<HTMLInputElement>) => void;
   onAttachmentClick: () => void;
+  onQuickPrompt: (prompt: string) => void;
   onSend: () => void;
 };
 

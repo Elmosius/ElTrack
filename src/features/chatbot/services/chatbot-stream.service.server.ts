@@ -15,7 +15,9 @@ import {
   getGeminiVisionModel,
   getPendingPreview,
 } from '../chatbot.shared.server';
+import { shouldIncludeChatbotFinancialContext } from './chatbot-financial-insight-intent.server';
 import { getChatbotMasterData } from './chatbot-master-data.service.server';
+import { getChatbotFinancialContextService } from './chatbot-financial-context.server';
 import { buildResolvedPreview } from './chatbot-preview.service.server';
 import { classifyPreviewIntent } from './chatbot-preview-intent.server';
 import { buildChatbotSystemPrompt } from './chatbot-system-prompt.server';
@@ -72,7 +74,16 @@ export async function createChatbotStreamService({
       : Date.now();
   }
 
-  const masterData = await getChatbotMasterData(userId);
+  const shouldIncludeFinancialContext = shouldIncludeChatbotFinancialContext({
+    previewIntent,
+    latestUserMessage,
+  });
+  const [masterData, financialContext] = await Promise.all([
+    getChatbotMasterData(userId),
+    shouldIncludeFinancialContext
+      ? getChatbotFinancialContextService(userId)
+      : Promise.resolve(null),
+  ]);
   const model = hasImage ? getGeminiVisionModel() : getGeminiTextModel();
   const promptMode = previewIntent === 'chat' ? 'chat' : 'preview';
 
@@ -84,6 +95,7 @@ export async function createChatbotStreamService({
         mode: promptMode,
         masterData,
         activePreview: previewContext,
+        financialContext,
       }),
       {
         stripPreviewAssistantText: promptMode === 'chat',
