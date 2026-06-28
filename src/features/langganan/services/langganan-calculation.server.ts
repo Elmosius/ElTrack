@@ -1,4 +1,5 @@
 import type {
+  LanggananReminderMilestone,
   LanggananReminderItem,
   LanggananReminderStatus,
   LanggananSummary,
@@ -85,6 +86,39 @@ export function calculateReminderStatus({
   }
 
   return 'safe';
+}
+
+export function getLanggananReminderMilestone({
+  status,
+  nextDueDate,
+  reminderDays,
+  now,
+}: Pick<SerializedLangganan, 'status' | 'nextDueDate' | 'reminderDays'> & {
+  now?: Date;
+}): LanggananReminderMilestone | null {
+  if (status === 'dijeda') {
+    return null;
+  }
+
+  const daysUntilDue = calculateDaysUntilDue({ nextDueDate, now });
+
+  if (daysUntilDue < 0) {
+    return 'overdue';
+  }
+
+  if (daysUntilDue === 0) {
+    return 'due';
+  }
+
+  if (daysUntilDue === 1) {
+    return 'h-1';
+  }
+
+  if (reminderDays > 1 && daysUntilDue === reminderDays) {
+    return 'h-n';
+  }
+
+  return null;
 }
 
 export function buildLanggananViewItems({

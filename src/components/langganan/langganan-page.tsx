@@ -6,6 +6,7 @@ import { BellRing, Plus, WalletCards } from 'lucide-react';
 import { useState } from 'react';
 import { LanggananCard } from './langganan-card';
 import { LanggananForm } from './langganan-form';
+import { LanggananPushNotificationCard } from './langganan-push-notification-card';
 import { LanggananReminderSection } from './langganan-reminder-section';
 import { LanggananSummaryCards } from './langganan-summary-cards';
 
@@ -46,6 +47,8 @@ export function LanggananPage({ data }: LanggananPageProps) {
   return (
     <div className='flex flex-col gap-4'>
       <LanggananSummaryCards summary={data.summary} />
+
+      <LanggananPushNotificationCard initialState={data.push} />
 
       <LanggananReminderSection reminders={data.reminders} />
 

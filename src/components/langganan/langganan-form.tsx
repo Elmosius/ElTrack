@@ -145,7 +145,7 @@ export function LanggananForm({
       <CardHeader>
         <CardTitle>{isEditing ? 'Edit Langganan' : 'Tambah Langganan'}</CardTitle>
         <CardDescription className='text-sm'>
-          Catat layanan rutin dan pilih Kantong pembayaran. Transaksi bayar otomatis masuk kategori Langganan.
+          Catat layanan rutin dan pilih Kantong pembayaran. Notifikasi bisa diaktifkan terpisah, dan transaksi bayar otomatis masuk kategori Langganan.
         </CardDescription>
       </CardHeader>
       <CardBody>
