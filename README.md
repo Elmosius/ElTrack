@@ -13,7 +13,7 @@ Tujuan utama ElTrack adalah membuat pencatatan keuangan harian terasa lebih sede
 
 ## Release
 
-Version: **1.0.0-beta.13**
+Version: **1.0.0-beta.14**
 
 Status: **Beta**
 
@@ -26,7 +26,7 @@ Fokus versi sekarang:
 - Langganan untuk subscription dan tagihan rutin dengan reminder in-app dan Web Push
 - hotfix aktivasi Web Push agar tidak loading terus di production
 - dropdown Catatan Keuangan mobile yang aman untuk opsi panjang
-- chatbot AI dasar
+- chatbot AI dengan insight finansial read-only dan prompt keamanan yang lebih ketat
 
 ## Fitur
 
@@ -62,7 +62,7 @@ Fokus versi sekarang:
   - kategori
   - metode pembayaran
   - tipe transaksi
-- Chatbot AI dengan TanStack AI + Gemini
+- Chatbot AI dengan TanStack AI + Gemini untuk preview transaksi dan insight finansial read-only
 
 ## Tech Stack
 
