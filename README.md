@@ -13,7 +13,7 @@ Tujuan utama ElTrack adalah membuat pencatatan keuangan harian terasa lebih sede
 
 ## Release
 
-Version: **1.0.0-beta.12**
+Version: **1.0.0-beta.13**
 
 Status: **Beta**
 
@@ -24,6 +24,7 @@ Fokus versi sekarang:
 - dashboard home
 - Goals untuk target menabung dan investasi berbasis Kantong
 - Langganan untuk subscription dan tagihan rutin dengan reminder in-app dan Web Push
+- hotfix aktivasi Web Push agar tidak loading terus di production
 - dropdown Catatan Keuangan mobile yang aman untuk opsi panjang
 - chatbot AI dasar
 
