@@ -24,6 +24,9 @@ type SerializedBrowserSubscription = {
   };
 };
 
+const PUSH_SERVICE_WORKER_PATH = '/push-sw.js';
+const PUSH_SERVICE_WORKER_TIMEOUT_MS = 10_000;
+
 function isPushSupported() {
   return (
     typeof window !== 'undefined' &&
@@ -65,6 +68,96 @@ function urlBase64ToUint8Array(value: string) {
   }
 
   return outputArray;
+}
+
+function withTimeout<T>(promise: Promise<T>, message: string) {
+  let timeoutId: number | undefined;
+
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(message));
+    }, PUSH_SERVICE_WORKER_TIMEOUT_MS);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  });
+}
+
+function isPushServiceWorker(worker: ServiceWorker | null) {
+  if (!worker) {
+    return false;
+  }
+
+  return new URL(worker.scriptURL).pathname === PUSH_SERVICE_WORKER_PATH;
+}
+
+function isPushServiceWorkerRegistration(
+  registration: ServiceWorkerRegistration,
+) {
+  return [registration.active, registration.waiting, registration.installing].some(
+    isPushServiceWorker,
+  );
+}
+
+async function waitForRegistrationActivation(
+  registration: ServiceWorkerRegistration,
+) {
+  if (isPushServiceWorker(registration.active)) {
+    return registration;
+  }
+
+  const pendingWorker =
+    [registration.installing, registration.waiting].find(isPushServiceWorker) ??
+    registration.installing ??
+    registration.waiting;
+
+  if (!pendingWorker) {
+    return registration;
+  }
+
+  if (pendingWorker.state === 'activated') {
+    return registration;
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    pendingWorker.addEventListener('statechange', () => {
+      if (pendingWorker.state === 'activated') {
+        resolve();
+      }
+
+      if (pendingWorker.state === 'redundant') {
+        reject(new Error('Service worker notifikasi gagal aktif.'));
+      }
+    });
+  });
+
+  return registration;
+}
+
+async function getPushServiceWorkerRegistration() {
+  const registration = await withTimeout(
+    navigator.serviceWorker.getRegistrations().then(async (registrations) => {
+      const existingPushRegistration = registrations.find(
+        isPushServiceWorkerRegistration,
+      );
+
+      return (
+        existingPushRegistration ??
+        navigator.serviceWorker.register(PUSH_SERVICE_WORKER_PATH, {
+          scope: '/',
+        })
+      );
+    }),
+    'Service worker notifikasi belum siap. Coba refresh halaman lalu aktifkan lagi.',
+  );
+
+  return withTimeout(
+    waitForRegistrationActivation(registration),
+    'Service worker notifikasi belum aktif. Coba refresh halaman lalu aktifkan lagi.',
+  );
 }
 
 function getStatusCopy(status: LanggananPushStatus, activeSubscriptionCount: number) {
@@ -140,8 +233,14 @@ export function LanggananPushNotificationCard({
         return;
       }
 
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      let subscription: PushSubscription | null = null;
+
+      try {
+        const registration = await getPushServiceWorkerRegistration();
+        subscription = await registration.pushManager.getSubscription();
+      } catch (_error) {
+        subscription = null;
+      }
 
       if (cancelled) {
         return;
@@ -178,7 +277,7 @@ export function LanggananPushNotificationCard({
         return;
       }
 
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await getPushServiceWorkerRegistration();
       const existingSubscription = await registration.pushManager.getSubscription();
       const subscription =
         existingSubscription ??
@@ -236,7 +335,7 @@ export function LanggananPushNotificationCard({
 
     try {
       setIsSaving(true);
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await getPushServiceWorkerRegistration();
       const subscription = await registration.pushManager.getSubscription();
 
       await deleteLanggananPushSubscriptionByEndpoint({
