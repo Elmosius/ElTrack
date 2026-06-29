@@ -15,6 +15,9 @@ export type DashboardChartSeries =
   | ApexAxisChartSeries
   | ApexNonAxisChartSeries;
 
+const chartMutedColor = '#b8aa9a';
+const chartGridColor = 'rgba(184, 170, 154, 0.18)';
+
 const baseChartOptions: ApexOptions = {
   chart: {
     toolbar: {
@@ -32,7 +35,7 @@ const baseChartOptions: ApexOptions = {
     show: false,
   },
   grid: {
-    borderColor: 'rgba(148, 163, 184, 0.15)',
+    borderColor: chartGridColor,
     strokeDashArray: 4,
   },
   noData: {
@@ -40,7 +43,7 @@ const baseChartOptions: ApexOptions = {
     align: 'center',
     verticalAlign: 'middle',
     style: {
-      color: '#94a3b8',
+      color: chartMutedColor,
       fontSize: '12px',
     },
   },
@@ -64,7 +67,7 @@ export function createTrendChartOptions(labels: string[]): ApexOptions {
       },
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: chartMutedColor,
           fontSize: '11px',
         },
       },
@@ -73,7 +76,7 @@ export function createTrendChartOptions(labels: string[]): ApexOptions {
       labels: {
         formatter: (value) => formatCurrency(Number(value)).replace('Rp ', ''),
         style: {
-          colors: '#94a3b8',
+          colors: chartMutedColor,
           fontSize: '11px',
         },
       },
@@ -131,7 +134,7 @@ export function createPaymentBarChartOptions(labels: string[]): ApexOptions {
       },
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: chartMutedColor,
           fontSize: '11px',
         },
       },
@@ -140,7 +143,7 @@ export function createPaymentBarChartOptions(labels: string[]): ApexOptions {
       labels: {
         formatter: (value) => formatCurrency(Number(value)).replace('Rp ', ''),
         style: {
-          colors: '#94a3b8',
+          colors: chartMutedColor,
           fontSize: '11px',
         },
       },

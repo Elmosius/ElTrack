@@ -5,7 +5,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { getKantongToastError, parseMoneyInput } from './kantong-page.helpers';
 
-export function useKantongCreateForm() {
+export function useKantongCreateForm(onSuccess?: () => void) {
   const router = useRouter();
   const [nama, setNama] = useState('');
   const [bucket, setBucket] = useState<BalanceBucket>('non_cash');
@@ -43,6 +43,7 @@ export function useKantongCreateForm() {
       });
       resetForm();
       await router.invalidate();
+      onSuccess?.();
       toastManager.add({
         type: 'success',
         title: 'Kantong ditambahkan',
