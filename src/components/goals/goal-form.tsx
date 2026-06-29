@@ -6,6 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/selia/card';
+import {
+  DialogBody,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '#/components/selia/dialog';
 import { Input } from '#/components/selia/input';
 import { Textarea } from '#/components/selia/textarea';
 import {
@@ -29,6 +37,8 @@ type GoalFormProps = {
   mediaSuggestions: string[];
   initialGoal?: GoalViewItem;
   onCancel?: () => void;
+  onSuccess?: () => void;
+  variant?: 'card' | 'dialog';
 };
 
 export function GoalForm({
@@ -36,10 +46,14 @@ export function GoalForm({
   mediaSuggestions,
   initialGoal,
   onCancel,
+  onSuccess,
+  variant = 'card',
 }: GoalFormProps) {
   const router = useRouter();
   const mediaListId = useId();
+  const formId = useId();
   const isEditing = Boolean(initialGoal);
+  const isDialog = variant === 'dialog';
   const [nama, setNama] = useState(initialGoal?.nama ?? '');
   const [media, setMedia] = useState(initialGoal?.media ?? 'Reksadana');
   const [kantong, setKantong] = useState(
@@ -137,6 +151,7 @@ export function GoalForm({
       }
 
       resetForm();
+      onSuccess?.();
     } catch (error) {
       toastManager.add({
         type: 'error',
@@ -151,129 +166,177 @@ export function GoalForm({
     }
   };
 
+  const form = (
+    <form
+      id={formId}
+      className='grid gap-3 md:gap-4 xl:grid-cols-12'
+      onSubmit={handleSubmit}
+    >
+      <label className='space-y-2 xl:col-span-3'>
+        <span className='text-sm font-medium'>Nama Goal</span>
+        <Input
+          className='text-sm'
+          placeholder='Dana investasi'
+          value={nama}
+          onChange={(event) => setNama(event.target.value)}
+        />
+      </label>
+
+      <label className='space-y-2 xl:col-span-2'>
+        <span className='text-sm font-medium'>Media</span>
+        <Input
+          className='text-sm'
+          list={mediaListId}
+          placeholder='Reksadana'
+          value={media}
+          onChange={(event) => setMedia(event.target.value)}
+        />
+        <datalist id={mediaListId}>
+          {normalizedMediaSuggestions.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+      </label>
+
+      <label className='space-y-2 xl:col-span-2'>
+        <span className='text-sm font-medium'>Kantong</span>
+        <select
+          className='h-10 w-full rounded-md border border-secondary-border bg-background px-3 text-sm outline-none focus:border-primary'
+          value={kantong}
+          onChange={(event) => setKantong(event.target.value)}
+        >
+          {kantongs.map((item) => (
+            <option key={item._id} value={item._id}>
+              {item.nama}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className='space-y-2 xl:col-span-2'>
+        <span className='text-sm font-medium'>Target</span>
+        <Input
+          className='text-sm'
+          inputMode='numeric'
+          placeholder='Rp 0'
+          value={formatGoalMoneyInput(targetAmount)}
+          onChange={(event) => setTargetAmount(event.target.value)}
+        />
+      </label>
+
+      <label className='space-y-2 xl:col-span-3'>
+        <span className='text-sm font-medium'>Deadline</span>
+        <Input
+          className='text-sm'
+          type='date'
+          value={deadline}
+          onChange={(event) => setDeadline(event.target.value)}
+        />
+      </label>
+
+      <label className='space-y-2 xl:col-span-3'>
+        <span className='text-sm font-medium'>Setoran rutin</span>
+        <Input
+          className='text-sm'
+          inputMode='numeric'
+          placeholder='Opsional'
+          value={formatGoalMoneyInput(monthlyContributionTarget)}
+          onChange={(event) =>
+            setMonthlyContributionTarget(event.target.value)
+          }
+        />
+      </label>
+
+      <label className='space-y-2 xl:col-span-9'>
+        <span className='text-sm font-medium'>Catatan</span>
+        <Textarea
+          className='min-h-9 text-sm md:min-h-10'
+          placeholder='Opsional'
+          value={catatan}
+          onChange={(event) => setCatatan(event.target.value)}
+        />
+      </label>
+
+      {!isDialog && (
+        <div className='flex items-end gap-2 pt-1 xl:col-span-12'>
+          {initialGoal && (
+            <Button
+              type='button'
+              variant='outline'
+              className='w-full text-sm'
+              onClick={onCancel}
+            >
+              <X className='size-4' />
+              Batal
+            </Button>
+          )}
+          <Button
+            type='submit'
+            disabled={isSaving || kantongs.length === 0}
+            progress={isSaving}
+            className='w-full text-sm ring-0'
+          >
+            {initialGoal ? (
+              <Check className='size-4' />
+            ) : (
+              <Plus className='size-4' />
+            )}
+            {initialGoal ? 'Simpan' : 'Tambah'}
+          </Button>
+        </div>
+      )}
+    </form>
+  );
+
+  const title = isEditing ? 'Edit Goal' : 'Tambah Goal';
+  const description =
+    'Hubungkan target ke Kantong supaya progress terbaca otomatis dari saldo Kantong.';
+
+  if (isDialog) {
+    return (
+      <>
+        <DialogHeader className='px-4 pt-4 md:px-6 md:pt-4.5'>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <DialogBody className='max-h-[calc(100dvh-10rem)] overflow-y-auto px-4 py-4 md:px-6 md:py-4.5'>
+          <DialogDescription className='text-sm'>
+            {description}
+          </DialogDescription>
+          {form}
+        </DialogBody>
+        <DialogFooter className='sticky bottom-0 flex-col-reverse items-stretch gap-2 px-4 py-3 md:flex-row md:items-center md:px-6 md:py-3.5'>
+          <DialogClose className='text-sm' disabled={isSaving}>
+            Batal
+          </DialogClose>
+          <Button
+            type='submit'
+            form={formId}
+            disabled={isSaving || kantongs.length === 0}
+            progress={isSaving}
+            className='w-full text-sm ring-0 md:w-auto'
+          >
+            {initialGoal ? (
+              <Check className='size-4' />
+            ) : (
+              <Plus className='size-4' />
+            )}
+            {initialGoal ? 'Simpan' : 'Tambah'}
+          </Button>
+        </DialogFooter>
+      </>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{isEditing ? 'Edit Goal' : 'Tambah Goal'}</CardTitle>
+        <CardTitle>{title}</CardTitle>
         <CardDescription className='text-sm'>
-          Hubungkan target ke Kantong supaya progress terbaca otomatis dari
-          saldo Kantong.
+          {description}
         </CardDescription>
       </CardHeader>
       <CardBody>
-        <form className='grid gap-4 xl:grid-cols-12' onSubmit={handleSubmit}>
-          <label className='space-y-2 xl:col-span-3'>
-            <span className='text-sm font-medium'>Nama Goal</span>
-            <Input
-              className='text-sm'
-              placeholder='Dana investasi'
-              value={nama}
-              onChange={(event) => setNama(event.target.value)}
-            />
-          </label>
-
-          <label className='space-y-2 xl:col-span-2'>
-            <span className='text-sm font-medium'>Media</span>
-            <Input
-              className='text-sm'
-              list={mediaListId}
-              placeholder='Reksadana'
-              value={media}
-              onChange={(event) => setMedia(event.target.value)}
-            />
-            <datalist id={mediaListId}>
-              {normalizedMediaSuggestions.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
-          </label>
-
-          <label className='space-y-2 xl:col-span-2'>
-            <span className='text-sm font-medium'>Kantong</span>
-            <select
-              className='h-10 w-full rounded-md border border-secondary-border bg-background px-3 text-sm outline-none focus:border-primary'
-              value={kantong}
-              onChange={(event) => setKantong(event.target.value)}
-            >
-              {kantongs.map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.nama}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className='space-y-2 xl:col-span-2'>
-            <span className='text-sm font-medium'>Target</span>
-            <Input
-              className='text-sm'
-              inputMode='numeric'
-              placeholder='Rp 0'
-              value={formatGoalMoneyInput(targetAmount)}
-              onChange={(event) => setTargetAmount(event.target.value)}
-            />
-          </label>
-
-          <label className='space-y-2 xl:col-span-3'>
-            <span className='text-sm font-medium'>Deadline</span>
-            <Input
-              className='text-sm'
-              type='date'
-              value={deadline}
-              onChange={(event) => setDeadline(event.target.value)}
-            />
-          </label>
-
-          <label className='space-y-2 xl:col-span-3'>
-            <span className='text-sm font-medium'>Setoran rutin</span>
-            <Input
-              className='text-sm'
-              inputMode='numeric'
-              placeholder='Opsional'
-              value={formatGoalMoneyInput(monthlyContributionTarget)}
-              onChange={(event) =>
-                setMonthlyContributionTarget(event.target.value)
-              }
-            />
-          </label>
-
-          <label className='space-y-2 xl:col-span-9'>
-            <span className='text-sm font-medium'>Catatan</span>
-            <Textarea
-              className='min-h-10 text-sm'
-              placeholder='Opsional'
-              value={catatan}
-              onChange={(event) => setCatatan(event.target.value)}
-            />
-          </label>
-
-          <div className='flex items-end gap-2 xl:col-span-12'>
-            {initialGoal && (
-              <Button
-                type='button'
-                variant='outline'
-                className='w-full text-sm'
-                onClick={onCancel}
-              >
-                <X className='size-4' />
-                Batal
-              </Button>
-            )}
-            <Button
-              type='submit'
-              disabled={isSaving || kantongs.length === 0}
-              progress={isSaving}
-              className='w-full text-sm ring-0'
-            >
-              {initialGoal ? (
-                <Check className='size-4' />
-              ) : (
-                <Plus className='size-4' />
-              )}
-              {initialGoal ? 'Simpan' : 'Tambah'}
-            </Button>
-          </div>
-        </form>
+        {form}
       </CardBody>
     </Card>
   );

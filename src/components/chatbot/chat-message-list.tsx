@@ -65,7 +65,7 @@ export function ChatMessageList({
   return (
     <div
       ref={scrollContainerRef}
-      className='w-full max-h-72 overflow-y-auto px-4 py-3 space-y-3'
+      className='w-full max-h-[calc(100dvh-20rem)] min-h-0 overflow-y-auto px-4 py-3 space-y-3 md:max-h-72'
     >
       {visibleMessages.map((message) => (
         <ChatMessageBubble key={message.id} message={message} />

@@ -18,7 +18,7 @@ function RouteComponent() {
   return (
     <>
       <Card className='ring-0 text-center shadow-none bg-background'>
-        <CardHeader className='border-none justify-center flex flex-col items-center '>
+        <CardHeader className='border-none justify-center flex flex-col items-center'>
           <CardTitle className='font-semibold text-3xl tracking-wide py-1'>Welcome to ElTrack</CardTitle>
           <CardDescription className='text-sm lg:text-base md:w-2/3'>Please login to your account to continue using ElTrack and manage your financial records effectively.</CardDescription>
         </CardHeader>

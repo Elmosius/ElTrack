@@ -2,6 +2,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupActio
 import { AppLogo } from '#/components/shared/app-logo';
 import { MENU_SIDEBAR } from '#/const/sidebar';
 import { authClient } from '#/lib/auth/client';
+import { cn } from '#/lib/utils';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { LogOut, PlusIcon } from 'lucide-react';
 
@@ -28,7 +29,15 @@ export default function AppSidebar({
   };
 
   return (
-    <Sidebar className={`overflow-hidden border-r border-b border-gray-200 rounded-lg py-4 z-10 transition-[width,opacity] duration-300 ease-out ${isSidebarOpen ? 'w-50 opacity-100 lg:w-70' : 'w-0 opacity-0'}`} size={'loose'}>
+    <Sidebar
+      className={cn(
+        'fixed inset-y-0 left-0 z-40 max-w-[calc(100vw-3rem)] overflow-hidden border-r border-b border-gray-200 bg-background py-4 shadow-2xl transition-[transform,width,opacity] duration-300 ease-out lg:static lg:z-10 lg:rounded-lg lg:shadow-none',
+        isSidebarOpen
+          ? 'pointer-events-auto w-68 translate-x-0 opacity-100 lg:w-70'
+          : 'pointer-events-none w-68 -translate-x-full opacity-0 lg:w-0 lg:translate-x-0',
+      )}
+      size={'loose'}
+    >
       <SidebarHeader className='mx-2'>
         <h1 className='flex items-center gap-2 text-base tracking-tight'>
           <AppLogo className='size-5 text-primary' />

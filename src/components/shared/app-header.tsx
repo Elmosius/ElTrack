@@ -13,17 +13,17 @@ export default function AppHeader({ toggleSidebar }: AppHeaderProps) {
 
   return (
     <header className='w-full'>
-      <nav className='w-full flex items-center justify-between'>
-        <div className='flex gap-4 items-center'>
-          <Button variant={'plain'} size={'sm-icon'} className={'lg:hidden flex'} onClick={toggleSidebar}>
+      <nav className='flex w-full min-w-0 items-center justify-between gap-3'>
+        <div className='flex min-w-0 items-center gap-2 md:gap-4'>
+          <Button variant={'plain'} size={'sm-icon'} className={'flex shrink-0 lg:hidden'} onClick={toggleSidebar}>
             <SidebarOpen className='size-4 text-muted' />
           </Button>
 
-          <span className='text-base'>Hello {user?.name || 'User'}!</span>
+          <span className='truncate text-sm md:text-base'>Hello {user?.name || 'User'}!</span>
         </div>
         <Menu>
           <MenuTrigger>
-            <Avatar size={'sm'} className={'font-normal text-sm  text-white cursor-pointer bg-primary/80 hover:bg-primary'}>
+            <Avatar size={'sm'} className={'shrink-0 font-normal text-sm text-white cursor-pointer bg-primary/80 hover:bg-primary'}>
               {user?.image ? <AvatarImage src={user?.image} alt={user.name} /> : <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>}
             </Avatar>
           </MenuTrigger>

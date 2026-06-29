@@ -36,7 +36,7 @@ const summaryItems = [
 
 export function GoalSummaryCards({ summary }: GoalSummaryCardsProps) {
   return (
-    <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+    <div className='grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4'>
       {summaryItems.map((item) => {
         const Icon = item.icon;
         const value = summary[item.key];
@@ -47,15 +47,15 @@ export function GoalSummaryCards({ summary }: GoalSummaryCardsProps) {
 
         return (
           <Card key={item.key} className='overflow-hidden'>
-            <CardBody className='flex items-start justify-between gap-4 p-5'>
-              <div className='min-w-0 space-y-2'>
-                <p className='text-sm text-muted'>{item.label}</p>
-                <p className='truncate text-base font-semibold tracking-tight'>
+            <CardBody className='flex items-start justify-between gap-2.5 p-3.5 md:gap-4 md:p-5'>
+              <div className='min-w-0 space-y-1.5 md:space-y-2'>
+                <p className='text-xs text-muted md:text-sm'>{item.label}</p>
+                <p className='truncate text-sm font-semibold tracking-tight md:text-base'>
                   {displayValue}
                 </p>
               </div>
-              <div className={`rounded-xl bg-accent p-2.5 ${item.tone}`}>
-                <Icon className='size-4.5' />
+              <div className={`shrink-0 rounded-lg bg-accent p-2 md:rounded-xl md:p-2.5 ${item.tone}`}>
+                <Icon className='size-4 md:size-4.5' />
               </div>
             </CardBody>
           </Card>

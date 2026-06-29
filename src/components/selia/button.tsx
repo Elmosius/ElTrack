@@ -21,7 +21,7 @@ export const buttonVariants = cva(
       variant: {
         primary: [
           'bg-primary text-primary-foreground',
-          'ring ring-primary-border',
+          'ring',
           'inset-shadow-2xs inset-shadow-white/15 shadow',
           'after:rounded outline-primary',
         ],

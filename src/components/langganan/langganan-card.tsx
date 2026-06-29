@@ -134,7 +134,7 @@ export function LanggananCard({ item, onEdit }: LanggananCardProps) {
   return (
     <>
       <Card className={item.reminderStatus === 'overdue' ? 'border-danger/40' : undefined}>
-        <CardBody className='space-y-5 p-5'>
+        <CardBody className='space-y-4 p-4 md:space-y-5 md:p-5'>
           <div className='flex items-start justify-between gap-4'>
             <div className='min-w-0 space-y-2'>
               <div className='flex flex-wrap items-center gap-2'>
@@ -182,7 +182,7 @@ export function LanggananCard({ item, onEdit }: LanggananCardProps) {
             </div>
           </div>
 
-          <div className='grid gap-3 rounded-lg bg-accent/45 p-4 text-sm md:grid-cols-3'>
+          <div className='grid gap-3 rounded-lg bg-accent/45 p-3.5 text-sm md:grid-cols-3 md:p-4'>
             <div className='space-y-1'>
               <p className='text-xs text-muted'>Nominal</p>
               <p className='font-semibold'>{formatLanggananCurrency(item.nominal)}</p>

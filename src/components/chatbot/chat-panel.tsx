@@ -15,8 +15,9 @@ export function ChatPanel({ isOpen }: ChatPanelProps) {
     <PopoverPopup
       side='top'
       align='end'
-      sideOffset={14}
-      className='w-[min(92vw,23rem)] p-0 gap-0 overflow-hidden rounded-xl'
+      sideOffset={12}
+      collisionPadding={12}
+      className='max-h-[calc(100dvh-6rem)] w-[calc(100vw-1.5rem)] p-0 gap-0 overflow-hidden rounded-xl md:w-[min(92vw,23rem)]'
     >
       <ChatPanelHeader header={sections.header} />
 
