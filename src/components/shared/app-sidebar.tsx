@@ -31,7 +31,7 @@ export default function AppSidebar({
   return (
     <Sidebar
       className={cn(
-        'fixed inset-y-0 left-0 z-40 max-w-[calc(100vw-3rem)] overflow-hidden border-r border-b border-gray-200 bg-background py-4 shadow-2xl transition-[transform,width,opacity] duration-300 ease-out lg:static lg:z-10 lg:rounded-lg lg:shadow-none',
+        'fixed inset-y-0 left-0 z-40 max-w-[calc(100vw-3rem)] overflow-hidden border-r border-b border-border bg-background py-4 shadow-2xl transition-[transform,width,opacity] duration-300 ease-out lg:static lg:z-10 lg:rounded-lg lg:shadow-none',
         isSidebarOpen
           ? 'pointer-events-auto w-68 translate-x-0 opacity-100 lg:w-70'
           : 'pointer-events-none w-68 -translate-x-full opacity-0 lg:w-0 lg:translate-x-0',

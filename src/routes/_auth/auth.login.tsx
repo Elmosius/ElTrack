@@ -23,7 +23,7 @@ function RouteComponent() {
           <CardDescription className='text-sm lg:text-base max-w-sm'>Please login to your account to continue using ElTrack and manage your financial records effectively.</CardDescription>
         </CardHeader>
         <CardBody className='mt-6 p-0!'>
-          <Button variant={'outline'} className={'text-sm lg:text-base bg-white'} onClick={handleGoogleLogin}>
+          <Button variant={'outline'} className={'text-sm lg:text-base'} onClick={handleGoogleLogin}>
             <img src='/web_neutral_rd_na.svg' alt='Google Logo' className='size-8' />
             Continue with Google
           </Button>

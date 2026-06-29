@@ -13,6 +13,7 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppLanggananRouteImport } from './routes/_app/langganan'
 import { Route as AppKantongRouteImport } from './routes/_app/kantong'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
@@ -38,6 +39,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppLanggananRoute = AppLanggananRouteImport.update({
   id: '/langganan',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/goals': typeof AppGoalsRoute
   '/kantong': typeof AppKantongRoute
   '/langganan': typeof AppLanggananRoute
+  '/profile': typeof AppProfileRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/goals': typeof AppGoalsRoute
   '/kantong': typeof AppKantongRoute
   '/langganan': typeof AppLanggananRoute
+  '/profile': typeof AppProfileRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/login': typeof AuthAuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_app/goals': typeof AppGoalsRoute
   '/_app/kantong': typeof AppKantongRoute
   '/_app/langganan': typeof AppLanggananRoute
+  '/_app/profile': typeof AppProfileRoute
   '/api/chat': typeof ApiChatRoute
   '/_app/': typeof AppIndexRoute
   '/_auth/auth/login': typeof AuthAuthLoginRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/kantong'
     | '/langganan'
+    | '/profile'
     | '/api/chat'
     | '/auth/login'
     | '/api/auth/$'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/kantong'
     | '/langganan'
+    | '/profile'
     | '/api/chat'
     | '/auth/login'
     | '/api/auth/$'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/_app/goals'
     | '/_app/kantong'
     | '/_app/langganan'
+    | '/_app/profile'
     | '/api/chat'
     | '/_app/'
     | '/_auth/auth/login'
@@ -187,6 +199,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/langganan': {
       id: '/_app/langganan'
@@ -245,6 +264,7 @@ interface AppRouteRouteChildren {
   AppGoalsRoute: typeof AppGoalsRoute
   AppKantongRoute: typeof AppKantongRoute
   AppLanggananRoute: typeof AppLanggananRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -253,6 +273,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGoalsRoute: AppGoalsRoute,
   AppKantongRoute: AppKantongRoute,
   AppLanggananRoute: AppLanggananRoute,
+  AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

@@ -66,7 +66,7 @@ export function KantongTransferDialog({ items }: KantongTransferDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={<Button variant="outline" className="w-full sm:w-auto text-sm bg-white" />}>
+      <DialogTrigger render={<Button variant="outline" className="w-full sm:w-auto text-sm" />}>
         <ArrowRightLeft className="size-3.5" />
         Transfer Antar Kantong
       </DialogTrigger>
